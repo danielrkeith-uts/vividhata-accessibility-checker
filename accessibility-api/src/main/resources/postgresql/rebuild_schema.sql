@@ -1,0 +1,8 @@
+DROP SCHEMA IF EXISTS ac CASCADE;
+
+CREATE SCHEMA ac;
+
+CREATE TABLE ac.account (
+    username VARCHAR(100),
+    password VARCHAR
+)

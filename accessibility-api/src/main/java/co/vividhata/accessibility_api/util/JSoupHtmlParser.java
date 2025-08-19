@@ -1,4 +1,4 @@
-package co.vividhata.accessibility_api.services;
+package co.vividhata.accessibility_api.util;
 
 import org.jsoup.helper.W3CDom;
 import org.jsoup.parser.HtmlTreeBuilder;
@@ -6,7 +6,7 @@ import org.jsoup.parser.Parser;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JSoupHtmlParseService implements IHtmlParseService {
+public class JSoupHtmlParser implements IHtmlParser {
 
     Parser jsoupParser = new Parser(new HtmlTreeBuilder());
     W3CDom w3CDom = new W3CDom();
