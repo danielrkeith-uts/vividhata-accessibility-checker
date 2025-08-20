@@ -2,7 +2,7 @@
 
 Accessibility Checker for Vividhata, developed in 41113 Software Development Studio
 
-## Setup local postgres database
+## Setup local PostgreSQL database
 Make sure you have postgres installed and can access the `psql` command-line tool.
 
 To log in with the admin user: `psql -U <username>`  
@@ -11,7 +11,9 @@ To log in with the admin user: `psql -U <username>`
 1. Run `CREATE USER ac_admin_local WITH PASSWORD 'fywkAm-vivhu4-nijgeq';`
 2. Run `CREATE DATABASE accessibility_checker_local OWNER ac_admin_local;`
 
-Now run the backend API, and use Postman (or some other tool) to `Post` to the endpoint `http://localhost:8000/api/admin/db/rebuild-schema`
+Now run the backend API, and use Postman (or some other tool) to rebuild the schema using the API:
+1. Create a `POST` request to `http://localhost:8000/api/admin/db/rebuild-schema`
+2. Include a header with key `ADMIN-AUTHENTICATION` and value `nahsyw-heqsi1-jucTof`
 
 ## Running project locally
 The project will only work as intended when both the frontend and backend are running simultaneously
