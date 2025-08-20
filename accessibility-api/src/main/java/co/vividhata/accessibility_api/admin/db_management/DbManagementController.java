@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// TODO - Secure controller with admin header in request
 @RestController
 @RequestMapping("/api/admin/db")
 public class DbManagementController {
