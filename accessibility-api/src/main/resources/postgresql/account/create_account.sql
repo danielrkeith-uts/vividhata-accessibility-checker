@@ -1,1 +1,0 @@
-INSERT INTO account(username, password, first_name, last_name)
