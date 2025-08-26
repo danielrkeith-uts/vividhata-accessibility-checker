@@ -1,5 +1,6 @@
 package co.vividhata.accessibility_api.account;
 
+import co.vividhata.accessibility_api.model.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -16,7 +17,7 @@ public class PostgreSqlAccountRepository implements IAccountRepository {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public int createAccount(String username, String password, String firstName, String lastName) {
+    public int create(String username, String password, String firstName, String lastName) {
         String sql = "INSERT INTO ac.account(username, password, first_name, last_name) VALUES (?, ?, ?, ?) RETURNING id";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -32,6 +33,21 @@ public class PostgreSqlAccountRepository implements IAccountRepository {
 
         Number id = keyHolder.getKey();
         return id == null ? -1 : (int) id;
+    }
+
+    @Override
+    public Account get(String username, String password) {
+        String sql = "SELECT * FROM ac.account WHERE username = ? AND password = ?";
+
+        return jdbcTemplate.query(sql, Account::fromResultSet, username, password);
+    }
+
+    @Override
+    public boolean delete(int id) {
+        String sql = "DELETE FROM ac.account WHERE id = ?";
+
+        int rowsAffected = jdbcTemplate.update(sql, id);
+        return rowsAffected == 1;
     }
 
 }
