@@ -31,10 +31,7 @@ public class PostgreSqlAccountRepository implements IAccountRepository {
         }, keyHolder);
 
         Number id = keyHolder.getKey();
-        if (id == null) {
-            return -1;
-        }
-        return (int) id;
+        return id == null ? -1 : (int) id;
     }
 
 }
