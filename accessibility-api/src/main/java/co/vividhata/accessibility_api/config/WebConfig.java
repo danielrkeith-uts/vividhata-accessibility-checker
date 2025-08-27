@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${admin.password}")
+    @Value("${AC_ADMIN_AUTH}")
     private String adminPassword;
 
     @Override
