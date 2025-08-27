@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.Map;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -13,7 +15,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleCreateAccountException(CreateAccountException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ex.getMessage());
+                .body(Map.of(
+                        "error", ex.getClass().getSimpleName(),
+                        "message", ex.getMessage()
+                ));
     }
 
 }

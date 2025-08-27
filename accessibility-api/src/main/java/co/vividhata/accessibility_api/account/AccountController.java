@@ -2,7 +2,6 @@ package co.vividhata.accessibility_api.account;
 
 import co.vividhata.accessibility_api.account.dto.LoginRequest;
 import co.vividhata.accessibility_api.account.dto.CreateAccountRequest;
-import co.vividhata.accessibility_api.account.exceptions.CreateAccountException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
