@@ -4,13 +4,13 @@ Accessibility Checker for Vividhata, developed in 41113 Software Development Stu
 
 
 ## Setup environment variables
-Environment variables can be set in multiple ways; pick one of the below.
-
 These environment variables must be set to a password of your choice:
 - AC_DB_PASSWORD
 - AC_ADMIN_PASSWORD
 
 **Write these passwords down somewhere**
+
+Environment variables can be set in multiple ways; pick one of the below.
 
 
 ### Set environment variables on device
