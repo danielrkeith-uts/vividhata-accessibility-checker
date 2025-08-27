@@ -5,11 +5,11 @@ import co.vividhata.accessibility_api.account.dto.CreateAccountRequest;
 import co.vividhata.accessibility_api.account.exceptions.CreateAccountException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,9 +28,9 @@ public class AccountController {
     private IAccountService accountService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createAccount(@RequestBody CreateAccountRequest createAccountRequest) throws CreateAccountException {
+    public ResponseEntity<?> createAccount(@RequestBody CreateAccountRequest createAccountRequest) {
         accountService.createAccount(createAccountRequest.username(), createAccountRequest.password(), createAccountRequest.firstName(), createAccountRequest.lastName());
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok("Account created");
     }
 
     @PostMapping("/login")
@@ -57,13 +57,7 @@ public class AccountController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(Map.of(
                 "username", userDetails.getUsername(),
                 "roles", userDetails.getAuthorities()

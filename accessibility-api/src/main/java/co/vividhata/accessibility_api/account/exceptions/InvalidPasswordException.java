@@ -1,7 +1,9 @@
 package co.vividhata.accessibility_api.account.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+public class InvalidPasswordException extends CreateAccountException {
 
-@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="Invalid password")
-public class InvalidPasswordException extends CreateAccountException { }
+    public InvalidPasswordException() {
+        super("Invalid password");
+    }
+
+}
