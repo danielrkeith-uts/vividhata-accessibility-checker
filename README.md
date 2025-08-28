@@ -34,7 +34,7 @@ To log in with the admin user: `psql -U <username>`
 2. Run `CREATE DATABASE accessibility_checker_local OWNER ac_admin_local;`
 
 Now run the backend API, and use Postman (or some other tool) to rebuild the schema using the API:
-1. Create a `POST` request to `http://localhost:8000/api/account/login`
+1. Create a `POST` request to `http://localhost:8080/api/account/login`
    * Include this body:
    ```
     {
@@ -43,7 +43,7 @@ Now run the backend API, and use Postman (or some other tool) to rebuild the sch
     }
    ```
    * Replace `<AC_ADMIN_PASSWORD>` with the corresponding environment variable
-2. Create a `POST` request to `http://localhost:8000/api/admin/db/rebuild-schema`
+2. Create a `POST` request to `http://localhost:8080/api/admin/db/rebuild-schema`
 
 
 ## Running project locally
@@ -57,7 +57,7 @@ The project will only work as intended when both the frontend and backend are ru
 
 Alternatively, an IntelliJ run configuration could be used
 
-This will run the backend on port 8000
+This will run the backend on port 8080
 
 
 ### Frontend
