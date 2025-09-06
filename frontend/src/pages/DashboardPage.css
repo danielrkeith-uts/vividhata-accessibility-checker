@@ -1,14 +1,16 @@
 .dashboard-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: #ede5d9
 }
-
+/* #9C8B80 */
 .dashboard-header {
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
+  background: #4A5568;
+  border-bottom: 1px solid #4A5568;
   padding: 20px 0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(10px);
+  z-index: 99999999;
+  position: relative; 
 }
 
 .dashboard-overview-row {
@@ -69,7 +71,7 @@
 .dashboard-title {
   font-size: 30px;
   font-weight: 700;
-  color: #111827;
+  color: white;
   margin: 0;
 }
 
@@ -92,18 +94,6 @@
   background-color: #f3f4f6;
 }
 
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 14px;
-}
 
 .user-details {
   display: flex;
@@ -175,4 +165,38 @@
     text-align: center;
     gap: 8px;
   }
+}
+.dashboard-breakdown-tasks-row {
+  display: flex;
+  gap: 24px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+
+/* This holds both the table and the export button in a row */
+.breakdown-and-export {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex: 1;
+  gap: 16px;
+}
+
+/* Make the table take up most of the space */
+.breakdown-and-export > .breakdown-section,
+.breakdown-and-export > .dashboard-export-button-inline {
+  flex: 1;
+}
+
+.dashboard-export-button-inline {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-top: 12px;
+}
+
+/* Optional: keep the tasks section a reasonable width */
+.tasks-section {
+  flex: 1;
+  min-width: 300px;
 }
