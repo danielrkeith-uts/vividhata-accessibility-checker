@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './BreakdownTable.css';
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 
 interface Requirement {
   id: string;
   description: string;
   category: string;
   status: 'Compliant' | 'At Risk' | 'Noncompliant';
-  severity: number;
+  severity: number; 
 }
 
 interface BreakdownTableProps {
@@ -14,6 +15,10 @@ interface BreakdownTableProps {
 }
 
 export const BreakdownTable: React.FC<BreakdownTableProps> = ({ requirements }) => {
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedSeverity, setSelectedSeverity] = useState('All');
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Compliant':
@@ -28,45 +33,77 @@ export const BreakdownTable: React.FC<BreakdownTableProps> = ({ requirements }) 
   };
 
   const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Compliant':
-        return '●';
-      case 'At Risk':
-        return '●';
-      case 'Noncompliant':
-        return '●';
-      default:
-        return '○';
-    }
+    return '●'; 
   };
+
+  const getSeverityLabel = (severity: number) => {
+    if (severity >= 70) return 'High';
+    if (severity >= 40) return 'Medium';
+    return 'Low';
+  };
+
+  const filteredRequirements = requirements.filter(req => {
+    const categoryMatch = selectedCategory === 'All' || req.category === selectedCategory;
+    const statusMatch = selectedStatus === 'All' || req.status === selectedStatus;
+    const severityLabel = getSeverityLabel(req.severity);
+    const severityMatch = selectedSeverity === 'All' || severityLabel === selectedSeverity;
+    return categoryMatch && statusMatch && severityMatch;
+  });
+
+  const categories = ['Perceivable', 'Operable', 'Understandable', 'Robust'];
 
   return (
     <div className="breakdown-table">
       <div className="table-header">
         <h3>Breakdown</h3>
         <div className="table-filters">
-          <select className="table-filter">
-            <option>Category</option>
-            <option>Perceivable</option>
-            <option>Operable</option>
-            <option>Understandable</option>
-            <option>Robust</option>
-          </select>
-          <select className="table-filter">
-            <option>Status</option>
-            <option>Compliant</option>
-            <option>At Risk</option>
-            <option>Non Compliant</option>
-          </select>
-          <select className="table-filter">
-            <option>Severity</option>
-            <option>High</option>
-            <option>Medium</option>
-            <option>Low</option>
-          </select>
+          {/* Category Filter */}
+          <FormControl variant="outlined" size="small" sx={{ minWidth: 140, marginRight: 1 }} className="custom-filter">
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              label="Category"
+            >
+              <MenuItem value="All">All</MenuItem>
+              {categories.map(cat => (
+                <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Status Filter */}
+          <FormControl variant="outlined" size="small" sx={{ minWidth: 140, marginRight: 1 }} className="custom-filter">
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              label="Status"
+            >
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="Compliant">Compliant</MenuItem>
+              <MenuItem value="At Risk">At Risk</MenuItem>
+              <MenuItem value="Noncompliant">Noncompliant</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Severity Filter */}
+          <FormControl variant="outlined" size="small" sx={{ minWidth: 140 }} className="custom-filter">
+            <InputLabel>Severity</InputLabel>
+            <Select
+              value={selectedSeverity}
+              onChange={(e) => setSelectedSeverity(e.target.value)}
+              label="Severity"
+            >
+              <MenuItem value="All">All</MenuItem>
+              <MenuItem value="High">High</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="Low">Low</MenuItem>
+            </Select>
+          </FormControl>
         </div>
       </div>
-      
+
       <div className="table-container">
         <table className="breakdown-table-content">
           <thead>
@@ -78,18 +115,14 @@ export const BreakdownTable: React.FC<BreakdownTableProps> = ({ requirements }) 
             </tr>
           </thead>
           <tbody>
-            {requirements.map((requirement) => (
+            {filteredRequirements.map((requirement) => (
               <tr key={requirement.id}>
-                <td className="requirement-description">
-                  {requirement.description}
-                </td>
-                <td className="requirement-category">
-                  {requirement.category}
-                </td>
+                <td className="requirement-description">{requirement.description}</td>
+                <td className="requirement-category">{requirement.category}</td>
                 <td className="requirement-status">
-                  <span 
+                  <span
                     className="status-indicator"
-                    style={{ color: getStatusColor(requirement.status) }}
+                    style={{ color: getStatusColor(requirement.status), marginRight: '6px' }}
                   >
                     {getStatusIcon(requirement.status)}
                   </span>
@@ -97,11 +130,11 @@ export const BreakdownTable: React.FC<BreakdownTableProps> = ({ requirements }) 
                 </td>
                 <td className="requirement-severity">
                   <div className="severity-bar">
-                    <div 
+                    <div
                       className="severity-fill"
-                      style={{ 
+                      style={{
                         width: `${requirement.severity}%`,
-                        backgroundColor: getStatusColor(requirement.status)
+                        backgroundColor: getStatusColor(requirement.status),
                       }}
                     ></div>
                   </div>
@@ -109,6 +142,13 @@ export const BreakdownTable: React.FC<BreakdownTableProps> = ({ requirements }) 
                 </td>
               </tr>
             ))}
+            {filteredRequirements.length === 0 && (
+              <tr>
+                <td colSpan={4} style={{ textAlign: 'center', padding: '1rem' }}>
+                  No requirements match the selected filters.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

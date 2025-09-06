@@ -14,6 +14,13 @@ export const gaugeData = {
     nonCompliantCount: 35
   };
 
+ export const categoryData = {
+    Perceivable: { score: 85, totalRequirements: 40, compliantCount: 30, atRiskCount: 5, nonCompliantCount: 5 },
+    Operable: { score: 70, totalRequirements: 35, compliantCount: 20, atRiskCount: 10, nonCompliantCount: 5 },
+    Understandable: { score: 75, totalRequirements: 38, compliantCount: 25, atRiskCount: 8, nonCompliantCount: 5 },
+    Robust: { score: 90, totalRequirements: 30, compliantCount: 28, atRiskCount: 1, nonCompliantCount: 1 },
+  };
+
  export const requirementsData = [
     {
       id: '1',

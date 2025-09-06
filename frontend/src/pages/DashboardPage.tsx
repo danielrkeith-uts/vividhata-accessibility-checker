@@ -6,7 +6,7 @@ import { GaugeChart } from '../components/dashboard/GaugeChart';
 import { BreakdownTable } from '../components/dashboard/BreakdownTable';
 import { TaskList } from '../components/dashboard/TaskList';
 import { PriorityChart } from '../components/dashboard/PriorityChart';
-import { overviewData, gaugeData, requirementsData, tasksData, priorityData } from './DashData';
+import { overviewData, gaugeData, requirementsData, tasksData, priorityData, categoryData } from './DashData';
 import './DashboardPage.css';
 
 export const DashboardPage: React.FC = () => {
@@ -47,7 +47,14 @@ export const DashboardPage: React.FC = () => {
             accessibilityYAxis={overviewData.yAxis} 
             improvement={overviewData.improvement}
           />    <PriorityChart priorityData={priorityData} />
-    <GaugeChart {...gaugeData} />
+<GaugeChart
+  score={80}
+  totalRequirements={143}
+  compliantCount={103}
+  atRiskCount={24}
+  nonCompliantCount={16}
+  categoryData={categoryData}
+/>
   </div>
 
         {/* Breakdown and Tasks Row */}

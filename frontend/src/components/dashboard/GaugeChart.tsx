@@ -1,8 +1,10 @@
 import React from 'react';
 import { Gauge } from '@mui/x-charts/Gauge';
 import './GaugeChart.css';
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { useState } from 'react';
 
-interface GaugeChartProps {
+interface CategoryStats {
   score: number;
   totalRequirements: number;
   compliantCount: number;
@@ -10,40 +12,70 @@ interface GaugeChartProps {
   nonCompliantCount: number;
 }
 
+interface GaugeChartProps {
+  score: number;
+  totalRequirements: number;
+  compliantCount: number;
+  atRiskCount: number;
+  nonCompliantCount: number;
+  categoryData: {
+    [category: string]: CategoryStats;
+  };
+}
+
 export const GaugeChart: React.FC<GaugeChartProps> = ({
   score,
   totalRequirements,
   compliantCount,
   atRiskCount,
-  nonCompliantCount
+  nonCompliantCount,
+  categoryData
 }) => {
+
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const displayData =
+  selectedCategory !== 'All' && categoryData[selectedCategory]
+    ? categoryData[selectedCategory]
+    : { score, totalRequirements, compliantCount, atRiskCount, nonCompliantCount };
+
   const getScoreCategory = () => {
-    if (score >= 80) return { category: 'Compliant', color: '#10b981' };
-    if (score >= 60) return { category: 'At Risk', color: '#f59e0b' };
+    if (displayData.score >= 80) return { category: 'Compliant', color: '#10b981' };
+    if (displayData.score >= 60) return { category: 'At Risk', color: '#f59e0b' };
     return { category: 'Non Compliant', color: '#ef4444' };
   };
 
   const scoreInfo = getScoreCategory();
+
 
   return (
     <div className="gauge-chart">
       {/* Header */}
       <div className="gauge-header">
         <h3>Overall Accessibility Score</h3>
-        <select className="gauge-filter" defaultValue="All">
-          <option value="All">All</option>
-          <option value="Perceivable">Perceivable</option>
-          <option value="Operable">Operable</option>
-          <option value="Understandable">Understandable</option>
-          <option value="Robust">Robust</option>
-        </select>
+        <FormControl size="small" sx={{ minWidth: 140 }}>
+          <InputLabel id="gauge-category-label">Category</InputLabel>
+          <Select
+            sx={{textAlign: 'left'}}
+            labelId="gauge-category-label"
+            value={selectedCategory}
+            label="Category"
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <MenuItem value="All">All</MenuItem>
+            <MenuItem value="Perceivable">Perceivable</MenuItem>
+            <MenuItem value="Operable">Operable</MenuItem>
+            <MenuItem value="Understandable">Understandable</MenuItem>
+            <MenuItem value="Robust">Robust</MenuItem>
+          </Select>
+        </FormControl>
       </div>
   
       {/* Gauge with integrated score */}
       <div className="gauge-container">
         <div className="gauge-wrapper">
           <Gauge
-            value={score}
+            value={displayData.score}
             startAngle={-90}
             endAngle={90}
             width={400}
@@ -56,7 +88,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
           />
           <div className="gauge-center">
             <div className="score-value" style={{ color: scoreInfo.color }}>
-              {score}%
+              {displayData.score}%
             </div>
             <div className="score-category" style={{ color: scoreInfo.color }}>
               {scoreInfo.category}

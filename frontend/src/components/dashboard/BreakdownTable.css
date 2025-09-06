@@ -82,7 +82,6 @@
   vertical-align: top;
 }
 
-/* Enhanced hover state - make sure it works for all columns */
 .breakdown-table-content tbody tr {
   transition: background-color 0.2s ease;
 }
@@ -145,8 +144,6 @@
 }
 
 
-
-/* Fixed width for severity column to ensure proper alignment */
 .breakdown-table-content th:nth-child(4),
 .breakdown-table-content td:nth-child(4) {
   min-width: 140px;
@@ -196,10 +193,27 @@
     width: 100%;
   }
 
-  /* Allow severity column to be more flexible on mobile */
   .breakdown-table-content th:nth-child(4),
   .breakdown-table-content td:nth-child(4) {
     min-width: 100px;
     width: auto;
   }
+}
+
+.custom-filter {
+  background-color: #f9fafb;
+  min-width: 160px;
+  text-align: left;
+}
+
+.custom-filter .MuiOutlinedInput-notchedOutline {
+  border-color: #d1d5db;
+}
+
+.custom-filter:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #3b82f6;
+}
+
+.custom-filter.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #2563eb;
 }
