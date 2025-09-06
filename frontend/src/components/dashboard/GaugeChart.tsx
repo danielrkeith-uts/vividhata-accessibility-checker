@@ -1,8 +1,9 @@
 import React from 'react';
 import { Gauge } from '@mui/x-charts/Gauge';
 import './GaugeChart.css';
-import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { MenuItem, FormControl, InputLabel } from '@mui/material';
 import { useState } from 'react';
+import { Select } from '../common/Select';
 
 interface CategoryStats {
   score: number;
@@ -32,7 +33,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   categoryData
 }) => {
 
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState(''); 
 
   const displayData =
   selectedCategory !== 'All' && categoryData[selectedCategory]
@@ -53,22 +54,19 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
       {/* Header */}
       <div className="gauge-header">
         <h3>Overall Accessibility Score</h3>
-        <FormControl size="small" sx={{ minWidth: 140 }}>
-          <InputLabel id="gauge-category-label">Category</InputLabel>
           <Select
-            sx={{textAlign: 'left'}}
-            labelId="gauge-category-label"
             value={selectedCategory}
-            label="Category"
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <MenuItem value="All">All</MenuItem>
-            <MenuItem value="Perceivable">Perceivable</MenuItem>
-            <MenuItem value="Operable">Operable</MenuItem>
-            <MenuItem value="Understandable">Understandable</MenuItem>
-            <MenuItem value="Robust">Robust</MenuItem>
-          </Select>
-        </FormControl>
+            onChange={(value) => setSelectedCategory(value)}
+           size="small"
+           placeholder="Category"
+            options={[
+              { value: "All", label: "Category" },
+              { value: "Perceivable", label: "Perceivable" },
+              { value: "Operable", label: "Operable" },
+              { value: "Understandable", label: "Understandable" },
+              { value: "Robust", label: "Robust" },
+            ]}
+          />
       </div>
   
       {/* Gauge with integrated score */}

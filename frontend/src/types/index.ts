@@ -17,6 +17,8 @@ export interface RegisterCredentials {
   password: string;
   firstName: string;
   lastName: string;
+  ocupation: '' | 'Developer' | 'Designer' | 'Manager' | 'QA' | 'Other';
+  purpose: '' | 'Personal' | 'Business' | 'Education' | 'Other';
 }
 
 // Website and Scan Types

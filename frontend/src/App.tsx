@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { EnterUrlPage } from './pages/EnterUrlPage';
 import './App.css';
 
 // Protected Route component
@@ -25,12 +26,21 @@ const AppRoutes: React.FC = () => {
     <Routes>
       <Route 
         path="/login" 
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
+        element={isAuthenticated ? <Navigate to="/enter-url" replace /> : <LoginPage />} 
       />
             <Route 
         path="/register" 
-        element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <RegisterPage />} 
+        element={isAuthenticated ? <Navigate to="/enter-url" replace /> : <RegisterPage />} 
       />
+
+      <Route 
+        path="/enter-url" 
+        element={
+          <ProtectedRoute>
+            <EnterUrlPage />
+          </ProtectedRoute>
+        } 
+      />  
       <Route 
         path="/dashboard" 
         element={
@@ -39,9 +49,9 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         } 
       />
-      <Route 
+       <Route 
         path="/" 
-        element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} 
+        element={<Navigate to={isAuthenticated ? "/enter-url" : "/login"} replace />} 
       />
     </Routes>
   );

@@ -3,6 +3,7 @@ import './TaskList.css';
 import { Checkbox, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { Select as CustomSelect } from '../common/Select';
 
 interface Task {
   id: string;
@@ -102,21 +103,19 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
             ))}
           </div>
 
-          <FormControl size="small" sx={{ minWidth: 120, marginTop: '8px' }}>
-            <InputLabel id="priority-filter-label">Priority</InputLabel>
-            <Select
-              labelId="priority-filter-label"
-              value={priorityFilter}
-              label="Priority"
-              onChange={(e) => setPriorityFilter(e.target.value)}
-              sx={{textAlign: 'left'}}
-            >
-              <MenuItem value="All">All</MenuItem>
-              <MenuItem value="High">High</MenuItem>
-              <MenuItem value="Medium">Medium</MenuItem>
-              <MenuItem value="Low">Low</MenuItem>
-            </Select>
-          </FormControl>
+          <CustomSelect
+  value={priorityFilter}
+  onChange={(val) => setPriorityFilter(val)}
+  placeholder="Priority"
+  options={[
+    { value: '', label: 'Priority' },
+    { value: 'High', label: 'High' },
+    { value: 'Medium', label: 'Medium' },
+    { value: 'Low', label: 'Low' },
+  ]}
+  size="small"
+/>
+
         </div>
       </div>
 

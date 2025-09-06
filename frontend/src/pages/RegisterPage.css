@@ -3,22 +3,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ede5d9;
   padding: 1rem;
 }
 
 .register-container {
   background: white;
+  opacity: 0.8;
   border-radius: 1rem;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   padding: 2.5rem;
   width: 100%;
   max-width: 32rem;
+  border: 1px solid #9C8B80;
 }
 
 .register-header {
   text-align: center;
   margin-bottom: 2rem;
+  text-align: left;
 }
 
 .register-title {
@@ -74,14 +77,14 @@
 }
 
 .register-footer-link {
-  color: #3b82f6;
+  color: #9CAF88;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s ease-in-out;
 }
 
 .register-footer-link:hover {
-  color: #2563eb;
+  color: #7B8A6B;
   text-decoration: underline;
 }
 

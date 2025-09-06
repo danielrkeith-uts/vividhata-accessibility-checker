@@ -45,9 +45,7 @@ export const UserDropDown: React.FC<UserDropdownProps> = ({ firstName, lastName,
         <ul className="user-dropdown-menu">
             <li onClick={handleLogout} className="user-dropdown-item">Logout</li>
           <li className="user-dropdown-item">Profile</li>
-          <li className="user-dropdown-item">Settings</li>
-          <li className="user-dropdown-item">Help</li>
-          {/* You can add a logout here or keep logout separate as you do now */}
+          <li className="user-dropdown-item">Manage Sites</li>
         </ul>
       )}
     </div>

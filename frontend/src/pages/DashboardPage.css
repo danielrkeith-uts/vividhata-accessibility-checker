@@ -1,62 +1,18 @@
 .dashboard-page {
   min-height: 100vh;
-  background: #ede5d9
+  background: #ede5d9;
 }
-/* #9C8B80 */
+
+/* ---------- HEADER ---------- */
 .dashboard-header {
   background: #4A5568;
   border-bottom: 1px solid #4A5568;
   padding: 20px 0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(10px);
   z-index: 99999999;
-  position: relative; 
-}
-
-.dashboard-overview-row {
-  display: flex;
-  justify-content: row;
-  flex-direction: row;
-  gap: 16px;
-  align-items: stretch;
-  margin-bottom: 16px;
-  min-height: 320px;
-}
-
-.dashboard-overview-row > * {
-  flex: 1;
-}
-
-/* Breakdown and Tasks Row */
-.dashboard-breakdown-tasks-row {
-  display: grid;
-  grid-template-columns: 2fr 1.5fr;
-  grid-auto-rows: 1fr;
-  gap: 16px;
-  margin-bottom: 24px;
-  align-items: stretch;
-}
-
-.breakdown-section,
-.tasks-section {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.breakdown-section > * ,
-.tasks-section > * {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-/* Optional: make them responsive */
-@media (max-width: 768px) {
-  .dashboard-overview-row {
-    flex-direction: column;
-  }
+  position: relative;
 }
 
 .dashboard-header-content {
@@ -81,121 +37,89 @@
   gap: 16px;
 }
 
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-}
-
-.user-profile:hover {
-  background-color: #f3f4f6;
-}
-
-
-.user-details {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.user-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.user-role {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.user-dropdown {
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 4px;
-  font-size: 12px;
-  transition: color 0.2s ease;
-}
-
-.user-dropdown:hover {
-  color: #374151;
-}
-
+/* ---------- MAIN CONTENT ---------- */
 .dashboard-main {
   max-width: 1400px;
   margin: 0 auto;
   padding: 16px;
 }
 
-@media (max-width: 1200px) {
-  .dashboard-overview-row {
-    flex-direction: column;
-    gap: 24px;
-  }
-  
-  .dashboard-breakdown-tasks-row {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard-header-content {
-    padding: 0 16px;
-    flex-direction: column;
-    gap: 16px;
-    text-align: center;
-  }
-  
-  .dashboard-title {
-    font-size: 24px;
-  }
-  
-  .dashboard-main {
-    padding: 16px;
-  }
-  
-  .user-profile {
-    flex-direction: column;
-    text-align: center;
-    gap: 8px;
-  }
-}
-.dashboard-breakdown-tasks-row {
+/* ---------- ROW: URL + EXPORT ---------- */
+.dashboard-row {
   display: flex;
-  gap: 24px;
-  margin-top: 32px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
   flex-wrap: wrap;
 }
 
-/* This holds both the table and the export button in a row */
-.breakdown-and-export {
+.dashboard-url-bar {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex: 1;
-  gap: 16px;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #2D3748;
+  opacity: 0.6;
+  background-color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #9C8B80;
 }
 
-/* Make the table take up most of the space */
-.breakdown-and-export > .breakdown-section,
-.breakdown-and-export > .dashboard-export-button-inline {
-  flex: 1;
+.dashboard-url-value {
+  font-family: monospace;
+  color: #4A5568;
 }
 
-.dashboard-export-button-inline {
+.dashboard-rescan-button-container {
+  display: flex;
+  gap: 8px; 
+}
+
+.dashboard-export-button-container {
   display: flex;
   justify-content: flex-end;
-  align-items: flex-start;
-  padding-top: 12px;
+  align-items: center;
 }
 
-/* Optional: keep the tasks section a reasonable width */
+/* ---------- OVERVIEW ROW (3 Cards) ---------- */
+.dashboard-overview-row {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 16px;
+  min-height: 320px;
+}
+
+.dashboard-overview-row > * {
+  flex: 1;
+}
+
+/* ---------- BREAKDOWN + TASKS ROW ---------- */
+.dashboard-breakdown-tasks-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.breakdown-section,
+.tasks-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.breakdown-section > *,
+.tasks-section > * {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .tasks-section {
   flex: 1;
   min-width: 300px;
