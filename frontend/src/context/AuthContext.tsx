@@ -1,14 +1,17 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, LoginCredentials, RegisterCredentials } from '../types';
+import { User, LoginCredentials, RegisterCredentials, Site } from '../types';
 
 interface AuthContextType {
   user: User | null;
+  userSites: Site[];
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (credentials: RegisterCredentials) => Promise<void>;
   logout: () => void;
   checkAuthStatus: () => Promise<void>;
+  addSite: (site: Site) => void; 
+  refreshUserData: () => Promise<void>; 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,6 +49,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const refreshUserData = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/account/me', {
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Error refreshing user data:', error);
+    }
+  };
+
+  const addSite = (site: Site) => {
+    if (user) {
+      setUser({
+        ...user,
+        sites: [...(user.sites || []), site]
+      });
     }
   };
 
@@ -112,14 +139,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuthStatus();
   }, []);
 
+  const userSites = user?.sites || [];
+
   const value: AuthContextType = {
     user,
+    userSites,
     isAuthenticated: !!user,
     isLoading,
     login,
     register,
     logout,
     checkAuthStatus,
+    addSite,
+    refreshUserData,
   };
 
   return (

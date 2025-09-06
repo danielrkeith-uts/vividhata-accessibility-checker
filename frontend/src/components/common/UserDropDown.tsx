@@ -2,22 +2,28 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import './UserDropDown.css'; 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 interface UserDropdownProps {
   firstName?: string;
   lastName?: string;
   role?: string;
 }
-// todo: replace with mui
+// TODO: replace with mui
 export const UserDropDown: React.FC<UserDropdownProps> = ({ firstName, lastName, role = 'Web Developer' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate()
 
   const handleLogout = () => {
     logout();
   };
-
+  const handleManageSites = () => {
+    navigate('/manage-sites');
+    setIsOpen(false);
+  };
+ 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -45,7 +51,7 @@ export const UserDropDown: React.FC<UserDropdownProps> = ({ firstName, lastName,
         <ul className="user-dropdown-menu">
             <li onClick={handleLogout} className="user-dropdown-item">Logout</li>
           <li className="user-dropdown-item">Profile</li>
-          <li className="user-dropdown-item">Manage Sites</li>
+          <li className="user-dropdown-item" onClick={handleManageSites}>Manage Sites</li>
         </ul>
       )}
     </div>

@@ -1,10 +1,17 @@
 // User and Authentication Types
+export interface Site {
+  id: string;
+  url: string;
+  name: string;
+  // can add other fields like name, lastScanned, etc.
+}
 export interface User {
   id: string;
   username: string;
   firstName: string;
   lastName: string;
   email?: string;
+  sites?: Site[];
 }
 
 export interface LoginCredentials {
