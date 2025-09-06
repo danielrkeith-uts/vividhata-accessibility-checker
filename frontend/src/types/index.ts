@@ -12,6 +12,8 @@ export interface User {
   lastName: string;
   email?: string;
   sites?: Site[];
+  ocupation: '' | 'Developer' | 'Designer' | 'Manager' | 'QA' | 'Other';
+  purpose: '' | 'Personal' | 'Business' | 'Education' | 'Other';
 }
 
 export interface LoginCredentials {

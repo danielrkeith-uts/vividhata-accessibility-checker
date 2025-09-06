@@ -217,7 +217,7 @@ export const RegisterPage: React.FC = () => {
               </li>
             </ul>
           </div>
-
+{/* TODO: Implement toggle to view password */}
           <Input
             label="Confirm Password"
             type="password"

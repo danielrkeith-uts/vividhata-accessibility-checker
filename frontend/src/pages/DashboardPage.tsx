@@ -42,11 +42,7 @@ export const DashboardPage: React.FC = () => {
         <div className="dashboard-header-content">
           <h1 className="dashboard-title">Dashboard for {currentSite.name}</h1>
           <div className="dashboard-user-info">
-            <UserDropDown
-              firstName={user?.firstName}
-              lastName={user?.lastName}
-              role="Web Developer"
-            />
+          <UserDropDown />
           </div>
         </div>
       </header>

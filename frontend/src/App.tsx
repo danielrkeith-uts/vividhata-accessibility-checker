@@ -12,6 +12,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { EnterUrlPage } from "./pages/EnterUrlPage";
 import { ManageSites } from "./pages/ManageSites";
 import "./App.css";
+import { EditProfile } from "./pages/EditProfile";
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
@@ -91,6 +92,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <ManageSites />
+          </ProtectedRoute>
+        }
+      />
+       <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <EditProfile />
           </ProtectedRoute>
         }
       />

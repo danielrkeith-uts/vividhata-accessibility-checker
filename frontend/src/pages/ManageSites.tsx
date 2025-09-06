@@ -19,11 +19,8 @@ export const ManageSites: React.FC = () => {
         <div className="manage-sites-header-content">
           <h1 className="manage-sites-title">Manage Your Sites</h1>
           <div className="manage-sites-user-info">
-            <UserDropDown
-              firstName={user?.firstName}
-              lastName={user?.lastName}
-              role="Web Developer"
-            />
+          <UserDropDown />
+
           </div>
         </div>
       </header>
