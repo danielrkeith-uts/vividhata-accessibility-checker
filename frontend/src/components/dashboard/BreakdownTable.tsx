@@ -5,7 +5,7 @@ interface Requirement {
   id: string;
   description: string;
   category: string;
-  status: 'Compliant' | 'At Risk' | 'Non Compliant';
+  status: 'Compliant' | 'At Risk' | 'Noncompliant';
   severity: number;
 }
 
@@ -20,7 +20,7 @@ export const BreakdownTable: React.FC<BreakdownTableProps> = ({ requirements }) 
         return '#10b981';
       case 'At Risk':
         return '#f59e0b';
-      case 'Non Compliant':
+      case 'Noncompliant':
         return '#ef4444';
       default:
         return '#6b7280';
@@ -33,7 +33,7 @@ export const BreakdownTable: React.FC<BreakdownTableProps> = ({ requirements }) 
         return '●';
       case 'At Risk':
         return '●';
-      case 'Non Compliant':
+      case 'Noncompliant':
         return '●';
       default:
         return '○';

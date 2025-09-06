@@ -1,4 +1,5 @@
 import React from 'react';
+import { Gauge } from '@mui/x-charts/Gauge';
 import './GaugeChart.css';
 
 interface GaugeChartProps {
@@ -16,10 +17,6 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   atRiskCount,
   nonCompliantCount
 }) => {
-  // Calculate the rotation angle for the gauge needle
-  const rotation = (score / 100) * 180 - 90; 
-  
-  // Determine the score category and color
   const getScoreCategory = () => {
     if (score >= 80) return { category: 'Compliant', color: '#10b981' };
     if (score >= 60) return { category: 'At Risk', color: '#f59e0b' };
@@ -30,33 +27,33 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
 
   return (
     <div className="gauge-chart">
+      {/* Header */}
       <div className="gauge-header">
         <h3>Overall Accessibility Score</h3>
-        <select className="gauge-filter">
-          <option>All</option>
-          <option>Perceivable</option>
-          <option>Operable</option>
-          <option>Understandable</option>
-          <option>Robust</option>
+        <select className="gauge-filter" defaultValue="All">
+          <option value="All">All</option>
+          <option value="Perceivable">Perceivable</option>
+          <option value="Operable">Operable</option>
+          <option value="Understandable">Understandable</option>
+          <option value="Robust">Robust</option>
         </select>
       </div>
-      
+  
+      {/* Gauge with integrated score */}
       <div className="gauge-container">
-        <div className="gauge">
-          {/* Gauge background with color sections */}
-          <div className="gauge-background">
-            <div className="gauge-section compliant" style={{ width: '40%' }}></div>
-            <div className="gauge-section at-risk" style={{ width: '30%' }}></div>
-            <div className="gauge-section non-compliant" style={{ width: '30%' }}></div>
-          </div>
-          
-          {/* Gauge needle */}
-          <div 
-            className="gauge-needle"
-            style={{ transform: `rotate(${rotation}deg)` }}
-          ></div>
-          
-          {/* Center score display */}
+        <div className="gauge-wrapper">
+          <Gauge
+            value={score}
+            startAngle={-90}
+            endAngle={90}
+            width={400}
+            height={400}
+            sx={{
+              [`& .MuiGauge-valueArc`]: { fill: scoreInfo.color },
+              [`& .MuiGauge-referenceArc`]: { fill: '#e0e0e0' },
+              [`& .MuiGauge-valueText`]: { display: 'none' },
+            }}
+          />
           <div className="gauge-center">
             <div className="score-value" style={{ color: scoreInfo.color }}>
               {score}%
@@ -67,26 +64,34 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
           </div>
         </div>
       </div>
-      
-      {/* Metrics below the gauge */}
-      <div className="gauge-metrics">
-        <div className="metric">
-          <span className="metric-value">{totalRequirements}</span>
-          <span className="metric-label">Requirements</span>
-        </div>
-        <div className="metric">
-          <span className="metric-value compliant">{compliantCount}</span>
-          <span className="metric-label">Compliant</span>
-        </div>
-        <div className="metric">
-          <span className="metric-value at-risk">{atRiskCount}</span>
-          <span className="metric-label">At risk</span>
-        </div>
-        <div className="metric">
-          <span className="metric-value non-compliant">{nonCompliantCount}</span>
-          <span className="metric-label">Non compliant</span>
-        </div>
-      </div>
+  
+      {/* Metrics underneath the gauge */}
+<div className="gauge-metrics">
+  <div className="metric">
+    <div className="metric-circle">
+      <div className="metric-value">{totalRequirements}</div>
     </div>
+    <div className="metric-label">Requirements</div>
+  </div>
+  <div className="metric compliant">
+    <div className="metric-circle">
+      <div className="metric-value compliant">{compliantCount}</div>
+    </div>
+    <div className="metric-label">Compliant</div>
+  </div>
+  <div className="metric at-risk">
+    <div className="metric-circle">
+      <div className="metric-value at-risk">{atRiskCount}</div>
+    </div>
+    <div className="metric-label">At Risk</div>
+  </div>
+  <div className="metric non-compliant">
+    <div className="metric-circle">
+      <div className="metric-value non-compliant">{nonCompliantCount}</div>
+    </div>
+    <div className="metric-label">Noncompliant</div>
+  </div>
+</div>
+</div>
   );
 };

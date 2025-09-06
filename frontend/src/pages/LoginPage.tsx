@@ -79,7 +79,7 @@ export const LoginPage: React.FC = () => {
               {errors.general}
             </div>
           )}
-
+          <div className="form-row">
           <Input
             label="Username"
             type="text"
@@ -91,7 +91,8 @@ export const LoginPage: React.FC = () => {
             autoComplete="username"
             placeholder="Enter your username"
           />
-
+</div>
+<div className="form-row">
           <Input
             label="Password"
             type="password"
@@ -103,7 +104,8 @@ export const LoginPage: React.FC = () => {
             autoComplete="current-password"
             placeholder="Enter your password"
           />
-
+          </div>
+          <div className="form-row">
           <Button
             type="submit"
             variant="primary"
@@ -114,6 +116,7 @@ export const LoginPage: React.FC = () => {
           >
             {isLoading ? 'Signing In...' : 'Sign In'}
           </Button>
+          </div>
         </form>
 
         <div className="login-footer">

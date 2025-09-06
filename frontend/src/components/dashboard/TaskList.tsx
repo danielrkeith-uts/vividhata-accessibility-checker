@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './TaskList.css';
-
+import { Checkbox } from '@mui/material';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 interface Task {
   id: string;
   description: string;
@@ -17,6 +19,7 @@ interface TaskListProps {
 export const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
+  const [taskList, setTaskList] = useState<Task[]>(tasks);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -44,7 +47,22 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
     }
   };
 
-  const filteredTasks = tasks.filter(task => {
+
+  const toggleTaskCompletion = (id: string) => {
+    setTaskList(prev =>
+      prev.map(task =>
+        task.id === id
+          ? {
+              ...task,
+              completed: !task.completed,
+              status: !task.completed ? 'Completed' : 'To Do',
+            }
+          : task
+      )
+    );
+  };
+
+  const filteredTasks = taskList.filter(task => {
     const categoryMatch = activeFilter === 'All' || task.category === activeFilter;
     const priorityMatch = priorityFilter === 'All' || task.priority === priorityFilter;
     return categoryMatch && priorityMatch;
@@ -69,7 +87,7 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
                 className={`category-tab ${activeFilter === category ? 'active' : ''}`}
                 onClick={() => setActiveFilter(category)}
               >
-                {category} {getCategoryCount(category)}
+                {category} ({getCategoryCount(category)})
               </button>
             ))}
           </div>
@@ -78,10 +96,10 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
           >
-            <option>Priority</option>
-            <option>High</option>
-            <option>Medium</option>
-            <option>Low</option>
+            <option value="All">All</option> 
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
           </select>
         </div>
       </div>
@@ -90,12 +108,18 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
         {filteredTasks.map((task) => (
           <div key={task.id} className="task-item">
             <div className="task-checkbox">
-              <input
-                type="checkbox"
-                checked={task.completed}
-                onChange={() => {}} // TODO: Implement task completion
-                className="task-checkbox-input"
-              />
+            <Checkbox
+              checked={task.completed}
+              onChange={() => toggleTaskCompletion(task.id)}
+              icon={<CheckBoxOutlineBlankIcon />}
+              checkedIcon={<CheckBoxIcon />}
+              sx={{
+                color: getStatusColor(task.status),
+                '&.Mui-checked': {
+                  color: getStatusColor(task.status),
+                },
+              }}
+            />
             </div>
             <div className="task-details">
               <div className="task-description">
