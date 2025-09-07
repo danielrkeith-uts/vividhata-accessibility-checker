@@ -116,6 +116,15 @@
 
 .site-info {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .site-name {
@@ -124,6 +133,20 @@
   color: #2D3748;
   margin: 0 0 8px 0;
   line-height: 1.2;
+  text-align: left;
+}
+
+.site-icon {
+  color: #4A5568;
+  display: flex;
+  align-items: top;
+  justify-content: center;  
+}
+
+.site-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .site-url {
@@ -133,6 +156,7 @@
   margin: 0;
   opacity: 0.8;
   word-break: break-all;
+  text-align: left;
 }
 
 .site-stats {

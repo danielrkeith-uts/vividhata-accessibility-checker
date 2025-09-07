@@ -195,7 +195,6 @@ export const EditProfile: React.FC = () => {
           <h1 className="edit-profile-title">Edit Profile</h1>
           <div className="edit-profile-user-info">
           <UserDropDown />
-
           </div>
         </div>
       </header>
@@ -289,14 +288,12 @@ export const EditProfile: React.FC = () => {
               </div>
             </div>
 
-            <div className="password-section">
-              <h2 className="section-title">Password</h2>
-              
+            <div className="password-section">              
               <div className="form-field">
                 <Button
                   type="button"
                   variant="outline"
-                  size="small"
+                  size="medium"
                   onClick={() => setIsChangingPassword(!isChangingPassword)}
                 >
                   {isChangingPassword ? "Cancel Password Change" : "Change Password"}

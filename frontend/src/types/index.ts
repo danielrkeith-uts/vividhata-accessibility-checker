@@ -3,6 +3,7 @@ export interface Site {
   id: string;
   url: string;
   name: string;
+  lastScanned: Date;
   // can add other fields like name, lastScanned, etc.
 }
 export interface User {

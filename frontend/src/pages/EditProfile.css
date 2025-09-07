@@ -175,36 +175,10 @@
     padding-top: 24px;
     border-top: 1px solid #E2E8F0;
   }
-  
-  /* ---------- RESPONSIVE ---------- */
-  @media (max-width: 768px) {
-    .edit-profile-main {
-      padding: 16px;
-    }
-    
-    .edit-profile-header-content {
-      padding: 0 16px;
-    }
-    
-    .edit-profile-title {
-      font-size: 24px;
-    }
-    
-    .edit-profile-form {
-      padding: 24px;
-    }
-    
-    .form-row {
-      grid-template-columns: 1fr;
-    }
-    
-    .form-actions {
-      flex-direction: column-reverse;
-    }
-    
-    .password-section-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 16px;
-    }
+
+  .form-field {
+    text-align: left;
+    margin-top: 16px;
   }
+  
+  
