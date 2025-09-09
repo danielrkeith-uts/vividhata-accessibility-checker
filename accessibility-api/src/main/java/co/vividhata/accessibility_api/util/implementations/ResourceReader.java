@@ -1,5 +1,6 @@
-package co.vividhata.accessibility_api.util;
+package co.vividhata.accessibility_api.util.implementations;
 
+import co.vividhata.accessibility_api.util.IResourceReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -12,7 +13,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 @Service
-public class ResourceReader {
+public class ResourceReader implements IResourceReader {
 
     @Autowired
     private ResourceLoader resourceLoader;
