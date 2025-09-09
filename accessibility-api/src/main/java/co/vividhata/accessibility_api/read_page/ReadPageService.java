@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.Instant;
 
 @Service
 public class ReadPageService implements IReadPageService {
@@ -17,6 +18,8 @@ public class ReadPageService implements IReadPageService {
     private IHtmlFetcher htmlFetcher;
     @Autowired
     private IWebPageRepository webPageRepository;
+    @Autowired
+    private IPageCheckRepository pageCheckRepository;
 
     @Override
     public String readPageFrom(String url, int accountId) {
@@ -35,6 +38,8 @@ public class ReadPageService implements IReadPageService {
             webPageRepository.create(accountId, url);
             webPage = webPageRepository.get(accountId, url);
         }
+
+        pageCheckRepository.create(webPage.id(), Instant.now(), html);
 
         return html;
     }
