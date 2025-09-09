@@ -2,7 +2,6 @@ package co.vividhata.accessibility_api.config;
 
 import co.vividhata.accessibility_api.account.IAccountRepository;
 import co.vividhata.accessibility_api.model.Account;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,10 +24,7 @@ public class DbUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Account not found");
         }
 
-        return User.withUsername(account.username())
-                .password(account.password())
-                .roles("USER")
-                .build();
+        return account;
     }
 
 }

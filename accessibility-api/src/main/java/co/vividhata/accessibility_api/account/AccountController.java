@@ -2,6 +2,7 @@ package co.vividhata.accessibility_api.account;
 
 import co.vividhata.accessibility_api.account.dto.LoginRequest;
 import co.vividhata.accessibility_api.account.dto.CreateAccountRequest;
+import co.vividhata.accessibility_api.model.Account;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,10 +56,10 @@ public class AccountController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Map<String, Object>> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Map<String, Object>> getCurrentUser(@AuthenticationPrincipal Account account) {
         return ResponseEntity.ok(Map.of(
-                "username", userDetails.getUsername(),
-                "roles", userDetails.getAuthorities()
+                "username", account.username(),
+                "id", account.id()
         ));
     }
 

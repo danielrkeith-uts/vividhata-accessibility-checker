@@ -9,3 +9,9 @@ CREATE TABLE ac.account (
     first_name VARCHAR(100),
     last_name VARCHAR(100)
 );
+
+CREATE TABLE ac.web_page (
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    account_id INT REFERENCES ac.account(id),
+    url VARCHAR(2000) UNIQUE
+);
