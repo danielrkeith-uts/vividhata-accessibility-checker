@@ -1,6 +1,6 @@
 package co.vividhata.accessibility_api.services;
 
-import co.vividhata.accessibility_api.util.JSoupHtmlParser;
+import co.vividhata.accessibility_api.util.implementations.JSoupHtmlParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

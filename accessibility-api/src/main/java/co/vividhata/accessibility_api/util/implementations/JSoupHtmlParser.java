@@ -1,5 +1,6 @@
-package co.vividhata.accessibility_api.util;
+package co.vividhata.accessibility_api.util.implementations;
 
+import co.vividhata.accessibility_api.util.IHtmlParser;
 import org.jsoup.helper.W3CDom;
 import org.jsoup.parser.HtmlTreeBuilder;
 import org.jsoup.parser.Parser;

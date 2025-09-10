@@ -1,6 +1,6 @@
 package co.vividhata.accessibility_api.admin.db_management;
 
-import co.vividhata.accessibility_api.util.ResourceReader;
+import co.vividhata.accessibility_api.util.IResourceReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ public class PostgreSqlDbManagementService implements IDbManagementService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    private ResourceReader resourceReader;
+    private IResourceReader resourceReader;
 
     @Override
     public void rebuildSchema() {
