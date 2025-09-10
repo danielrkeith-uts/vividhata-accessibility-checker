@@ -4,6 +4,6 @@ import java.time.Instant;
 
 public interface IPageCheckRepository {
 
-    void create(int webPageId, Instant timeRan, String htmlContent);
+    int create(int webPageId, Instant timeChecked, String htmlContent);
 
 }

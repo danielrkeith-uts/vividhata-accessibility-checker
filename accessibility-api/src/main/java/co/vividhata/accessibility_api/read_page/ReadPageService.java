@@ -34,12 +34,9 @@ public class ReadPageService implements IReadPageService {
 
         WebPage webPage = webPageRepository.get(accountId, url);
 
-        if (webPage == null) {
-            webPageRepository.create(accountId, url);
-            webPage = webPageRepository.get(accountId, url);
-        }
+        int webPageId = webPage == null ? webPageRepository.create(accountId, url) : webPage.id();
 
-        pageCheckRepository.create(webPage.id(), Instant.now(), html);
+        pageCheckRepository.create(webPageId, Instant.now(), html);
 
         return html;
     }

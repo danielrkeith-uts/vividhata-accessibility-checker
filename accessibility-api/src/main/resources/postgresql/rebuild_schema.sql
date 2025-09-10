@@ -20,6 +20,6 @@ CREATE TABLE ac.web_page (
 CREATE TABLE ac.page_check (
     id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     web_page_id INT REFERENCES ac.web_page(id),
-    time_ran TIMESTAMP WITH TIME ZONE,
+    time_checked TIMESTAMP WITH TIME ZONE,
     html_content TEXT
-)
+);

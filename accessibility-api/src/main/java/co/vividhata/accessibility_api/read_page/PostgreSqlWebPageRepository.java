@@ -3,7 +3,11 @@ package co.vividhata.accessibility_api.read_page;
 import co.vividhata.accessibility_api.model.WebPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
+
+import java.sql.PreparedStatement;
 
 @Service
 public class PostgreSqlWebPageRepository implements IWebPageRepository {
@@ -12,10 +16,25 @@ public class PostgreSqlWebPageRepository implements IWebPageRepository {
     JdbcTemplate jdbcTemplate;
 
     @Override
-    public void create(int accountId, String url) {
+    public int create(int accountId, String url) {
         String sql = "INSERT INTO ac.web_page(account_id, url) VALUES (?, ?);";
 
-        jdbcTemplate.update(sql, accountId, url);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(con -> {
+
+            PreparedStatement ps = con.prepareStatement(sql, new String[]{"id"});
+            ps.setInt(1, accountId);
+            ps.setString(2, url);
+            return ps;
+
+        }, keyHolder);
+
+        Number id = keyHolder.getKey();
+        if (id == null) {
+            return -1;
+        }
+        return id.intValue();
     }
 
     public WebPage get(int accountId, String url) {
