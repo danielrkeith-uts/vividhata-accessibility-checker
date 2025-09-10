@@ -29,8 +29,10 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });  const [isLoading, setIsLoading] = useState(true);
 
   const checkAuthStatus = async () => {
     try {
@@ -41,8 +43,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
-      } else {
+      } else if (response.status === 401) {
         setUser(null);
+      } else {
+        console.warn('Auth check failed with unexpected status:', response.status);
       }
     } catch (error) {
       console.error('Error checking auth status:', error);
@@ -69,10 +73,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const addSite = (site: Site) => {
     if (user) {
-      setUser({
+      const updatedUser = {
         ...user,
-        sites: [...(user.sites || []), site]
-      });
+        sites: [...(user.sites || []), site],
+      };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
     }
   };
 
@@ -132,12 +138,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Logout error:', error);
     } finally {
       setUser(null);
+      localStorage.removeItem("user");
     }
   };
 
   useEffect(() => {
     checkAuthStatus();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
   const userSites = user?.sites || [];
 

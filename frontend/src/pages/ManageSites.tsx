@@ -6,6 +6,7 @@ import { Button } from "../components/common/Button";
 import "./ManageSites.css";
 import LanguageIcon from "@mui/icons-material/Language";
 
+// TODO: SITES DO NOT PERSIST AFTER LOGOUT
 export const ManageSites: React.FC = () => {
   const { user, userSites } = useAuth();
   const navigate = useNavigate();
