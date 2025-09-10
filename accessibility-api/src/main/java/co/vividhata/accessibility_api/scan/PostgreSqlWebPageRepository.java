@@ -1,5 +1,6 @@
-package co.vividhata.accessibility_api.read_page;
+package co.vividhata.accessibility_api.scan;
 
+import co.vividhata.accessibility_api.model.WebPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -7,27 +8,24 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
-import java.sql.Timestamp;
-import java.time.Instant;
 
 @Service
-public class PostgreSqlPageCheckRepository implements IPageCheckRepository {
+public class PostgreSqlWebPageRepository implements IWebPageRepository {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    JdbcTemplate jdbcTemplate;
 
     @Override
-    public int create(int webPageId, Instant timeChecked, String htmlContent) {
-        String sql = "INSERT INTO ac.page_check(web_page_id, time_checked, html_content) VALUES (?, ?, ?);";
+    public int create(int accountId, String url) {
+        String sql = "INSERT INTO ac.web_page(account_id, url) VALUES (?, ?);";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(con -> {
 
             PreparedStatement ps = con.prepareStatement(sql, new String[]{"id"});
-            ps.setInt(1, webPageId);
-            ps.setTimestamp(2, Timestamp.from(timeChecked));
-            ps.setString(3, htmlContent);
+            ps.setInt(1, accountId);
+            ps.setString(2, url);
             return ps;
 
         }, keyHolder);
@@ -38,4 +36,11 @@ public class PostgreSqlPageCheckRepository implements IPageCheckRepository {
         }
         return id.intValue();
     }
+
+    public WebPage get(int accountId, String url) {
+        String sql = "SELECT * FROM ac.web_page WHERE account_id = ? AND url = ?;";
+
+        return jdbcTemplate.query(sql, WebPage::fromResultSet, accountId, url);
+    }
+
 }

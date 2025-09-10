@@ -1,4 +1,4 @@
-package co.vividhata.accessibility_api.read_page;
+package co.vividhata.accessibility_api.scan;
 
 import co.vividhata.accessibility_api.model.Account;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/api/read-page")
-public class ReadPageController {
+@RequestMapping("/api/scan")
+public class ScanController {
 
     @Autowired
-    private IReadPageService readPageService;
+    private IScanService readPageService;
 
     @PostMapping("/from-url")
     public ResponseEntity<String> readPageFromUrl(@RequestBody String url, @AuthenticationPrincipal Account account) {

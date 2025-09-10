@@ -1,8 +1,8 @@
-package co.vividhata.accessibility_api.read_page;
+package co.vividhata.accessibility_api.scan;
 
 import co.vividhata.accessibility_api.model.WebPage;
-import co.vividhata.accessibility_api.read_page.exceptions.CouldNotFetchPageException;
-import co.vividhata.accessibility_api.read_page.exceptions.InvalidUrlException;
+import co.vividhata.accessibility_api.scan.exceptions.CouldNotFetchPageException;
+import co.vividhata.accessibility_api.scan.exceptions.InvalidUrlException;
 import co.vividhata.accessibility_api.util.IHtmlFetcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,14 +12,14 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 
 @Service
-public class ReadPageService implements IReadPageService {
+public class ScanService implements IScanService {
 
     @Autowired
     private IHtmlFetcher htmlFetcher;
     @Autowired
     private IWebPageRepository webPageRepository;
     @Autowired
-    private IPageCheckRepository pageCheckRepository;
+    private IScanRepository pageCheckRepository;
 
     @Override
     public String readPageFrom(String url, int accountId) {

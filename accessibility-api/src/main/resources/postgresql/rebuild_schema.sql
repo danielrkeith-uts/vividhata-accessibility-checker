@@ -17,9 +17,9 @@ CREATE TABLE ac.web_page (
     UNIQUE(account_id, url)
 );
 
-CREATE TABLE ac.page_check (
+CREATE TABLE ac.scan (
     id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     web_page_id INT REFERENCES ac.web_page(id),
-    time_checked TIMESTAMP WITH TIME ZONE,
+    time_scanned TIMESTAMP WITH TIME ZONE,
     html_content TEXT
 );

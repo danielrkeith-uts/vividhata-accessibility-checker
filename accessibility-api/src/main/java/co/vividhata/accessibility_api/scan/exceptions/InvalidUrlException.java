@@ -1,4 +1,4 @@
-package co.vividhata.accessibility_api.read_page.exceptions;
+package co.vividhata.accessibility_api.scan.exceptions;
 
 import co.vividhata.accessibility_api.exceptions.BadRequestException;
 
