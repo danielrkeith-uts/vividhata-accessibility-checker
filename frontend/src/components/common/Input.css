@@ -1,0 +1,84 @@
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  line-height: 1.25;
+}
+
+.input__required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+.input {
+  padding: 0.75rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #111827;
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+  font-family: inherit;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input:focus:not(:focus-visible) {
+  box-shadow: none;
+}
+
+.input:hover:not(:disabled) {
+  border-color: #9ca3af;
+}
+
+.input:disabled {
+  background-color: #f9fafb;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.input--full-width {
+  width: 100%;
+}
+
+.input--error {
+  border-color: #ef4444;
+}
+
+.input--error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.input__error {
+  font-size: 0.875rem;
+  color: #ef4444;
+  line-height: 1.25;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .input {
+    padding: 0.625rem;
+    font-size: 0.875rem;
+  }
+  
+  .input__label {
+    font-size: 0.75rem;
+  }
+}

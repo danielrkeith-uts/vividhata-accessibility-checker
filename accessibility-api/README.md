@@ -11,6 +11,7 @@ All API endpoints come from the base url `http://localhost:8080/api` when run lo
 Any endpoints that require a login will return a `401 UNAUTHORIZED` if they are hit without first hitting the `/account/login` endpoint.
 - To check if any account is logged in, hit any endpoint that requires a login (e.g. `/account/me`) and see if it returns a `401`.
 
+
 All endpoints will return a `200 OK` if they succeed, and may or may not return data in the response as well.
 
 ## Endpoints
