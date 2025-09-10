@@ -1,7 +1,9 @@
 package co.vividhata.accessibility_api.scan;
 
+import co.vividhata.accessibility_api.model.Scan;
+
 public interface IScanService {
 
-    String readPageFrom(String url, int accountId);
+    Scan scanFrom(String url, int accountId);
 
 }

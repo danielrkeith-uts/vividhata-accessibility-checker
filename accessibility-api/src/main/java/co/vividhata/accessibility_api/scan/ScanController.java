@@ -1,6 +1,7 @@
 package co.vividhata.accessibility_api.scan;
 
 import co.vividhata.accessibility_api.model.Account;
+import co.vividhata.accessibility_api.model.Scan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ScanController {
 
     @Autowired
-    private IScanService readPageService;
+    private IScanService scanService;
 
     @PostMapping("/from-url")
-    public ResponseEntity<String> readPageFromUrl(@RequestBody String url, @AuthenticationPrincipal Account account) {
-        String html = readPageService.readPageFrom(url, account.id());
+    public ResponseEntity<Scan> readPageFromUrl(@RequestBody String url, @AuthenticationPrincipal Account account) {
+        Scan scan = scanService.scanFrom(url, account.id());
 
-        return ResponseEntity.ok(html);
+        return ResponseEntity.ok(scan);
     }
 
 }

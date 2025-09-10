@@ -23,3 +23,10 @@ CREATE TABLE ac.scan (
     time_scanned TIMESTAMP WITH TIME ZONE,
     html_content TEXT
 );
+
+CREATE TABLE ac.issue (
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    scan_id INT REFERENCES ac.scan(id),
+    issue_type VARCHAR(20),
+    html_snippet TEXT
+);
