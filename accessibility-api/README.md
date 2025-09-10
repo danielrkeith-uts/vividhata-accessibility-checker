@@ -111,6 +111,7 @@ Body contents (Text):
 ```
 https://www.url-to-scan.com
 ```
+*Note: url must include protocol (e.g. `http://` or `https://`)*
 
 Returns (JSON):
 ```
