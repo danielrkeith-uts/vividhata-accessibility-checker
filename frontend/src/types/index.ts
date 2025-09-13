@@ -3,27 +3,26 @@ export interface Site {
   id: string;
   url: string;
   name: string;
-  lastScanned: Date;
-  // can add other fields like name, lastScanned, etc.
+  lastScanned: string;
+  scanData?: any; // Will contain the scan results from the API
 }
 export interface User {
   id: string;
-  username: string;
   firstName: string;
   lastName: string;
-  email?: string;
+  email: string;
   sites?: Site[];
   ocupation: '' | 'Developer' | 'Designer' | 'Manager' | 'QA' | 'Other';
   purpose: '' | 'Personal' | 'Business' | 'Education' | 'Other';
 }
 
 export interface LoginCredentials {
-  username: string;
+  email: string;
   password: string;
 }
 
 export interface RegisterCredentials {
-  username: string;
+  email: string;
   password: string;
   firstName: string;
   lastName: string;

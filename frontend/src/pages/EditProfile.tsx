@@ -15,7 +15,7 @@ export const EditProfile: React.FC = () => {
   const { user, checkAuthStatus } = useAuth();
 
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     firstName: "",
     lastName: "",
     ocupation: "",
@@ -35,7 +35,7 @@ export const EditProfile: React.FC = () => {
   useEffect(() => {
     if (user) {
       setFormData({
-        username: user.username || "",
+        email: user.email || "",
         firstName: user.firstName || "",
         lastName: user.lastName || "",
         ocupation: user.ocupation || "",
@@ -51,8 +51,8 @@ export const EditProfile: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     // Username validation (but can't change username typically)
-    if (!formData.username.trim()) {
-      newErrors.username = "Username is required";
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
     }
 
     if (!formData.firstName.trim()) {
@@ -241,14 +241,14 @@ export const EditProfile: React.FC = () => {
 
               <div className="form-field">
                 <Input
-                  label="Username"
+                  label="Email"
                   type="text"
-                  value={formData.username}
-                  onChange={(value) => handleInputChange("username", value)}
-                  error={errors.username}
+                  value={formData.email}
+                  onChange={(value) => handleInputChange("Email", value)}
+                  error={errors.email}
                   required
                   disabled // Usually can't change username
-                  placeholder="Username cannot be changed"
+                  placeholder="Email cannot be changed"
                 />
               </div>
 

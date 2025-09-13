@@ -20,6 +20,7 @@ public class ScanController {
 
     @PostMapping("/from-url")
     public ResponseEntity<Scan> readPageFromUrl(@RequestBody String url, @AuthenticationPrincipal Account account) {
+
         Scan scan = scanService.scanFrom(url, account.id());
 
         return ResponseEntity.ok(scan);

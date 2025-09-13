@@ -12,17 +12,17 @@ public class PostgreSqlAccountRepository implements IAccountRepository {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public void create(String username, String password, String firstName, String lastName) {
-        String sql = "INSERT INTO ac.account(username, password, first_name, last_name) VALUES (?, ?, ?, ?);";
+    public void create(String email, String password, String firstName, String lastName) {
+        String sql = "INSERT INTO ac.account(email, password, first_name, last_name) VALUES (?, ?, ?, ?);";
 
-        jdbcTemplate.update(sql, username, password, firstName, lastName);
+        jdbcTemplate.update(sql, email, password, firstName, lastName);
     }
 
     @Override
-    public Account get(String username) {
-        String sql = "SELECT * FROM ac.account WHERE username = ?;";
+    public Account get(String email) {
+        String sql = "SELECT * FROM ac.account WHERE email = ?;";
 
-        return jdbcTemplate.query(sql, Account::fromResultSet, username);
+        return jdbcTemplate.query(sql, Account::fromResultSet, email);
     }
 
 }

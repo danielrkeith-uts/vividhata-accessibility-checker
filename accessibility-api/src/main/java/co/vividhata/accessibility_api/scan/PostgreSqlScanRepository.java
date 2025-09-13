@@ -1,5 +1,6 @@
 package co.vividhata.accessibility_api.scan;
 
+import co.vividhata.accessibility_api.model.Scan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class PostgreSqlScanRepository implements IScanRepository {
@@ -38,4 +40,5 @@ public class PostgreSqlScanRepository implements IScanRepository {
         }
         return id.intValue();
     }
+
 }

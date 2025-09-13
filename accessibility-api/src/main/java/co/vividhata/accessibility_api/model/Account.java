@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-public record Account(int id, String username, String password, String firstName, String lastName) implements UserDetails {
+public record Account(int id, String email, String password, String firstName, String lastName) implements UserDetails {
 
     private static final Collection<? extends GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
@@ -20,7 +20,7 @@ public record Account(int id, String username, String password, String firstName
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override
@@ -32,7 +32,7 @@ public record Account(int id, String username, String password, String firstName
         if (!rs.next()) return null;
         return new Account(
                 rs.getInt("id"),
-                rs.getString("username"),
+                rs.getString("email"),
                 rs.getString("password"),
                 rs.getString("first_name"),
                 rs.getString("last_name")

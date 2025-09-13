@@ -4,7 +4,7 @@ CREATE SCHEMA ac;
 
 CREATE TABLE ac.account (
     id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    username VARCHAR(100) UNIQUE,
+    email VARCHAR(100) UNIQUE,
     password VARCHAR(100),
     first_name TEXT,
     last_name TEXT

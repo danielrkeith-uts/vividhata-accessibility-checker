@@ -17,8 +17,8 @@ public class AccountService implements IAccountService {
     private IAccountRepository accountRepository;
 
     @Override
-    public void createAccount(String username, String password, String firstName, String lastName) throws CreateAccountException {
-        if (accountRepository.get(username) != null) {
+    public void createAccount(String email, String password, String firstName, String lastName) throws CreateAccountException {
+        if (accountRepository.get(email) != null) {
             throw new UsernameTakenException();
         }
 
@@ -28,7 +28,7 @@ public class AccountService implements IAccountService {
 
         String hashedPassword = passwordEncoder.encode(password);
 
-        accountRepository.create(username, hashedPassword, firstName, lastName);
+        accountRepository.create(email, hashedPassword, firstName, lastName);
     }
 
 }

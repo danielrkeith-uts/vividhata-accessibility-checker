@@ -6,9 +6,8 @@ import { Button } from "../components/common/Button";
 import "./ManageSites.css";
 import LanguageIcon from "@mui/icons-material/Language";
 
-// TODO: SITES DO NOT PERSIST AFTER LOGOUT
 export const ManageSites: React.FC = () => {
-  const { user, userSites } = useAuth();
+  const { user, userSites, removeSite } = useAuth();
   const navigate = useNavigate();
 
   const goToDashboard = (siteId: string) => {
@@ -81,12 +80,13 @@ export const ManageSites: React.FC = () => {
                   </Button>
                   <Button
                     onClick={() => {
-                      // TODO: Add edit functionality later
-                      console.log("Edit site:", site.id);
+                      if (window.confirm(`Are you sure you want to delete ${site.name}?`)) {
+                        removeSite(site.id);
+                      }
                     }}
                     variant="outline"
                   >
-                    Edit
+                    Delete
                   </Button>
                 </div>
               </div>

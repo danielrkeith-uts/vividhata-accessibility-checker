@@ -58,6 +58,7 @@ public class ScanService implements IScanService {
         return new Scan(scanId, webPageId, timeScanned, html, issuesWithIds);
     }
 
+
     private String readPageFrom(String url) {
         String html;
         try {

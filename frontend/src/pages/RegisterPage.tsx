@@ -12,7 +12,7 @@ export const RegisterPage: React.FC = () => {
   const { register } = useAuth();
 
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: "",
     confirmPassword: "",
     firstName: "",
@@ -27,10 +27,10 @@ export const RegisterPage: React.FC = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.username.trim()) {
-      newErrors.username = "Username is required";
-    } else if (formData.username.length < 3) {
-      newErrors.username = "Username must be at least 3 characters";
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Email is not valid";
     }
 
     if (!formData.password) {
@@ -81,17 +81,17 @@ export const RegisterPage: React.FC = () => {
 
     try {
       await register({
-        username: formData.username,
+        email: formData.email,
         password: formData.password,
         firstName: formData.firstName,
         lastName: formData.lastName,
         ocupation: formData.ocupation as RegisterCredentials["ocupation"],
         purpose: formData.purpose as RegisterCredentials["purpose"],
       });
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
       setErrors({
-        general: "Registration failed. Username might already be taken.",
+        general: "Registration failed. Email might already be in use.",
       });
     } finally {
       setIsLoading(false);
@@ -154,14 +154,14 @@ export const RegisterPage: React.FC = () => {
           </div>
 
           <Input
-            label="Username"
-            type="text"
-            value={formData.username}
-            onChange={(value) => handleInputChange("username", value)}
-            error={errors.username}
+            label="Email"
+            type="email"
+            value={formData.email}
+            onChange={(value) => handleInputChange("email", value)}
+            error={errors.email}
             required
-            autoComplete="username"
-            placeholder="Choose a username"
+            autoComplete="email"
+            placeholder="Enter your email address"
           />
 
           <Input
@@ -229,6 +229,7 @@ export const RegisterPage: React.FC = () => {
             placeholder="Confirm your password"
           />
 
+{/* TODO: Get finalised list of occupations */}
           <Select
             label="Occupation"
             value={formData.ocupation}
@@ -244,7 +245,7 @@ export const RegisterPage: React.FC = () => {
             required
             fullWidth
           />
-
+{/* TODO: Get finalised list of purposes */}
           <Select
             label="What are you using this tool for?"
             value={formData.purpose}

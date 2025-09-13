@@ -1,6 +1,8 @@
 package co.vividhata.accessibility_api.exceptions;
 
 import co.vividhata.accessibility_api.account.exceptions.CreateAccountException;
+import co.vividhata.accessibility_api.account.exceptions.UsernameTakenException;
+import co.vividhata.accessibility_api.account.exceptions.InvalidPasswordException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -29,6 +31,27 @@ public class HttpExceptionHandler {
     public ResponseEntity<?> handleBadGatewayException(BadGatewayException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_GATEWAY)
+                .body(bodyFrom(ex));
+    }
+
+    @ExceptionHandler(UsernameTakenException.class)
+    public ResponseEntity<?> handleUsernameTakenException(UsernameTakenException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(bodyFrom(ex));
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<?> handleInvalidPasswordException(InvalidPasswordException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(bodyFrom(ex));
+    }
+
+    @ExceptionHandler(CreateAccountException.class)
+    public ResponseEntity<?> handleCreateAccountException(CreateAccountException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(bodyFrom(ex));
     }
 
