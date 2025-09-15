@@ -6,6 +6,7 @@ import { Input } from "../components/common/Input";
 import "./RegisterPage.css";
 import { RegisterCredentials } from "../types";
 import { Select } from "../components/common/Select";
+import { EyeOff, Eye } from "lucide-react";
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +24,8 @@ export const RegisterPage: React.FC = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -166,7 +169,7 @@ export const RegisterPage: React.FC = () => {
 
           <Input
             label="Password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={formData.password}
             onChange={(value) => handleInputChange("password", value)}
             error={errors.password}
@@ -174,6 +177,14 @@ export const RegisterPage: React.FC = () => {
             autoComplete="new-password"
             placeholder="Create a password"
           />
+          <button 
+            type="button" 
+            className="password-toggle"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+            onClick={() => setShowPassword((v) => !v)}>
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
           <div className="password-requirements">
             <p className="password-requirements-title">
               Password must contain:
@@ -220,7 +231,7 @@ export const RegisterPage: React.FC = () => {
 {/* TODO: Implement toggle to view password */}
           <Input
             label="Confirm Password"
-            type="password"
+            type={showConfirmPassword ? "text" : "password"}
             value={formData.confirmPassword}
             onChange={(value) => handleInputChange("confirmPassword", value)}
             error={errors.confirmPassword}
@@ -228,7 +239,14 @@ export const RegisterPage: React.FC = () => {
             autoComplete="new-password"
             placeholder="Confirm your password"
           />
-
+          <button 
+            type="button" 
+            className="password-toggle"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+            onClick={() => setShowPassword((v) => !v)}>
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
           <Select
             label="Occupation"
             value={formData.ocupation}

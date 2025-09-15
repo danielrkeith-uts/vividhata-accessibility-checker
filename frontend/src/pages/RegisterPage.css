@@ -162,3 +162,17 @@
 .requirement-unmet::before {
   background-color: #d1d5db;
 }
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 0;
+  padding: 4px 6px;
+  cursor: pointer;
+  font-size: 18px; /* emoji size */
+  line-height: 1;
+  color: #555;
+}
