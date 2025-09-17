@@ -20,7 +20,7 @@ All endpoints will return a `200 OK` if they succeed, and may or may not return 
 
 ---
 
-#### `/admin/db/rebuild-schema`
+#### `POST /admin/db/rebuild-schema`
 Rebuilds the schema, erasing all data. Should be done after any update to the backend.
 
 Requires login: *false*
@@ -38,7 +38,7 @@ Returns no significant data.
 
 ---
 
-#### `/account/create`
+#### `POST /account/create`
 Requires login: *false*
 
 Body contents (JSON):
@@ -59,7 +59,7 @@ Returns no significant data.
 
 ---
 
-#### `/account/login`
+#### `POST /account/login`
 Requires login: *false*
 
 Body contents (JSON):
@@ -76,7 +76,7 @@ Returns no significant data.
 
 ---
 
-#### `/account/logout`
+#### `POST /account/logout`
 Requires login: *true*
 
 No body required.
@@ -85,7 +85,7 @@ Returns no significant data.
 
 ---
 
-#### `/account/me`
+#### `GET /account/me`
 Requires login: *true*
 
 No body required.
@@ -97,6 +97,34 @@ Returns (JSON):
     "id": 1
 }
 ```
+---
+
+### Web Pages
+
+---
+
+#### `GET /web-page/all`
+Fetches all of the web pages scanned in the past on the currently logged in account.
+
+Requires login: *true*
+
+No body required.
+
+Returns (JSON):
+```
+{
+    {
+        "id": 1,
+        "accountId": 1,
+        "url": "https://www.google.com"
+    },
+    {
+        "id": 1,
+        "accountId": 1,
+        "url": "https://www.whattimeisitrightnow.com"
+    },
+}
+```
 
 ---
 
@@ -104,7 +132,7 @@ Returns (JSON):
 
 ___
 
-#### `/scan/from-url`
+#### `POST /scan/from-url`
 Fetches a website, scans it, and returns the details of that scan, including all issues.
 
 Requires login: *true*

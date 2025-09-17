@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
+import java.util.List;
 
-@Service
+@Repository
 public class PostgreSqlWebPageRepository implements IWebPageRepository {
 
     @Autowired
@@ -37,10 +39,18 @@ public class PostgreSqlWebPageRepository implements IWebPageRepository {
         return id.intValue();
     }
 
+    @Override
     public WebPage get(int accountId, String url) {
         String sql = "SELECT * FROM ac.web_page WHERE account_id = ? AND url = ?;";
 
         return jdbcTemplate.query(sql, WebPage::fromResultSet, accountId, url);
+    }
+
+    @Override
+    public List<WebPage> getAll(int accountId) {
+        String sql = "SELECT * FROM ac.web_page WHERE account_id = ?;";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> WebPage.fromRow(rs), accountId);
     }
 
 }
