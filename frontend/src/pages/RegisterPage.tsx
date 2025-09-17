@@ -6,6 +6,8 @@ import { Input } from "../components/common/Input";
 import "./RegisterPage.css";
 import { RegisterCredentials } from "../types";
 import { Select } from "../components/common/Select";
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +25,8 @@ export const RegisterPage: React.FC = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -166,13 +170,21 @@ export const RegisterPage: React.FC = () => {
 
           <Input
             label="Password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={formData.password}
             onChange={(value) => handleInputChange("password", value)}
             error={errors.password}
             required
             autoComplete="new-password"
             placeholder="Create a password"
+            endAdornment={<button 
+              type="button" 
+              className="password-toggle"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-pressed={showPassword}
+              onClick={() => setShowPassword((v) => !v)}>
+              {showPassword ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+            </button>}
           />
           <div className="password-requirements">
             <p className="password-requirements-title">
@@ -217,18 +229,24 @@ export const RegisterPage: React.FC = () => {
               </li>
             </ul>
           </div>
-{/* TODO: Implement toggle to view password */}
           <Input
             label="Confirm Password"
-            type="password"
+            type={showConfirmPassword ? "text" : "password"}
             value={formData.confirmPassword}
             onChange={(value) => handleInputChange("confirmPassword", value)}
             error={errors.confirmPassword}
             required
             autoComplete="new-password"
             placeholder="Confirm your password"
+            endAdornment={<button 
+            type="button" 
+            className="password-toggle"
+            aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+            aria-pressed={showConfirmPassword}
+            onClick={() => setShowConfirmPassword((v) => !v)}>
+            {showConfirmPassword ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+          </button>}
           />
-
           <Select
             label="Occupation"
             value={formData.ocupation}
