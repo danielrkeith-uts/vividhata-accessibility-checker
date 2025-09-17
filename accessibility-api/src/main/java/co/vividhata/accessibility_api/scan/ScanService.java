@@ -1,6 +1,7 @@
 package co.vividhata.accessibility_api.scan;
 
 import co.vividhata.accessibility_api.checker.ICheckerService;
+import co.vividhata.accessibility_api.issue.IIssueRepository;
 import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.Scan;
 import co.vividhata.accessibility_api.model.WebPage;
@@ -8,6 +9,7 @@ import co.vividhata.accessibility_api.scan.exceptions.CouldNotFetchPageException
 import co.vividhata.accessibility_api.scan.exceptions.InvalidUrlException;
 import co.vividhata.accessibility_api.util.IHtmlFetcher;
 import co.vividhata.accessibility_api.util.IHtmlParser;
+import co.vividhata.accessibility_api.web_page.IWebPageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
