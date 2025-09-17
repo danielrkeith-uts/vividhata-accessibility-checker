@@ -1,6 +1,6 @@
-package co.vividhata.accessibility_api.scan;
+package co.vividhata.accessibility_api.web_page;
 
-import co.vividhata.accessibility_api.model.IssueType;
+import co.vividhata.accessibility_api.model.WebPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -8,27 +8,25 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
+import java.util.List;
 
 @Service
-public class PostgreSqlIssueRepository implements IIssueRepository {
+public class PostgreSqlWebPageRepository implements IWebPageRepository {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    JdbcTemplate jdbcTemplate;
 
     @Override
-    public int create(int scanId, IssueType issueType, String htmlSnippet) {
-        String sql = "INSERT INTO ac.issue(scan_id, issue_type, html_snippet) VALUES (?, ?, ?);";
+    public int create(int accountId, String url) {
+        String sql = "INSERT INTO ac.web_page(account_id, url) VALUES (?, ?);";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(con -> {
 
             PreparedStatement ps = con.prepareStatement(sql, new String[]{"id"});
-
-            ps.setInt(1, scanId);
-            ps.setString(2, issueType.name());
-            ps.setString(3, htmlSnippet);
-
+            ps.setInt(1, accountId);
+            ps.setString(2, url);
             return ps;
 
         }, keyHolder);
@@ -39,4 +37,12 @@ public class PostgreSqlIssueRepository implements IIssueRepository {
         }
         return id.intValue();
     }
+
+    public WebPage get(int accountId, String url) {
+        String sql = "SELECT * FROM ac.web_page WHERE account_id = ? AND url = ?;";
+
+        return jdbcTemplate.query(sql, WebPage::fromResultSet, accountId, url);
+    }
+
+
 }

@@ -1,4 +1,4 @@
-package co.vividhata.accessibility_api.scan;
+package co.vividhata.accessibility_api.issue;
 
 import co.vividhata.accessibility_api.model.IssueType;
 

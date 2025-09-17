@@ -4,6 +4,12 @@
   gap: 0.5rem;
 }
 
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .input__label {
   font-size: 0.875rem;
   font-weight: 500;
@@ -26,6 +32,7 @@
   background-color: white;
   transition: all 0.2s ease-in-out;
   font-family: inherit;
+  width: 100%;
 }
 
 .input:focus {
@@ -69,6 +76,47 @@
   font-size: 0.875rem;
   color: #ef4444;
   line-height: 1.25;
+}
+
+.input__adornment {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.input__adornment button {
+  pointer-events: auto;
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.2s ease-in-out;
+  width: 24px;
+  height: 24px;
+}
+
+.input__adornment button:hover {
+  color: #374151;
+}
+
+.input__adornment button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Add padding to input when it has an endAdornment */
+.input-container--with-adornment .input {
+  padding-right: 40px;
 }
 
 /* Responsive */
