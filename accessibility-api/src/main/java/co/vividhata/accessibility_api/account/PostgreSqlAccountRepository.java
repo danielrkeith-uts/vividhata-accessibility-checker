@@ -3,9 +3,9 @@ package co.vividhata.accessibility_api.account;
 import co.vividhata.accessibility_api.model.Account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
-@Service
+@Repository
 public class PostgreSqlAccountRepository implements IAccountRepository {
 
     @Autowired
