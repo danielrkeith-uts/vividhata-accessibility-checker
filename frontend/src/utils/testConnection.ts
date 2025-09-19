@@ -15,21 +15,20 @@ export const testBackendConnection = async (): Promise<boolean> => {
       
       // 401 is expected when not authenticated
       if (response.status === 401) {
-        console.log('✅ Backend is reachable and responding correctly');
+        console.log('Backend is reachable and responding correctly');
         return true;
       } else if (response.ok) {
-        console.log('✅ Backend is reachable and user is authenticated');
+        console.log('Backend is reachable and user is authenticated');
         return true;
       } else {
-        console.log(`⚠️ Backend responded with unexpected status: ${response.status}`);
+        console.log(`Backend responded with unexpected status: ${response.status}`);
         return false;
       }
     } catch (error) {
-      console.error('❌ Backend connection failed:', error);
+      console.error('Backend connection failed:', error);
       console.log('Make sure the backend server is running on http://localhost:8080');
       return false;
     }
   };
   
-  // Test function you can call from browser console
   (window as any).testBackendConnection = testBackendConnection;
