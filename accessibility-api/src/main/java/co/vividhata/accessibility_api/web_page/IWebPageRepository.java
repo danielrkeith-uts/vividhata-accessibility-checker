@@ -10,6 +10,8 @@ public interface IWebPageRepository {
 
     WebPage get(int accountId, String url);
 
+    WebPage get(int webPageId);
+
     List<WebPage> getAll(int accountId);
 
 }

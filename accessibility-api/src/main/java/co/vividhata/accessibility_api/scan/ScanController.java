@@ -1,5 +1,6 @@
 package co.vividhata.accessibility_api.scan;
 
+import co.vividhata.accessibility_api.issue.IIssueService;
 import co.vividhata.accessibility_api.model.Account;
 import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.Scan;
@@ -18,6 +19,8 @@ public class ScanController {
 
     @Autowired
     private IScanService scanService;
+    @Autowired
+    private IIssueService issueService;
 
     @PostMapping("/from-url")
     public ResponseEntity<Scan> readPageFromUrl(@RequestBody String url, @AuthenticationPrincipal Account account) {
@@ -32,7 +35,7 @@ public class ScanController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Scan does not belong to current user");
         }
 
-        return ResponseEntity.ok(scanService.getIssues(scanId));
+        return ResponseEntity.ok(issueService.getIssues(scanId));
     }
 
 }

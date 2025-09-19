@@ -46,6 +46,13 @@ public class PostgreSqlWebPageRepository implements IWebPageRepository {
     }
 
     @Override
+    public WebPage get(int webPageId) {
+        String sql = "SELECT * FROM ac.web_page WHERE id = ?;";
+
+        return jdbcTemplate.query(sql, WebPage::fromResultSet, webPageId);
+    }
+
+    @Override
     public List<WebPage> getAll(int accountId) {
         String sql = "SELECT * FROM ac.web_page WHERE account_id = ?;";
 

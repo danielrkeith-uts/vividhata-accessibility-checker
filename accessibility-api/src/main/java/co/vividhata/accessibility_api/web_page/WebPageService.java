@@ -16,4 +16,10 @@ public class WebPageService implements IWebPageService {
     public List<WebPage> getAllWebPages(int accountId) {
         return webPageRepository.getAll(accountId);
     }
+
+    @Override
+    public int getOwner(int webPageId) {
+        return webPageRepository.get(webPageId).accountId();
+    }
+
 }

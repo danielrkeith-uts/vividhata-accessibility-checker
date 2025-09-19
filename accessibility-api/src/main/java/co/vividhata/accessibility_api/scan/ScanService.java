@@ -66,8 +66,8 @@ public class ScanService implements IScanService {
     }
 
     @Override
-    public List<Issue> getIssues(int scanId) {
-        return issueRepository.getAll(scanId);
+    public List<Scan> getScans(int webPageId) {
+        return scanRepository.getAll(webPageId);
     }
 
     private String readPageFrom(String url) {
