@@ -60,6 +60,16 @@ public class ScanService implements IScanService {
         return new Scan(scanId, webPageId, timeScanned, html, issuesWithIds);
     }
 
+    @Override
+    public int getOwner(int scanId) {
+        return scanRepository.getOwner(scanId);
+    }
+
+    @Override
+    public List<Issue> getIssues(int scanId) {
+        return issueRepository.getAll(scanId);
+    }
+
     private String readPageFrom(String url) {
         String html;
         try {

@@ -1,14 +1,15 @@
 package co.vividhata.accessibility_api.scan;
 
 import co.vividhata.accessibility_api.model.Account;
+import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.Scan;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -23,6 +24,15 @@ public class ScanController {
         Scan scan = scanService.scanFrom(url, account.id());
 
         return ResponseEntity.ok(scan);
+    }
+
+    @GetMapping("/{scanId}/issues")
+    public ResponseEntity<?> getIssues(@PathVariable int scanId, @AuthenticationPrincipal Account account) {
+        if (scanService.getOwner(scanId) != account.id()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Scan does not belong to current user");
+        }
+
+        return ResponseEntity.ok(scanService.getIssues(scanId));
     }
 
 }

@@ -1,5 +1,6 @@
 package co.vividhata.accessibility_api.issue;
 
+import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.IssueType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -8,6 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
+import java.util.List;
 
 @Repository
 public class PostgreSqlIssueRepository implements IIssueRepository {
@@ -38,5 +40,11 @@ public class PostgreSqlIssueRepository implements IIssueRepository {
             return -1;
         }
         return id.intValue();
+    }
+
+    public List<Issue> getAll(int scanId) {
+        String sql = "SELECT * FROM ac.issue WHERE scan_id = ?";
+
+        return jdbcTemplate.query(sql, Issue::fromRow, scanId);
     }
 }

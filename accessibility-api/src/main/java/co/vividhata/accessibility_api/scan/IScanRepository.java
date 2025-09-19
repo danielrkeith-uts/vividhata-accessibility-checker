@@ -9,4 +9,6 @@ public interface IScanRepository {
 
     int create(int webPageId, Instant timeScanned, String htmlContent);
 
+    int getOwner(int scanId);
+
 }
