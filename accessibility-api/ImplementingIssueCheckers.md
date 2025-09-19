@@ -48,5 +48,9 @@ For each issue checker, add the WCAG issue type to the enum and use that.
 `htmlSnippet` is a `String` containing the HTML that is causing the issue.
 
 ## Testing the checker
+Please write a unit test for the checker inside
+`src/test/java/co/vividhata/accessibility_api/issue_checkers`
+to ensure it functions as expected.
+
 All the checkers are triggered when the `scan/from-url` endpoint is hit.
 Details for that endpoint are in the `README.md`.
