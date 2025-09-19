@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './EnterUrlPage.css';
 import { useAuth } from '../context/AuthContext';
+import { scanService } from '../services/scan/scanService';
 
 export const EnterUrlPage: React.FC = () => {
   const [url, setUrl] = useState('');
@@ -18,24 +19,27 @@ export const EnterUrlPage: React.FC = () => {
     setError('');
 
     try {
-      // Create the site on backend
-      const newSite = await createSiteOnBackend(url);
+      // Perform accessibility scan
+      const scanResult = await scanService.scanUrl(url);
       
-      if (!newSite || !newSite.id) {
-        throw new Error('Failed to create site');
-      }
+      // Create site object with scan data
+      const newSite = {
+        id: scanResult.siteId,
+        name: extractSiteName(url),
+        url: url.trim(),
+        lastScanned: scanResult.scan.timeScanned,
+        scanData: scanResult.scan,
+      };
 
-      // Add to context (optimistic update)
+      // Add to context
       addSite(newSite);
 
-      // Navigate to dashboard
-      navigate(`/dashboard/${newSite.id}`);
+      // Navigate to dashboard with the site ID
+      navigate(`/dashboard/${scanResult.siteId}`);
     } catch (err) {
-      console.error('Error creating site:', err);
-      setError('Failed to create site. Please try again.');
-      
-      // Refresh user data from backend in case of mismatch
-      await refreshUserData();
+      console.error('Error scanning URL:', err);
+      setError(err instanceof Error ? err.message : 'Failed to scan URL. Please try again.');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -55,7 +59,7 @@ export const EnterUrlPage: React.FC = () => {
             disabled={isLoading}
           />
           <button type="submit" className="url-submit-button" disabled={isLoading}>
-            {isLoading ? 'Creating Site...' : 'Go to Dashboard'}
+            {isLoading ? 'Scanning Website...' : 'Scan Website'}
           </button>
         </form>
         
@@ -69,33 +73,6 @@ export const EnterUrlPage: React.FC = () => {
   );
 };
 
-// Replace this with actual API call
-async function createSiteOnBackend(url: string): Promise<any> {
-  try {
-    const response = await fetch('http://localhost:8080/api/sites', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ url }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create site');
-    }
-
-    return await response.json();
-  } catch (error) {
-    // Fallback to mock data for testing
-    console.warn('Backend call failed, using mock data:', error);
-    return {
-      id: `site_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      name: extractSiteName(url),
-      url: url.trim()
-    };
-  }
-}
 
 function extractSiteName(url: string): string {
   try {

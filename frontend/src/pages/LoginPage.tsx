@@ -10,7 +10,7 @@ export const LoginPage: React.FC = () => {
   const { login } = useAuth();
 
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
@@ -20,8 +20,10 @@ export const LoginPage: React.FC = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.username.trim()) {
-      newErrors.username = "Username is required";
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Email is not valid";
     }
 
     if (!formData.password) {
@@ -43,9 +45,9 @@ export const LoginPage: React.FC = () => {
 
     try {
       await login(formData);
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
-      setErrors({ general: "Invalid username or password" });
+      setErrors({ general: "Invalid email or password" });
     } finally {
       setIsLoading(false);
     }
@@ -83,15 +85,15 @@ export const LoginPage: React.FC = () => {
           )}
           <div className="form-row">
             <Input
-              label="Username"
-              type="text"
-              value={formData.username}
-              onChange={(value) => handleInputChange("username", value)}
-              error={errors.username}
+              label="Email"
+              type="email"
+              value={formData.email}
+              onChange={(value) => handleInputChange("email", value)}
+              error={errors.email}
               required
               fullWidth
-              autoComplete="username"
-              placeholder="Enter your username"
+              autoComplete="email"
+              placeholder="Enter your email"
             />
           </div>
           <div className="form-row">

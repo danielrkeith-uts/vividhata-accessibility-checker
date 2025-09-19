@@ -4,6 +4,6 @@ import co.vividhata.accessibility_api.account.exceptions.CreateAccountException;
 
 public interface IAccountService {
 
-    void createAccount(String username, String password, String firstName, String lastName) throws CreateAccountException;
+    void createAccount(String email, String password, String firstName, String lastName) throws CreateAccountException;
 
 }

@@ -28,13 +28,13 @@ public class AccountController {
 
     @PostMapping("/create")
     public ResponseEntity<String> createAccount(@RequestBody CreateAccountRequest createAccountRequest) {
-        accountService.createAccount(createAccountRequest.username(), createAccountRequest.password(), createAccountRequest.firstName(), createAccountRequest.lastName());
+        accountService.createAccount(createAccountRequest.email(), createAccountRequest.password(), createAccountRequest.firstName(), createAccountRequest.lastName());
         return ResponseEntity.ok("Account created");
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password());
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password());
 
         Authentication authentication = authenticationManager.authenticate(authToken);
 
@@ -58,7 +58,7 @@ public class AccountController {
     @GetMapping("/me")
     public ResponseEntity<Map<String, Object>> getCurrentUser(@AuthenticationPrincipal Account account) {
         return ResponseEntity.ok(Map.of(
-                "username", account.username(),
+                "email", account.email(),
                 "id", account.id()
         ));
     }

@@ -1,6 +1,4 @@
 package co.vividhata.accessibility_api.exceptions;
-
-import co.vividhata.accessibility_api.account.exceptions.CreateAccountException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

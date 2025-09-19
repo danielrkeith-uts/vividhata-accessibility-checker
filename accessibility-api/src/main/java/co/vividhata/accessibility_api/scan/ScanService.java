@@ -68,6 +68,7 @@ public class ScanService implements IScanService {
         return scanRepository.getAll(webPageId);
     }
 
+
     private String readPageFrom(String url) {
         String html;
         try {

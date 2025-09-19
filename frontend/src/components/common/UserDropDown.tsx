@@ -50,7 +50,7 @@ export const UserDropDown: React.FC = ({
   }
 
   // Create display name from user data
-  const displayName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username;
+  const displayName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email;
 
   return (
     <div 

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginCredentials, RegisterCredentials, Site } from '../types';
+import { apiService } from '../services/api/apiService';
 
 interface AuthContextType {
   user: User | null;
@@ -11,6 +12,7 @@ interface AuthContextType {
   logout: () => void;
   checkAuthStatus: () => Promise<void>;
   addSite: (site: Site) => void; 
+  removeSite: (siteId: string) => void;
   refreshUserData: () => Promise<void>; 
 }
 
@@ -32,72 +34,99 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
-  });  const [isLoading, setIsLoading] = useState(true);
+  });
+  
+  const [userSites, setUserSites] = useState<Site[]>([]);
+  
+  const [isLoading, setIsLoading] = useState(true);
 
   const checkAuthStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/account/me', {
-        credentials: 'include',
-      });
-      
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else if (response.status === 401) {
-        setUser(null);
-      } else {
-        console.warn('Auth check failed with unexpected status:', response.status);
-      }
+      const userData = await apiService.getCurrentUser();
+      // Map Account to User type
+      const user: User = {
+        id: userData.id.toString(),
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        ocupation: '',
+        purpose: ''
+      };
+      setUser(user);
+      loadUserSites(user.id);
     } catch (error) {
-      console.error('Error checking auth status:', error);
-      setUser(null);
+      if (error instanceof Error && error.message.includes('Unauthorized')) {
+        console.log('User not authenticated - this is normal');
+        setUser(null);
+        setUserSites([]);
+      } else if (error instanceof Error && error.message.includes('Failed to fetch')) {
+        console.error('Network error - backend may not be running');
+        setUser(null);
+        setUserSites([]);
+      } else {
+        console.error('Error checking auth status:', error);
+        setUser(null);
+        setUserSites([]);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
+  const loadUserSites = (userId: string) => {
+    const userSpecificKey = `userSites_${userId}`;
+    const storedSites = localStorage.getItem(userSpecificKey);
+    const sites = storedSites ? JSON.parse(storedSites) : [];
+    setUserSites(sites);
+  };
+
+  const saveUserSites = (userId: string, sites: Site[]) => {
+    const userSpecificKey = `userSites_${userId}`;
+    localStorage.setItem(userSpecificKey, JSON.stringify(sites));
+  };
+
   const refreshUserData = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/account/me', {
-        credentials: 'include',
-      });
+      const userData = await apiService.getCurrentUser();
+      const user: User = {
+        id: userData.id.toString(),
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        ocupation: '',
+        purpose: ''
+      };
+      setUser(user);
       
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      }
+      loadUserSites(user.id);
     } catch (error) {
       console.error('Error refreshing user data:', error);
     }
   };
 
+  const refreshUserSites = async () => {
+    // Since we only have the scan endpoint, keep sites in localStorage
+    // todo: fetch sites from the API
+    console.log('User sites refreshed from localStorage');
+  };
+
   const addSite = (site: Site) => {
-    if (user) {
-      const updatedUser = {
-        ...user,
-        sites: [...(user.sites || []), site],
-      };
-      setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
-    }
+    if (!user) return; 
+    const updatedSites = [...userSites, site];
+    setUserSites(updatedSites);
+    saveUserSites(user.id, updatedSites);
+  };
+
+  const removeSite = (siteId: string) => {
+    if (!user) return; 
+    const updatedSites = userSites.filter(site => site.id !== siteId);
+    setUserSites(updatedSites);
+    saveUserSites(user.id, updatedSites);
   };
 
   const login = async (credentials: LoginCredentials) => {
     try {
-      const response = await fetch('http://localhost:8080/api/account/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(credentials),
-      });
-
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-
-      // After successful login, check auth status to get user data
+      await apiService.login(credentials);
       await checkAuthStatus();
     } catch (error) {
       console.error('Login error:', error);
@@ -107,20 +136,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (credentials: RegisterCredentials) => {
     try {
-      const response = await fetch('http://localhost:8080/api/account/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(credentials),
+      await apiService.createAccount(credentials);
+      await apiService.login({
+        email: credentials.email,
+        password: credentials.password
       });
-
-      if (!response.ok) {
-        throw new Error('Registration failed');
-      }
-
-      // After successful registration, check auth status to get user data
       await checkAuthStatus();
     } catch (error) {
       console.error('Registration error:', error);
@@ -130,14 +150,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch('http://localhost:8080/api/account/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await apiService.logout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       setUser(null);
+      setUserSites([]); 
       localStorage.removeItem("user");
     }
   };
@@ -154,7 +172,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user]);
 
-  const userSites = user?.sites || [];
 
   const value: AuthContextType = {
     user,
@@ -166,6 +183,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     checkAuthStatus,
     addSite,
+    removeSite,
     refreshUserData,
   };
 
