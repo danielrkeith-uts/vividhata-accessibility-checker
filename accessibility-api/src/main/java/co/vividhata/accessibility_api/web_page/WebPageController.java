@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/web-page")
+@RequestMapping("/api")
 public class WebPageController {
 
     @Autowired
@@ -23,12 +23,12 @@ public class WebPageController {
     @Autowired
     private IScanService scanService;
 
-    @GetMapping("/all")
+    @GetMapping("/web-pages")
     public ResponseEntity<List<WebPage>> getAll(@AuthenticationPrincipal Account account) {
         return ResponseEntity.ok(webPageService.getAllWebPages(account.id()));
     }
 
-    @GetMapping("/{webPageId}/scans")
+    @GetMapping("/web-page/{webPageId}/scans")
     public ResponseEntity<?> getScans(@PathVariable int webPageId, @AuthenticationPrincipal Account account) {
         if (webPageService.getOwner(webPageId) != account.id()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Scan does not belong to current user");
