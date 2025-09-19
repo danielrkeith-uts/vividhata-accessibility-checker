@@ -30,6 +30,10 @@ public record Account(int id, String email, String password, String firstName, S
 
     public static Account fromResultSet(ResultSet rs) throws SQLException {
         if (!rs.next()) return null;
+        return fromRow(rs, rs.getRow());
+    }
+
+    public static Account fromRow(ResultSet rs, int ignoredRowNum) throws SQLException {
         return new Account(
                 rs.getInt("id"),
                 rs.getString("email"),

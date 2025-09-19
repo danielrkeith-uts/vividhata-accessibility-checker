@@ -51,13 +51,21 @@ public class ScanService implements IScanService {
 
         int scanId = scanRepository.create(webPageId, timeScanned, html);
 
-        List<Issue> issuesWithIds = new ArrayList<>();
         for (Issue issue : issues) {
-            int issueId = issueRepository.create(scanId, issue.issueType(), issue.htmlSnippet());
-            issuesWithIds.add(issue.withId(issueId).withScanId(scanId));
+            issueRepository.create(scanId, issue.issueType(), issue.htmlSnippet());
         }
 
-        return new Scan(scanId, webPageId, timeScanned, html, issuesWithIds);
+        return new Scan(scanId, webPageId, timeScanned, html);
+    }
+
+    @Override
+    public int getOwner(int scanId) {
+        return scanRepository.getOwner(scanId);
+    }
+
+    @Override
+    public List<Scan> getScans(int webPageId) {
+        return scanRepository.getAll(webPageId);
     }
 
 

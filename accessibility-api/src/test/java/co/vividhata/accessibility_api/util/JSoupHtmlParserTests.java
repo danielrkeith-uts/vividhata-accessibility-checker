@@ -1,4 +1,4 @@
-package co.vividhata.accessibility_api.services;
+package co.vividhata.accessibility_api.util;
 
 import co.vividhata.accessibility_api.util.implementations.JSoupHtmlParser;
 import org.junit.jupiter.api.Assertions;

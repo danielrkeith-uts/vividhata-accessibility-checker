@@ -20,7 +20,7 @@ All endpoints will return a `200 OK` if they succeed, and may or may not return 
 
 ---
 
-#### `/admin/db/rebuild-schema`
+#### `POST /admin/db/rebuild-schema`
 Rebuilds the schema, erasing all data. Should be done after any update to the backend.
 
 Requires login: *false*
@@ -38,11 +38,11 @@ Returns no significant data.
 
 ---
 
-#### `/account/create`
+#### `POST /account/create`
 Requires login: *false*
 
 Body contents (JSON):
-```
+```json
 {
     "username": "gregory.example.1",
     "password": "gregory.password.1",
@@ -59,11 +59,11 @@ Returns no significant data.
 
 ---
 
-#### `/account/login`
+#### `POST /account/login`
 Requires login: *false*
 
 Body contents (JSON):
-```
+```json
 {
     "username": "gregory.example.1",
     "password": "gregory.password.1"
@@ -76,7 +76,7 @@ Returns no significant data.
 
 ---
 
-#### `/account/logout`
+#### `POST /account/logout`
 Requires login: *true*
 
 No body required.
@@ -85,17 +85,73 @@ Returns no significant data.
 
 ---
 
-#### `/account/me`
+#### `GET /account/me`
 Requires login: *true*
 
 No body required.
 
 Returns (JSON):
-```
+```json
 {
     "username": "gregory.example.1",
     "id": 1
 }
+```
+---
+
+### Web Pages
+
+---
+
+#### `GET /web-pages`
+Fetches all the web pages scanned in the past on the currently logged in account.
+
+Requires login: *true*
+
+No body required.
+
+Returns (JSON):
+```json
+[
+    {
+        "id": 1,
+        "accountId": 1,
+        "url": "https://www.google.com"
+    },
+    {
+        "id": 1,
+        "accountId": 1,
+        "url": "https://www.whattimeisitrightnow.com"
+    }
+]
+```
+
+---
+
+#### `GET /web-page/{webPageId}/scans`
+Fetches all the scans associated with a single web page.
+Replace `webPageId` with the relevant web page id (which can be gotten from the `GET /web-pages` endpoint).
+
+Requires login: *true*
+
+No body required
+
+Returns (JSON):
+```json
+[
+    {
+        "id": 2,
+        "webPageId": 2,
+        "timeScanned": "2025-09-18T02:37:20.996618Z",
+        "htmlContent": "<html>Content</html>"
+    },
+    {
+        "id": 3,
+        "webPageId": 2,
+        "timeScanned": "2025-09-18T06:46:31.900183Z",
+        "htmlContent": "<html>Content</html>"
+    }
+]
 ```
 
 ---
@@ -104,7 +160,7 @@ Returns (JSON):
 
 ___
 
-#### `/scan/from-url`
+#### `POST /scan/from-url`
 Fetches a website, scans it, and returns the details of that scan, including all issues.
 
 Requires login: *true*
@@ -116,17 +172,19 @@ https://www.url-to-scan.com
 *Note: url must include protocol (e.g. `http://` or `https://`)*
 
 Returns (JSON):
-```
+```json
 {
-    "id": 1,
-    "webPageId": 1,
-    "timeScanned": "2025-09-10T03:32:11.983352Z",
-    "htmlContent": "<html>EntirePageContents</html>",
+    "scan": {
+          "id": 1,
+          "webPageId": 1,
+          "timeScanned": "2025-09-10T03:32:11.983352Z",
+          "htmlContent": "<html>EntirePageContents</html>"
+    },
     "issues": [
         {
             "id": 1,
             "scanId": 1,
-            "issueType": "SAMPLE_ISSUE_2",
+            "issueType": "SAMPLE_ISSUE_1",
             "htmlSnippet": "<sample>snippet</sample>"
         },
         {
@@ -137,4 +195,32 @@ Returns (JSON):
         }
     ]
 }
+```
+
+---
+
+#### `GET /scan/{scanId}/issues`
+Fetches all the issues associated with a single scan.
+Replace `scanId` with the relevant scan id (which can be gotten from the `GET /web-page/{webPageId}/scans` endpoint).
+
+Requires login: *true*
+
+No body required
+
+Returns (JSON):
+```json
+[
+    {
+        "id": 1,
+        "scanId": 1,
+        "issueType": "SAMPLE_ISSUE_1",
+        "htmlSnippet": "<sample>snippet</sample>"
+    },
+    {
+        "id": 2,
+        "scanId": 1,
+        "issueType": "SAMPLE_ISSUE_2",
+        "htmlSnippet": "<sample>snippet</sample>"
+    }
+]
 ```
