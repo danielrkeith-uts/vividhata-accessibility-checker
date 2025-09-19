@@ -114,12 +114,6 @@
   align-items: flex-start;
 }
 
-.site-info {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
 
 .site-row {
   display: flex;

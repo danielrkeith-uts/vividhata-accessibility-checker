@@ -76,12 +76,6 @@
     margin: 0 0 24px 0;
   }
   
-  .password-section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-  }
   
   /* ---------- FORM ELEMENTS ---------- */
   .form-row {
