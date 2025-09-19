@@ -105,12 +105,10 @@ export const RegisterPage: React.FC = () => {
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
 
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
 
-    // Clear general error
     if (errors.general) {
       setErrors((prev) => ({ ...prev, general: "" }));
     }
@@ -261,6 +259,7 @@ export const RegisterPage: React.FC = () => {
             error={errors.ocupation}
             required
             fullWidth
+            placeholder="Select your occupation"
           />
 {/* TODO: Get finalised list of purposes */}
           <Select
@@ -276,6 +275,7 @@ export const RegisterPage: React.FC = () => {
             error={errors.purpose}
             required
             fullWidth
+            placeholder="Select your purpose"
           />
 
           <Button

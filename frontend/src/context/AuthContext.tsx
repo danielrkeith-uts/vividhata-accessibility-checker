@@ -36,11 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return storedUser ? JSON.parse(storedUser) : null;
   });
   
-  // Sites are stored separately and persist across sessions
-  const [userSites, setUserSites] = useState<Site[]>(() => {
-    const storedSites = localStorage.getItem("userSites");
-    return storedSites ? JSON.parse(storedSites) : [];
-  });
+  const [userSites, setUserSites] = useState<Site[]>([]);
   
   const [isLoading, setIsLoading] = useState(true);
 
@@ -57,27 +53,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         purpose: ''
       };
       setUser(user);
+      loadUserSites(user.id);
     } catch (error) {
-      // 401 Unauthorized is expected when not logged in - don't log as error
       if (error instanceof Error && error.message.includes('Unauthorized')) {
         console.log('User not authenticated - this is normal');
         setUser(null);
+        setUserSites([]);
       } else if (error instanceof Error && error.message.includes('Failed to fetch')) {
         console.error('Network error - backend may not be running');
         setUser(null);
+        setUserSites([]);
       } else {
         console.error('Error checking auth status:', error);
         setUser(null);
+        setUserSites([]);
       }
     } finally {
       setIsLoading(false);
     }
   };
 
+  const loadUserSites = (userId: string) => {
+    const userSpecificKey = `userSites_${userId}`;
+    const storedSites = localStorage.getItem(userSpecificKey);
+    const sites = storedSites ? JSON.parse(storedSites) : [];
+    setUserSites(sites);
+  };
+
+  const saveUserSites = (userId: string, sites: Site[]) => {
+    const userSpecificKey = `userSites_${userId}`;
+    localStorage.setItem(userSpecificKey, JSON.stringify(sites));
+  };
+
   const refreshUserData = async () => {
     try {
       const userData = await apiService.getCurrentUser();
-      // Map Account to User type
       const user: User = {
         id: userData.id.toString(),
         email: userData.email,
@@ -88,35 +98,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       };
       setUser(user);
       
-      // Also refresh user sites from API
-      await refreshUserSites();
+      loadUserSites(user.id);
     } catch (error) {
       console.error('Error refreshing user data:', error);
     }
   };
 
   const refreshUserSites = async () => {
-    // Since we only have the scan endpoint, we'll keep sites in localStorage
-    // In a real implementation, you'd fetch sites from the API
+    // Since we only have the scan endpoint, keep sites in localStorage
+    // todo: fetch sites from the API
     console.log('User sites refreshed from localStorage');
   };
 
   const addSite = (site: Site) => {
+    if (!user) return; 
     const updatedSites = [...userSites, site];
     setUserSites(updatedSites);
-    localStorage.setItem("userSites", JSON.stringify(updatedSites));
+    saveUserSites(user.id, updatedSites);
   };
 
   const removeSite = (siteId: string) => {
+    if (!user) return; 
     const updatedSites = userSites.filter(site => site.id !== siteId);
     setUserSites(updatedSites);
-    localStorage.setItem("userSites", JSON.stringify(updatedSites));
+    saveUserSites(user.id, updatedSites);
   };
 
   const login = async (credentials: LoginCredentials) => {
     try {
       await apiService.login(credentials);
-      // After successful login, check auth status to get user data
       await checkAuthStatus();
     } catch (error) {
       console.error('Login error:', error);
@@ -127,7 +137,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (credentials: RegisterCredentials) => {
     try {
       await apiService.createAccount(credentials);
-      // After successful registration, check auth status to get user data
+      await apiService.login({
+        email: credentials.email,
+        password: credentials.password
+      });
       await checkAuthStatus();
     } catch (error) {
       console.error('Registration error:', error);
@@ -142,8 +155,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Logout error:', error);
     } finally {
       setUser(null);
+      setUserSites([]); 
       localStorage.removeItem("user");
-      // Note: userSites are NOT removed from localStorage, so they persist after logout
     }
   };
 
@@ -159,10 +172,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user]);
 
-  // Persist sites to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem("userSites", JSON.stringify(userSites));
-  }, [userSites]);
 
   const value: AuthContextType = {
     user,
