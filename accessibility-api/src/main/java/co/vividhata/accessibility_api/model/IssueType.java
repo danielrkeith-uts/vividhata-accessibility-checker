@@ -1,5 +1,8 @@
 package co.vividhata.accessibility_api.model;
 
 public enum IssueType {
-    ALT_TEXT_MISSING
+    ALT_TEXT_MISSING,
+    CAPTIONS_FOR_VIDEO_AUDIO_MISSING,
+    SEMANTIC_HTML_MISSING,
+    CONTENT_MEANINGFUL_SEQUENCE_VIOLATION
 }
