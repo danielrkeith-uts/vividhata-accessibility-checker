@@ -55,5 +55,6 @@ This will run the backend on port 8000
 
 ### Frontend
 1. Navigate terminal to `frontend`
-2. Run `npm start`
-3. Open `http://localhost:3000`
+2. Run  `npm install`
+3. Run `npm start`
+4. Open `http://localhost:3000`

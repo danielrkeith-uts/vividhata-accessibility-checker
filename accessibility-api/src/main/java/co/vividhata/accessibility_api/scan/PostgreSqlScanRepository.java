@@ -43,8 +43,6 @@ public class PostgreSqlScanRepository implements IScanRepository {
         return id.intValue();
     }
 
-<<<<<<< HEAD
-=======
     @Override
     public int getOwner(int scanId) {
         String sql = "SELECT wp.id FROM ac.web_page wp INNER JOIN ac.scan sc ON wp.id = sc.web_page_id WHERE sc.id = ?;";
@@ -67,5 +65,4 @@ public class PostgreSqlScanRepository implements IScanRepository {
 
         return jdbcTemplate.query(sql, Scan::fromRow, webPageId);
     }
->>>>>>> main
 }
