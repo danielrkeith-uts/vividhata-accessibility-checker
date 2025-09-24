@@ -3,6 +3,7 @@ package co.vividhata.accessibility_api.checker.issue_checkers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -11,6 +12,7 @@ import co.vividhata.accessibility_api.checker.IIssueChecker;
 import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.IssueType;
 
+@Service
 public class ClearPageTitlesIssueChecker implements IIssueChecker {
 
     private static final IssueType ISSUE_TYPE = IssueType.CLEAR_PAGE_TITLES;

@@ -11,7 +11,9 @@ import org.w3c.dom.NodeList;
 import co.vividhata.accessibility_api.checker.IIssueChecker;
 import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.IssueType;
+import org.springframework.stereotype.Service;
 
+@Service
 public class MultipleWaysToNavigateIssueChecker implements IIssueChecker {
 
     private static final IssueType ISSUE_TYPE = IssueType.MULTIPLE_WAYS_TO_NAVIGATE;

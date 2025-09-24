@@ -13,7 +13,9 @@ import co.vividhata.accessibility_api.checker.IIssueChecker;
 import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.IssueType;
 import co.vividhata.accessibility_api.util.INodeParser;
+import org.springframework.stereotype.Service;
 
+@Service
 public class TimeLimitsIssueChecker implements IIssueChecker {
 
     private static final IssueType ISSUE_TYPE = IssueType.TIME_LIMITS;
@@ -33,7 +35,15 @@ public class TimeLimitsIssueChecker implements IIssueChecker {
             Element element = (Element) node;
 
             if (element.hasAttribute("http-equiv") && "refresh".equalsIgnoreCase(element.getAttribute("http-equiv"))) {
-                issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
+                String httpEquiv = element.getAttribute("http-equiv");
+                String content = element.getAttribute("content");
+                StringBuilder sb = new StringBuilder();
+                sb.append("<meta http-equiv=\"").append(httpEquiv).append("\"");
+                if (content != null && !content.isEmpty()) {
+                    sb.append(" content=\"").append(content).append("\"");
+                }
+                sb.append("/>");
+                issues.add(new Issue(-1, -1, ISSUE_TYPE, sb.toString()));
             }
     }
 

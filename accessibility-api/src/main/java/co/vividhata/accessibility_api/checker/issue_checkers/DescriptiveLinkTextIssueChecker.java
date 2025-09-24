@@ -12,8 +12,10 @@ import org.w3c.dom.NodeList;
 import co.vividhata.accessibility_api.checker.IIssueChecker;
 import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.IssueType;
+import org.springframework.stereotype.Service;
 import co.vividhata.accessibility_api.util.INodeParser;
 
+@Service
 public class DescriptiveLinkTextIssueChecker implements IIssueChecker {
 
     private static final IssueType ISSUE_TYPE = IssueType.DESCRIPTIVE_LINK_TEXT;
@@ -38,7 +40,14 @@ public class DescriptiveLinkTextIssueChecker implements IIssueChecker {
             boolean isVague = lower.equals("click here") || lower.equals("here") || lower.equals("read more") || lower.equals("more") || lower.equals("learn more");
 
             if (isEmpty || isVague){
-                issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
+                String id = element.getAttribute("id");
+                String href = element.getAttribute("href");
+                StringBuilder sb = new StringBuilder();
+                sb.append("<a");
+                if (id != null && !id.isEmpty()) sb.append(" id=\"").append(id).append("\"");
+                if (href != null && !href.isEmpty()) sb.append(" href=\"").append(href).append("\"");
+                sb.append('>').append(text).append("</a>");
+                issues.add(new Issue(-1, -1, ISSUE_TYPE, sb.toString()));
             }
         }
         

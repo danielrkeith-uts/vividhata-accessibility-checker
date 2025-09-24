@@ -12,8 +12,10 @@ import org.w3c.dom.NodeList;
 import co.vividhata.accessibility_api.checker.IIssueChecker;
 import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.IssueType;
+import org.springframework.stereotype.Service;
 import co.vividhata.accessibility_api.util.INodeParser;
 
+@Service
 public class FocusOrderLogicalIssueChecker implements IIssueChecker{
     
     private static final IssueType ISSUE_TYPE = IssueType.FOCUS_ORDER_LOGICAL;
@@ -35,7 +37,16 @@ public class FocusOrderLogicalIssueChecker implements IIssueChecker{
                 try {
                     int tabindex = Integer.parseInt(element.getAttribute("tabindex").trim());
                     if (tabindex > 0) {
-                        issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
+                        StringBuilder sb = new StringBuilder();
+                        String tag = element.getTagName().toLowerCase();
+                        sb.append('<').append(tag);
+                        String id = element.getAttribute("id");
+                        String href = element.getAttribute("href");
+                        if (id != null && !id.isEmpty()) sb.append(" id=\"").append(id).append("\"");
+                        if (href != null && !href.isEmpty()) sb.append(" href=\"").append(href).append("\"");
+                        sb.append(" tabindex=\"").append(tabindex).append("\"");
+                        sb.append('>').append(element.getTextContent()).append("</").append(tag).append('>');
+                        issues.add(new Issue(-1, -1, ISSUE_TYPE, sb.toString()));
                     }
                 } catch (NumberFormatException ignored) { }
             }

@@ -8,12 +8,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.springframework.stereotype.Service;
 
 import co.vividhata.accessibility_api.checker.IIssueChecker;
 import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.IssueType;
 import co.vividhata.accessibility_api.util.INodeParser;
 
+@Service
 public class KeyboardOperableIssueChecker implements IIssueChecker {
 
     private static final IssueType ISSUE_TYPE = IssueType.KEYBOARD_OPERABLE;
@@ -31,14 +33,18 @@ public class KeyboardOperableIssueChecker implements IIssueChecker {
             if (node.getNodeType() != Node.ELEMENT_NODE) continue;
             Element element = (Element) node;
 
-            boolean hasMouseOnly = element.hasAttribute("onclick") || element.hasAttribute("onmousedown") || element.hasAttribute("onmouseup");
-            if (hasMouseOnly) continue;
+            boolean hasMouseHandlers = element.hasAttribute("onclick") || element.hasAttribute("onmousedown") || element.hasAttribute("onmouseup");
+            boolean hasKeyboardHandlers = element.hasAttribute("onkeydown") || element.hasAttribute("onkeyup");
 
-            boolean hasKeyboardOnly = element.hasAttribute("onkeydown") || element.hasAttribute("onkeyup");
-            if (hasKeyboardOnly) continue;
-            
-            if (hasMouseOnly && !hasKeyboardOnly) {
-                issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
+            if (hasMouseHandlers && !hasKeyboardHandlers) {
+                String id = element.getAttribute("id");
+                String onclick = element.getAttribute("onclick");
+                StringBuilder sb = new StringBuilder();
+                sb.append("<div");
+                if (id != null && !id.isEmpty()) sb.append(" id=\"").append(id).append("\"");
+                if (onclick != null && !onclick.isEmpty()) sb.append(" onclick=\"").append(onclick).append("\"");
+                sb.append("></div>");
+                issues.add(new Issue(-1, -1, ISSUE_TYPE, sb.toString()));
             }
         
         }

@@ -6,11 +6,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import co.vividhata.accessibility_api.checker.issue_checkers.FocusOrderLogicalIssueChecker;
 import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.util.IHtmlParser;
 
+@SpringBootTest
 public class FocusOrderLogicalIssueCheckerTests {
     private static final String HTML_POSITIVE_TABINDEX = """
 <!doctype html>
