@@ -1,3 +1,14 @@
 package co.vividhata.accessibility_api.model;
 
-public record Link(int scanId, String link) { }
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public record Link(int id, int scanId, String link) {
+    public static Link fromRow(ResultSet rs, int ignoredRowNum) throws SQLException {
+        return new Link(
+                rs.getInt("id"),
+                rs.getInt("scan_id"),
+                rs.getString("link")
+        );
+    }
+}
