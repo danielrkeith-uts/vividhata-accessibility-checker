@@ -224,3 +224,27 @@ Returns (JSON):
     }
 ]
 ```
+
+#### `GET /scan/{scanId}/links`
+Fetches all the links associated with a single scan.
+Replace `scanId` with the relevant scan id (which can be gotten from the `GET /web-page/{webPageId}/scans` endpoint).
+
+Requires login: *true*
+
+No body required
+
+Returns (JSON):
+```json
+[
+    {
+        "id": 1,
+        "scanId": 1,
+        "link": "https://google.com"
+    },
+    {
+        "id": 2,
+        "scanId": 1,
+        "link": "https://www.whattimeisitrightnow.com"
+    }
+]
+```

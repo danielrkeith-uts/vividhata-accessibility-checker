@@ -27,6 +27,12 @@ CREATE TABLE ac.scan (
 CREATE TABLE ac.issue (
     id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     scan_id INT REFERENCES ac.scan(id),
-    issue_type VARCHAR(20),
+    issue_type VARCHAR(100),
     html_snippet TEXT
 );
+
+CREATE TABLE ac.link (
+    id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    scan_id INT REFERENCES ac.scan(id),
+    link TEXT
+)

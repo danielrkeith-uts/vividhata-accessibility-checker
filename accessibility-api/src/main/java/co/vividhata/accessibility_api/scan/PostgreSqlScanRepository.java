@@ -1,6 +1,5 @@
 package co.vividhata.accessibility_api.scan;
 
-import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.Scan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -45,7 +44,7 @@ public class PostgreSqlScanRepository implements IScanRepository {
 
     @Override
     public int getOwner(int scanId) {
-        String sql = "SELECT wp.id FROM ac.web_page wp INNER JOIN ac.scan sc ON wp.id = sc.web_page_id WHERE sc.id = ?;";
+        String sql = "SELECT wp.account_id FROM ac.web_page wp INNER JOIN ac.scan sc ON wp.id = sc.web_page_id WHERE sc.id = ?;";
 
         Integer id;
         try {

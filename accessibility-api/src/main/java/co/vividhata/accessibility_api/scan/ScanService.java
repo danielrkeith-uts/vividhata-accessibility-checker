@@ -2,6 +2,7 @@ package co.vividhata.accessibility_api.scan;
 
 import co.vividhata.accessibility_api.checker.ICheckerService;
 import co.vividhata.accessibility_api.issue.IIssueRepository;
+import co.vividhata.accessibility_api.link.ILinkService;
 import co.vividhata.accessibility_api.model.Issue;
 import co.vividhata.accessibility_api.model.Scan;
 import co.vividhata.accessibility_api.model.WebPage;
@@ -17,7 +18,6 @@ import org.w3c.dom.Document;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,6 +35,8 @@ public class ScanService implements IScanService {
     private IScanRepository scanRepository;
     @Autowired
     private IIssueRepository issueRepository;
+    @Autowired
+    private ILinkService linkService;
 
     @Override
     public Scan scanFrom(String url, int accountId) {
@@ -55,6 +57,8 @@ public class ScanService implements IScanService {
             issueRepository.create(scanId, issue.issueType(), issue.htmlSnippet());
         }
 
+        linkService.findLinksAndSaveToScan(document, scanId);
+
         return new Scan(scanId, webPageId, timeScanned, html);
     }
 
@@ -67,7 +71,6 @@ public class ScanService implements IScanService {
     public List<Scan> getScans(int webPageId) {
         return scanRepository.getAll(webPageId);
     }
-
 
     private String readPageFrom(String url) {
         String html;

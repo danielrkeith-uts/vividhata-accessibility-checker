@@ -20,8 +20,8 @@ public class HtmlFetcher implements IHtmlFetcher {
 
 
         StringBuilder sb = new StringBuilder();
-        while (sc.hasNext()) {
-            sb.append(sc.next());
+        while (sc.hasNextLine()) {
+            sb.append(sc.nextLine()).append("\n");
         }
 
         return sb.toString();
