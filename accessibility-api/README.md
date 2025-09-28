@@ -238,10 +238,12 @@ Returns (JSON):
 [
     {
         "id": 1,
+        "scanId": 1,
         "link": "https://google.com"
     },
     {
         "id": 2,
+        "scanId": 1,
         "link": "https://www.whattimeisitrightnow.com"
     }
 ]
