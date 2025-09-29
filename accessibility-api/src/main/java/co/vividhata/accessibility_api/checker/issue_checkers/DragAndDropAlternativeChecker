@@ -1,0 +1,59 @@
+package co.vividhata.accessibility_api.checker.issue_checkers;
+
+import co.vividhata.accessibility_api.checker.IIssueChecker;
+import co.vividhata.accessibility_api.model.Issue;
+import co.vividhata.accessibility_api.model.IssueType;
+import co.vividhata.accessibility_api.util.INodeParser;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import java.util.List;
+import java.util.ArrayList;
+
+@Service
+public class DragAndDropAlternativeChecker implements IIssueChecker {
+    private static final IssueType ISSUE_TYPE = IssueType.NO_DRAG_DROP_ALTERNATIVE;
+
+    @Autowired
+    private INodeParser nodeParser;
+
+    @Override
+    public List<Issue> check(Document document) {
+        List<Issue> issues = new ArrayList<>();
+        String[] defaultDragElements = {"a", "img"};
+        String[] customDragAttributes = {"draggable", "ondragstart", "ondrop", "ondragover"};
+        
+        for (String tag : defaultDragElements) {
+            NodeList nodeList = document.getElementsByTagName(tag);
+
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                Element element = (Element) nodeList.item(i);
+                if (!hasKeyboardAlternative(element)) {
+                    issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
+                }
+            }
+        }
+
+        NodeList allNodes = document.getElementsByTagName("*");
+        
+        for (int i = 0; i < allNodes.getLength(); i++) {
+            Element element = (Element) allNodes.item(i);
+            for (String attr : customDragAttributes) {
+                if (element.hasAttribute(attr) && !hasKeyboardAlternative(element)) {
+                    issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
+                    break;
+                }
+            }
+        }
+        return issues;
+    }
+
+    private boolean hasKeyboardAlternative(Element element) {
+        String tabindex = element.getAttribute("tabindex");
+
+        return (tabindex != null && !tabindex.isEmpty() && Integer.parseInt(tabindex) >= 0);
+    }
+}
