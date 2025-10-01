@@ -47,6 +47,12 @@ export interface ScanRequest {
   url: string;
 }
 
+export interface ScanFromUrlResponse {
+  scan: Omit<Scan, "issues">; 
+  issues: Issue[];
+  links: any[]; // if you have a type for links, replace 'any'
+}
+
 class ApiService {
   async makeRequest<T>(
     endpoint: string,
@@ -120,10 +126,10 @@ class ApiService {
   }
 
   // Scan endpoints
-  async scanFromUrl(url: string): Promise<Scan> {
-    return this.makeRequest<Scan>('/scan/from-url', {
+  async scanFromUrl(url: string): Promise<ScanFromUrlResponse> {
+    return this.makeRequest<ScanFromUrlResponse>('/scan/from-url', {
       method: 'POST',
-      body: url, // Send as plain string, not JSON
+      body: url, // plain string
     });
   }
 }
