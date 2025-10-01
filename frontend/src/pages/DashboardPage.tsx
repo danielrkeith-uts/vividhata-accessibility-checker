@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { OverviewCard } from "../components/dashboard/OverviewCard";
 import { GaugeChart } from "../components/dashboard/GaugeChart";
@@ -10,6 +10,8 @@ import { Scan } from "../services/api/apiService";
 import "./DashboardPage.css";
 import { Button } from "../components/common/Button";
 import { useParams, Navigate } from "react-router-dom";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 export const DashboardPage: React.FC = () => {
   const { siteId } = useParams<{ siteId: string }>();
@@ -17,6 +19,9 @@ export const DashboardPage: React.FC = () => {
   const [scanData, setScanData] = useState<Scan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const pdfRef = useRef<HTMLDivElement>(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const [pdfMode, setPdfMode] = useState(false);
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -174,34 +179,145 @@ export const DashboardPage: React.FC = () => {
     dueDate: new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   }));
 
-  return (
-    <div className="dashboard-page">
-      <header className="dashboard-header">
-        <div className="dashboard-header-content">
-          <h1 className="dashboard-title">Dashboard for {currentSite.name}</h1>
-          <div className="dashboard-user-info">
-          <UserDropDown />
-          </div>
-        </div>
-      </header>
+// allow export to pdf
+  const handleExportToPDF = async () => {
+    if (!pdfRef.current) return;
+    const overlay = document.createElement("div");
+    overlay.className = "export-overlay";
+    overlay.innerHTML = "<div class='spinner'></div><p>Generating PDF...</p>";
+    document.body.appendChild(overlay);
+  
+    try {
+      const printable = document.createElement("div");
+      printable.className = "pdf-root";
+      document.body.appendChild(printable);
 
+      const title = document.createElement("div");
+      title.className = "pdf-title";
+      title.innerHTML = `
+        <h1>Accessibility Report for ${currentSite.name}</h1>
+        <p>${websiteUrl}</p>
+        <p style="font-size:11px;color:#777;margin-top:4px;">
+          Generated on ${new Date().toLocaleDateString()}
+        </p>
+      `;
+      printable.appendChild(title);
+
+      const clone = pdfRef.current.cloneNode(true) as HTMLDivElement;
+
+      clone.querySelector(".dashboard-rescan-button-container")?.remove();
+
+      const markAsSection = (sel: string) => {
+        clone.querySelectorAll(sel).forEach((el) => el.classList.add("pdf-section"));
+      };
+      markAsSection(".dashboard-overview-row > *");
+      markAsSection(".dashboard-breakdown-tasks-row > *");
+      markAsSection(".breakdown-section");
+      markAsSection(".tasks-section");
+  
+      printable.appendChild(clone);
+
+      await new Promise((r) => requestAnimationFrame(r));
+  
+      const pdf = new jsPDF({ orientation: "p", unit: "px", format: "a4" });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 16;
+  
+      const blocks = Array.from(
+        printable.querySelectorAll(".pdf-title, .pdf-section")
+      ) as HTMLElement[];
+  
+      let cursorY = margin;
+  
+      for (let i = 0; i < blocks.length; i++) {
+        const block = blocks[i];
+  
+        block.style.width = `${printable.clientWidth}px`;
+  
+        const canvas = await html2canvas(block, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          windowWidth: printable.scrollWidth,
+        });
+  
+        const imgData = canvas.toDataURL("image/png");
+        const imgProps = pdf.getImageProperties(imgData);
+  
+        let imgW = pageW - margin * 2;
+        let imgH = (imgProps.height * imgW) / imgProps.width;
+  
+        const maxH = pageH - margin * 2;
+        if (imgH > maxH) {
+          const scale = maxH / imgH;
+          imgH = maxH;
+          imgW = imgW * scale; 
+        }
+  
+        const needsNewPage = cursorY + imgH > pageH - margin;
+        if (needsNewPage) {
+          if (i !== 0) pdf.addPage();
+          cursorY = margin;
+        }
+  
+        const x = margin + (pageW - margin * 2 - imgW) / 2;
+  
+        pdf.addImage(imgData, "PNG", x, cursorY, imgW, imgH);
+        cursorY += imgH + margin;
+      }
+  
+      const safe = currentSite.name.replace(/[^\w\-]+/g, "_");
+      const dateStr = new Date().toISOString().slice(0, 10);
+      pdf.save(`${safe}-dashboard-${dateStr}.pdf`);
+    } catch (err) {
+      console.error("Export to PDF failed:", err);
+      alert("Sorry, something went wrong while exporting the PDF.");
+    } finally {
+      document.querySelector(".export-overlay")?.remove();
+      document.querySelector(".pdf-root")?.remove();
+    }
+  };  
+
+  return (
+    <div className={`dashboard-page ${isExporting ? 'pdf-mode' : ''}`} ref={pdfRef}>
+      {!isExporting && (
+        <header className="dashboard-header">
+          <div className="dashboard-header-content">
+            <h1 className="dashboard-title">Dashboard for {currentSite.name}</h1>
+            <div className="dashboard-user-info">
+              <UserDropDown />
+            </div>
+          </div>
+        </header>
+      )}
+  
+      {isExporting && (
+        <div className="pdf-title">
+          <h1>Accessibility Report for {currentSite.name}</h1>
+          <p>{websiteUrl}</p>
+        </div>
+      )}
+  
       <main className="dashboard-main">
         <div className="dashboard-row">
           <div className="dashboard-url-bar">
             <span className="dashboard-url-value">{websiteUrl}</span>
           </div>
-          <div className="dashboard-rescan-button-container">
-            <Button onClick={() => console.log("Rescan clicked")} variant="secondary">
-              Rescan
-            </Button>
-            <Button onClick={() => console.log("Export to PDF clicked")} variant="outline">
-              Export to PDF
-            </Button>
-          </div>
+          {!isExporting && (
+            <div className="dashboard-rescan-button-container">
+              <Button onClick={() => console.log("Rescan clicked")} variant="secondary">
+                Rescan
+              </Button>
+              <Button onClick={handleExportToPDF} variant="outline" disabled={isExporting}>
+                {isExporting ? "Exporting…" : "Export to PDF"}
+              </Button>
+            </div>
+          )}
         </div>
-
-        {/* Wrap OverviewCards, PriorityChart and GaugeChart */}
-        <div className="dashboard-overview-row">
+  
+        {/* Overview, Priority, Gauge */}
+        <div className={`dashboard-overview-row ${isExporting ? 'pdf-stack' : ''}`}>
           <OverviewCard
             accessibilityXAxis={overviewData.xAxis}
             accessibilityYAxis={overviewData.yAxis}
@@ -217,9 +333,9 @@ export const DashboardPage: React.FC = () => {
             categoryData={categoryData}
           />
         </div>
-
-        {/* Breakdown and Tasks Row */}
-        <div className="dashboard-breakdown-tasks-row">
+  
+        {/* Breakdown and Tasks */}
+        <div className={`dashboard-breakdown-tasks-row ${isExporting ? 'pdf-stack' : ''}`}>
           <div className="breakdown-section">
             <BreakdownTable requirements={requirementsData} />
           </div>
