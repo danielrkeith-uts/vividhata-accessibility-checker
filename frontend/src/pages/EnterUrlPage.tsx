@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './EnterUrlPage.css';
 import { useAuth } from '../context/AuthContext';
@@ -9,11 +9,25 @@ export const EnterUrlPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { addSite, refreshUserData } = useAuth();
+  const { user, isAuthenticated, addSite, refreshUserData } = useAuth();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim()) return;
+
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      setError('Please log in to scan websites.');
+      navigate('/login');
+      return;
+    }
 
     setIsLoading(true);
     setError('');
@@ -32,7 +46,7 @@ export const EnterUrlPage: React.FC = () => {
       };
 
       // Add to context
-      addSite(newSite);
+      await addSite(newSite);
 
       // Navigate to dashboard with the site ID
       navigate(`/dashboard/${scanResult.siteId}`);
