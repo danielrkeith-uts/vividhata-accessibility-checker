@@ -106,17 +106,16 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
         <h3>Today's Tasks</h3>
         <div className="task-filters">
           <div className="category-tabs">
-            {categories.map((category) => (
-              <button
-                key={category}
-                className={`category-tab ${
-                  activeFilter === category ? "active" : ""
-                }`}
-                onClick={() => setActiveFilter(category)}
-              >
-                {category} ({getCategoryCount(category)})
-              </button>
-            ))}
+          {categories.map((category) => (
+            <button
+              key={category}
+              className={`category-tab ${activeFilter === category ? "active" : ""}`}
+              onClick={() => setActiveFilter(category)}
+              {...(category === "All" ? { "data-tab": "all" } : {})}
+            >
+              {category} ({getCategoryCount(category)})
+            </button>
+          ))}
           </div>
 
           <CustomSelect
@@ -134,7 +133,7 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
         </div>
       </div>
 
-      <div className="task-content">
+      <div className="task-content" data-pdf-expand>
         {filteredTasks.map((task) => (
           <div key={task.id} className="task-item">
             <div className="task-checkbox">

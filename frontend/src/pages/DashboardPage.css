@@ -202,7 +202,7 @@
 .pdf-root .gauge {
   background: #ffffff !important;
   box-shadow: none !important;
-  border: 1px solid #e5e7eb !important; /* light border so cards pop */
+  border: 1px solid #e5e7eb !important; 
   border-radius: 8px !important;
 }
 
@@ -235,6 +235,7 @@
   overflow: visible !important;
   box-shadow: none !important;
 }
+
 
 .pdf-root .pdf-section {
   break-inside: avoid !important;
@@ -269,6 +270,39 @@
   font-size: 13px;
   color: #555;
 }
+.pdf-root [data-pdf-expand],
+.dashboard-page.pdf-mode [data-pdf-expand] {
+  max-height: none !important;
+  overflow: visible !important;
+}
+.pdf-root {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+/* PDF helpers */
+.pdf-root *,
+.dashboard-page .pdf-section {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.pdf-root [data-pdf-expand] {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* spinner */
+.export-overlay {
+  position: fixed; inset: 0; background: rgba(255,255,255,.6);
+  display:flex; align-items:center; justify-content:center;
+  gap:.5rem; z-index: 9999; backdrop-filter: blur(2px);
+}
+.export-overlay .spinner {
+  width:20px; height:20px; border:3px solid #ddd; border-top-color:#888;
+  border-radius:50%; animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 
 

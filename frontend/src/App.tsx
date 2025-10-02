@@ -13,6 +13,7 @@ import { EnterUrlPage } from "./pages/EnterUrlPage";
 import { ManageSites } from "./pages/ManageSites";
 import "./App.css";
 import { EditProfile } from "./pages/EditProfile";
+import "./services/api/apiTest"; // Import to run API tests
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({

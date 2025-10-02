@@ -109,7 +109,7 @@ export const BreakdownTable: React.FC<BreakdownTableProps> = ({
         </div>
       </div>
 
-      <div className="table-container">
+      <div className="table-container" data-pdf-expand>
         <table className="breakdown-table-content">
           <thead>
             <tr>

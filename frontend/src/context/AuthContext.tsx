@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginCredentials, RegisterCredentials, Site } from '../types';
 import { apiService } from '../services/api/apiService';
+import { scanService } from '../services/scan/scanService';
 
 interface AuthContextType {
   user: User | null;
@@ -11,12 +12,22 @@ interface AuthContextType {
   register: (credentials: RegisterCredentials) => Promise<void>;
   logout: () => void;
   checkAuthStatus: () => Promise<void>;
-  addSite: (site: Site) => void; 
+  addSite: (site: Site) => Promise<void>; 
   removeSite: (siteId: string) => void;
   refreshUserData: () => Promise<void>; 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+//extract site name from URL
+const extractSiteName = (url: string): string => {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.hostname.replace('www.', '');
+  } catch {
+    return url;
+  }
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -53,7 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         purpose: ''
       };
       setUser(user);
-      loadUserSites(user.id);
+      await loadUserSites(user.id);
     } catch (error) {
       if (error instanceof Error && error.message.includes('Unauthorized')) {
         console.log('User not authenticated - this is normal');
@@ -73,11 +84,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const loadUserSites = (userId: string) => {
-    const userSpecificKey = `userSites_${userId}`;
-    const storedSites = localStorage.getItem(userSpecificKey);
-    const sites = storedSites ? JSON.parse(storedSites) : [];
-    setUserSites(sites);
+  const loadUserSites = async (userId: string) => {
+    try {
+      // Fetch web pages from backend
+      const webPages = await scanService.getWebPages();
+      
+      // Convert WebPage objects to Site objects
+      const sites: Site[] = await Promise.all(
+        webPages.map(async (webPage) => {
+          // Get the latest scan for this web page to get last scanned time
+          const scans = await scanService.getWebPageScans(webPage.id);
+          const latestScan = scans.length > 0 
+            ? scans.sort((a, b) => new Date(b.timeScanned).getTime() - new Date(a.timeScanned).getTime())[0]
+            : null;
+          
+          return {
+            id: webPage.id.toString(),
+            name: extractSiteName(webPage.url),
+            url: webPage.url,
+            lastScanned: latestScan?.timeScanned || new Date().toISOString(),
+            scanData: latestScan || null
+          };
+        })
+      );
+      
+      setUserSites(sites);
+      
+      // Also save to localStorage as backup
+      const userSpecificKey = `userSites_${userId}`;
+      localStorage.setItem(userSpecificKey, JSON.stringify(sites));
+    } catch (error) {
+      console.error('Error loading user sites:', error);
+      // Fallback to localStorage if backend fails
+      const userSpecificKey = `userSites_${userId}`;
+      const storedSites = localStorage.getItem(userSpecificKey);
+      const sites = storedSites ? JSON.parse(storedSites) : [];
+      setUserSites(sites);
+    }
   };
 
   const saveUserSites = (userId: string, sites: Site[]) => {
@@ -98,7 +141,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       };
       setUser(user);
       
-      loadUserSites(user.id);
+      await loadUserSites(user.id);
     } catch (error) {
       console.error('Error refreshing user data:', error);
     }
@@ -110,11 +153,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     console.log('User sites refreshed from localStorage');
   };
 
-  const addSite = (site: Site) => {
+  const addSite = async (site: Site) => {
     if (!user) return; 
+    
+    // Add to local state immediately
     const updatedSites = [...userSites, site];
     setUserSites(updatedSites);
     saveUserSites(user.id, updatedSites);
+    
+    // Refresh from backend to get the actual data
+    try {
+      await loadUserSites(user.id);
+    } catch (error) {
+      console.error('Error refreshing sites after adding:', error);
+    }
   };
 
   const removeSite = (siteId: string) => {

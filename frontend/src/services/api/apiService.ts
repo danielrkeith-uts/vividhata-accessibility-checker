@@ -47,10 +47,17 @@ export interface ScanRequest {
   url: string;
 }
 
+export interface Link {
+  id: number;
+  scanId: number;
+  url: string;
+  text: string;
+}
+
 export interface ScanFromUrlResponse {
   scan: Omit<Scan, "issues">;
   issues: Issue[];
-  links: any[]; // if you have a type for links, replace 'any'
+  links: Link[];
 }
 
 class ApiService {
@@ -131,6 +138,23 @@ class ApiService {
       method: 'POST',
       body: url, // plain string
     });
+  }
+
+  async getScanIssues(scanId: number): Promise<Issue[]> {
+    return this.makeRequest<Issue[]>(`/scan/${scanId}/issues`);
+  }
+
+  async getScanLinks(scanId: number): Promise<Link[]> {
+    return this.makeRequest<Link[]>(`/scan/${scanId}/links`);
+  }
+
+  // Web page endpoints
+  async getWebPages(): Promise<WebPage[]> {
+    return this.makeRequest<WebPage[]>('/web-pages');
+  }
+
+  async getWebPageScans(webPageId: number): Promise<Scan[]> {
+    return this.makeRequest<Scan[]>(`/web-page/${webPageId}/scans`);
   }
 }
 

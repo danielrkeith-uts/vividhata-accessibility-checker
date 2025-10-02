@@ -7,6 +7,7 @@ import { TaskList } from "../components/dashboard/TaskList";
 import { UserDropDown } from "../components/common/UserDropDown";
 import { PriorityChart } from "../components/dashboard/PriorityChart";
 import { Scan } from "../services/api/apiService";
+import { scanService } from "../services/scan/scanService";
 import "./DashboardPage.css";
 import { Button } from "../components/common/Button";
 import { useParams, Navigate } from "react-router-dom";
@@ -15,19 +16,27 @@ import jsPDF from "jspdf";
 
 export const DashboardPage: React.FC = () => {
   const { siteId } = useParams<{ siteId: string }>();
-  const { user, userSites } = useAuth();
+  const { user, userSites, isAuthenticated } = useAuth();
   const [scanData, setScanData] = useState<Scan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const pdfRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
   const [pdfMode, setPdfMode] = useState(false);
+  const [isRescanning, setIsRescanning] = useState(false);
+  const [rescanComplete, setRescanComplete] = useState(false);
 
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
         setIsLoading(true);
         setError(null);
+        
+        // Check if user is authenticated
+        if (!isAuthenticated) {
+          setError('Please log in to view dashboard');
+          return;
+        }
         
         if (!siteId) {
           setError('No site ID provided');
@@ -40,19 +49,29 @@ export const DashboardPage: React.FC = () => {
           return;
         }
         
-        // For now, we'll use mock data since we only have the scan endpoint
-        // In a real implementation, you'd store scan data and retrieve it here
-        const mockScanData: Scan = {
-          id: webPageId,
-          webPageId: webPageId,
-          timeScanned: new Date().toISOString(),
-          htmlContent: "",
-          issues: [
-            { id: 1, scanId: webPageId, issueType: "SAMPLE_ISSUE_1", htmlSnippet: "<sample>snippet</sample>" },
-            { id: 2, scanId: webPageId, issueType: "SAMPLE_ISSUE_2", htmlSnippet: "<sample>snippet</sample>" }
-          ]
+        // Get the latest scan for this web page
+        const scans = await scanService.getWebPageScans(webPageId);
+        
+        if (scans.length === 0) {
+          setError('No scans found for this site');
+          return;
+        }
+        
+        // Get the most recent scan
+        const latestScan = scans.sort((a, b) => 
+          new Date(b.timeScanned).getTime() - new Date(a.timeScanned).getTime()
+        )[0];
+        
+        // Get the issues for this scan
+        const issues = await scanService.getScanIssues(latestScan.id);
+        
+        // Combine scan data with issues
+        const scanWithIssues: Scan = {
+          ...latestScan,
+          issues: issues
         };
-        setScanData(mockScanData);
+        
+        setScanData(scanWithIssues);
       } catch (err) {
         console.error('Error loading dashboard data:', err);
         setError('Failed to load dashboard data');
@@ -179,105 +198,220 @@ export const DashboardPage: React.FC = () => {
     dueDate: new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   }));
 
-// allow export to pdf
-  const handleExportToPDF = async () => {
-    if (!pdfRef.current) return;
-    const overlay = document.createElement("div");
-    overlay.className = "export-overlay";
-    overlay.innerHTML = "<div class='spinner'></div><p>Generating PDF...</p>";
-    document.body.appendChild(overlay);
-  
-    try {
-      const printable = document.createElement("div");
-      printable.className = "pdf-root";
-      document.body.appendChild(printable);
+//allow export to pdf
+const handleExportToPDF = async () => {
+  if (!pdfRef.current) return;
 
-      const title = document.createElement("div");
-      title.className = "pdf-title";
-      title.innerHTML = `
-        <h1>Accessibility Report for ${currentSite.name}</h1>
-        <p>${websiteUrl}</p>
-        <p style="font-size:11px;color:#777;margin-top:4px;">
-          Generated on ${new Date().toLocaleDateString()}
-        </p>
-      `;
-      printable.appendChild(title);
+  const overlay = document.createElement("div");
+  overlay.className = "export-overlay";
+  overlay.innerHTML = "<div class='spinner'></div><p>Generating PDF...</p>";
+  document.body.appendChild(overlay);
 
-      const clone = pdfRef.current.cloneNode(true) as HTMLDivElement;
+  try {
+    const printable = document.createElement("div");
+    printable.className = "pdf-root";
+    document.body.appendChild(printable);
 
-      clone.querySelector(".dashboard-rescan-button-container")?.remove();
+    const title = document.createElement("div");
+    title.className = "pdf-title";
+    title.innerHTML = `
+      <h1>Accessibility Report for ${currentSite.name}</h1>
+      <p>${websiteUrl}</p>
+      <p style="font-size:11px;color:#777;margin-top:4px;">
+        Generated on ${new Date().toLocaleDateString()}
+      </p>
+    `;
+    printable.appendChild(title);
 
-      const markAsSection = (sel: string) => {
-        clone.querySelectorAll(sel).forEach((el) => el.classList.add("pdf-section"));
-      };
-      markAsSection(".dashboard-overview-row > *");
-      markAsSection(".dashboard-breakdown-tasks-row > *");
-      markAsSection(".breakdown-section");
-      markAsSection(".tasks-section");
-  
-      printable.appendChild(clone);
+    const clone = pdfRef.current.cloneNode(true) as HTMLDivElement;
 
-      await new Promise((r) => requestAnimationFrame(r));
-  
-      const pdf = new jsPDF({ orientation: "p", unit: "px", format: "a4" });
-      const pageW = pdf.internal.pageSize.getWidth();
-      const pageH = pdf.internal.pageSize.getHeight();
-      const margin = 16;
-  
-      const blocks = Array.from(
-        printable.querySelectorAll(".pdf-title, .pdf-section")
-      ) as HTMLElement[];
-  
-      let cursorY = margin;
-  
-      for (let i = 0; i < blocks.length; i++) {
-        const block = blocks[i];
-  
-        block.style.width = `${printable.clientWidth}px`;
-  
-        const canvas = await html2canvas(block, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          windowWidth: printable.scrollWidth,
-        });
-  
-        const imgData = canvas.toDataURL("image/png");
-        const imgProps = pdf.getImageProperties(imgData);
-  
-        let imgW = pageW - margin * 2;
-        let imgH = (imgProps.height * imgW) / imgProps.width;
-  
-        const maxH = pageH - margin * 2;
-        if (imgH > maxH) {
-          const scale = maxH / imgH;
-          imgH = maxH;
-          imgW = imgW * scale; 
+    // remove buttons etc.
+    clone.querySelector(".dashboard-rescan-button-container")?.remove();
+
+    // expand scrollable containers (TaskList, Breakdown)
+    clone.querySelectorAll("[data-pdf-expand]").forEach((el) => {
+      const e = el as HTMLElement;
+      e.style.maxHeight = "none";
+      e.style.overflow = "visible";
+    });
+
+    printable.appendChild(clone);
+
+    await new Promise((r) => requestAnimationFrame(r));
+
+    // PDF setup
+    const pdf = new jsPDF({ orientation: "p", unit: "px", format: "a4" });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const margin = 20;
+
+    // capture blocks
+    const blocks = Array.from(
+      printable.querySelectorAll(
+        ".pdf-title, .dashboard-overview-row, .dashboard-breakdown-tasks-row"
+      )
+    ) as HTMLElement[];
+
+    let cursorY = margin;
+
+    for (let i = 0; i < blocks.length; i++) {
+      const block = blocks[i];
+      block.style.width = `${printable.clientWidth}px`;
+
+      const canvas = await html2canvas(block, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        windowWidth: printable.scrollWidth,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const imgProps = pdf.getImageProperties(imgData);
+
+      let imgW = (pageW - margin * 2) * 0.75;
+      let imgH = (imgProps.height * imgW) / imgProps.width;
+
+      if (imgH > pageH - margin * 2) {
+        let y = 0;
+        while (y < imgProps.height) {
+          const sliceHeight = Math.min(
+            imgProps.height - y,
+            (pageH - margin * 2) * (imgProps.width / imgW)
+          );
+
+          const sliceCanvas = document.createElement("canvas");
+          sliceCanvas.width = imgProps.width;
+          sliceCanvas.height = sliceHeight;
+
+          const ctx = sliceCanvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(
+              canvas,
+              0,
+              y,
+              imgProps.width,
+              sliceHeight,
+              0,
+              0,
+              imgProps.width,
+              sliceHeight
+            );
+          }
+
+          const sliceData = sliceCanvas.toDataURL("image/png");
+          const sliceH = (sliceHeight * imgW) / imgProps.width;
+
+          if (cursorY + sliceH > pageH - margin) {
+            pdf.addPage();
+            cursorY = margin;
+          }
+
+          // center the image horizontally
+          const x = margin + (pageW - margin * 2 - imgW) / 2;
+          pdf.addImage(sliceData, "PNG", x, cursorY, imgW, sliceH);
+
+          cursorY += sliceH + margin;
+          y += sliceHeight;
         }
-  
-        const needsNewPage = cursorY + imgH > pageH - margin;
-        if (needsNewPage) {
-          if (i !== 0) pdf.addPage();
+      } else {
+        if (cursorY + imgH > pageH - margin) {
+          pdf.addPage();
           cursorY = margin;
         }
-  
+
         const x = margin + (pageW - margin * 2 - imgW) / 2;
-  
         pdf.addImage(imgData, "PNG", x, cursorY, imgW, imgH);
         cursorY += imgH + margin;
       }
-  
-      const safe = currentSite.name.replace(/[^\w\-]+/g, "_");
-      const dateStr = new Date().toISOString().slice(0, 10);
-      pdf.save(`${safe}-dashboard-${dateStr}.pdf`);
-    } catch (err) {
-      console.error("Export to PDF failed:", err);
-      alert("Sorry, something went wrong while exporting the PDF.");
-    } finally {
-      document.querySelector(".export-overlay")?.remove();
-      document.querySelector(".pdf-root")?.remove();
     }
-  };  
+
+    const safe = currentSite.name.replace(/[^\w\-]+/g, "_");
+    const dateStr = new Date().toISOString().slice(0, 10);
+    pdf.save(`${safe}-dashboard-${dateStr}.pdf`);
+  } catch (err) {
+    console.error("Export to PDF failed:", err);
+    alert("Sorry, something went wrong while exporting the PDF.");
+  } finally {
+    document.querySelector(".export-overlay")?.remove();
+    document.querySelector(".pdf-root")?.remove();
+  }
+};
+
+// allow rescanning of the website
+const handleRescan = async () => {
+  if (!currentSite) return;
+  
+  setIsRescanning(true);
+  setRescanComplete(false);
+  setError(null);
+  
+  // Create full-screen loading overlay
+  const overlay = document.createElement("div");
+  overlay.className = "export-overlay";
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100%";
+  overlay.style.height = "100%";
+  overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+  overlay.style.display = "flex";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+  overlay.style.zIndex = "9999";
+  document.body.appendChild(overlay);
+  
+  const loadingDiv = document.createElement("div");
+  loadingDiv.style.backgroundColor = "white";
+  loadingDiv.style.padding = "2rem";
+  loadingDiv.style.borderRadius = "8px";
+  loadingDiv.style.textAlign = "center";
+  loadingDiv.innerHTML = `
+    <div style="font-size: 1.2rem; margin-bottom: 1rem;">Rescanning Website...</div>
+    <div style="color: #666;">Please wait while we analyze the accessibility of your site</div>
+  `;
+  overlay.appendChild(loadingDiv);
+  
+  try {
+    // Rescan the current site URL
+    const scanResult = await scanService.scanUrl(currentSite.url);
+    
+    // Update the scan data
+    setScanData(scanResult.scan);
+    
+    // Update the site in context with new scan data
+    const updatedSite = {
+      ...currentSite,
+      lastScanned: scanResult.scan.timeScanned,
+      scanData: scanResult.scan,
+    };
+    
+    // Show completion message
+    loadingDiv.innerHTML = `
+      <div style="font-size: 1.2rem; margin-bottom: 1rem; color: #22c55e;">✓ Re-scan Complete!</div>
+      <div style="color: #666;">Your website has been successfully re-analyzed</div>
+    `;
+    
+    setTimeout(() => {
+      document.querySelector(".export-overlay")?.remove();
+    }, 2000);
+    
+  } catch (err) {
+    console.error('Error during rescan:', err);
+    setError(err instanceof Error ? err.message : 'Failed to rescan. Please try again.');
+    
+    // Show error message
+    loadingDiv.innerHTML = `
+      <div style="font-size: 1.2rem; margin-bottom: 1rem; color: #ef4444;">✗ Rescan Failed</div>
+      <div style="color: #666;">${err instanceof Error ? err.message : 'Failed to rescan. Please try again.'}</div>
+    `;
+    
+    setTimeout(() => {
+      document.querySelector(".export-overlay")?.remove();
+    }, 3000);
+  } finally {
+    setIsRescanning(false);
+  }
+};
 
   return (
     <div className={`dashboard-page ${isExporting ? 'pdf-mode' : ''}`} ref={pdfRef}>
@@ -306,8 +440,12 @@ export const DashboardPage: React.FC = () => {
           </div>
           {!isExporting && (
             <div className="dashboard-rescan-button-container">
-              <Button onClick={() => console.log("Rescan clicked")} variant="secondary">
-                Rescan
+              <Button 
+                onClick={handleRescan} 
+                variant={rescanComplete ? "primary" : "outline"} 
+                disabled={isRescanning}
+              >
+                {isRescanning ? "Rescanning..." : rescanComplete ? "Re-scan Complete!" : "Rescan"}
               </Button>
               <Button onClick={handleExportToPDF} variant="outline" disabled={isExporting}>
                 {isExporting ? "Exporting…" : "Export to PDF"}
