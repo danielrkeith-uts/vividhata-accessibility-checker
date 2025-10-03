@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
-import { OverviewCard } from "../components/dashboard/OverviewCard";
-import { GaugeChart } from "../components/dashboard/GaugeChart";
-import { BreakdownTable } from "../components/dashboard/BreakdownTable";
-import { TaskList } from "../components/dashboard/TaskList";
 import { UserDropDown } from "../components/common/UserDropDown";
-import { PriorityChart } from "../components/dashboard/PriorityChart";
 import { Scan } from "../services/api/apiService";
 import { scanService } from "../services/scan/scanService";
 import "./DashboardPage.css";
@@ -133,69 +128,27 @@ export const DashboardPage: React.FC = () => {
     );
   }
 
-  // Transform scan data for components
+  // Transform scan data for dashboard
   const totalIssues = scanData.issues.length;
-  const complianceScore = Math.max(0, 100 - (totalIssues * 10)); // Simple calculation
+  const complianceScore = Math.max(0, Math.min(100, 100 - totalIssues * 2));
 
-  const overviewData = {
-    xAxis: [1, 2, 3, 4, 5], // Mock historical data
-    yAxis: [complianceScore, complianceScore + 5, complianceScore - 2, complianceScore + 3, complianceScore],
-    improvement: 5 // Mock improvement
-  };
-
-  const gaugeData = {
-    score: complianceScore,
-    totalRequirements: totalIssues + 10,
-    compliantCount: Math.floor(complianceScore / 10),
-    atRiskCount: Math.floor(totalIssues * 0.3),
-    nonCompliantCount: Math.floor(totalIssues * 0.7)
-  };
-
-  // Group issues by category
+  // Group issues by category for requirements table and breakdown
   const issuesByCategory: Record<string, number> = {};
   scanData.issues.forEach(issue => {
     const category = issue.issueType.split('_')[0] || 'Other';
     issuesByCategory[category] = (issuesByCategory[category] || 0) + 1;
   });
-
-  // Transform category data to match expected interface
-  const categoryData = Object.entries(issuesByCategory).reduce((acc, [category, count]) => {
-    acc[category] = {
-      score: Math.max(0, 100 - count * 10),
-      totalRequirements: count + 5,
-      compliantCount: Math.floor(count * 0.3),
-      atRiskCount: Math.floor(count * 0.3),
-      nonCompliantCount: Math.floor(count * 0.4)
-    };
-    return acc;
-  }, {} as Record<string, { score: number; totalRequirements: number; compliantCount: number; atRiskCount: number; nonCompliantCount: number }>);
-
-  // Transform priority data to match expected interface
-  const priorityData = [
-    { level: 'AAA', value: Math.max(0, complianceScore - 10), color: '#60a5fa' },
-    { level: 'A', value: Math.max(0, complianceScore - 5), color: '#8b5cf6' },
-    { level: 'AA', value: complianceScore, color: '#f97316' }
+  const breakdown = [
+    { label: 'Essential (A)', grade: 'A', passed: Math.max(0, Math.round(complianceScore * 0.72)), total: 100, color: '#22c55e' },
+    { label: 'Enhanced (AA)', grade: 'AA', passed: Math.max(0, Math.round(complianceScore * 0.6)), total: 100, color: '#f59e0b' },
+    { label: 'Advanced (AAA)', grade: 'AAA', passed: Math.max(0, Math.round(complianceScore * 0.3)), total: 100, color: '#ef4444' },
   ];
 
-  // Transform requirements data to match expected interface
-  const requirementsData = Object.entries(issuesByCategory).map(([category, count], index) => ({
-    id: (index + 1).toString(),
-    description: `Fix ${category.toLowerCase()} accessibility issues`,
+  const requirementsRows = Object.entries(issuesByCategory).map(([category, count], i) => ({
+    id: i + 1,
+    text: `Fix ${category.toLowerCase()} accessibility issues`,
+    priority: count > 3 ? 'High' : count > 1 ? 'Medium' : 'Low',
     category,
-    status: count > 2 ? 'Noncompliant' as const : count > 1 ? 'At Risk' as const : 'Compliant' as const,
-    severity: count > 2 ? 3 : count > 1 ? 2 : 1
-  }));
-
-  // Transform tasks data to match expected interface
-  const tasksData = scanData.issues.map((issue, index) => ({
-    id: (index + 1).toString(),
-    title: `Fix ${issue.issueType.replace(/_/g, ' ').toLowerCase()}`,
-    description: `Address accessibility issue: ${issue.issueType}`,
-    priority: (index % 3 === 0 ? 'High' : index % 3 === 1 ? 'Medium' : 'Low') as 'High' | 'Medium' | 'Low',
-    status: 'To Do' as const,
-    category: issue.issueType.split('_')[0] || 'Other',
-    completed: false,
-    dueDate: new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   }));
 
 //allow export to pdf
@@ -454,31 +407,71 @@ const handleRescan = async () => {
           )}
         </div>
   
-        {/* Overview, Priority, Gauge */}
+        {/* Overview + Stats ring */}
         <div className={`dashboard-overview-row ${isExporting ? 'pdf-stack' : ''}`}>
-          <OverviewCard
-            accessibilityXAxis={overviewData.xAxis}
-            accessibilityYAxis={overviewData.yAxis}
-            improvement={overviewData.improvement}
-          />
-          <PriorityChart priorityData={priorityData} />
-          <GaugeChart
-            score={gaugeData.score}
-            totalRequirements={gaugeData.totalRequirements}
-            compliantCount={gaugeData.compliantCount}
-            atRiskCount={gaugeData.atRiskCount}
-            nonCompliantCount={gaugeData.nonCompliantCount}
-            categoryData={categoryData}
-          />
-        </div>
-  
-        {/* Breakdown and Tasks */}
-        <div className={`dashboard-breakdown-tasks-row ${isExporting ? 'pdf-stack' : ''}`}>
-          <div className="breakdown-section">
-            <BreakdownTable requirements={requirementsData} />
+          <div className="card" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <div className="donut">
+              <svg viewBox="0 0 36 36">
+                <path className="bg" d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path className="fg" strokeDasharray={`${complianceScore}, 100`} d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <text x="18" y="20.35" className="percent">{complianceScore}%</text>
+              </svg>
+              <div className="donut-sub">Compliant with WCAG</div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div className="callout">You're on the right track! Keep improving.</div>
+              <ul className="bullets">
+                <li><b>{Math.round(complianceScore / 4)}</b> WCAG requirements met</li>
+                <li><b>{Math.max(0, 100 - Math.round(complianceScore / 4))}</b> WCAG requirements not met</li>
+                <li><b>{Math.max(0, 100 - complianceScore)}%</b> below industry standard</li>
+                <li><b>3</b> quick wins to increase score by 20%</li>
+              </ul>
+            </div>
           </div>
-          <div className="tasks-section">
-            <TaskList tasks={tasksData} />
+          <div className="card">
+            <h3 className="card-title">Compliance Breakdown</h3>
+            <div className="breakdown-list">
+              {breakdown.map((b) => (
+                <div key={b.grade} className="breakdown-item">
+                  <div className="badge" style={{ background: b.color }}>{b.grade}</div>
+                  <div className="breakdown-copy">
+                    <div className="label">{b.label}</div>
+                    <div className="muted">{b.passed}% passed</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="card">
+            <h3 className="card-title">What is WCAG?</h3>
+            <p className="muted">WCAG ensures your site is usable by people with disabilities. It creates an inclusive web where everyone can access content. Find out more.</p>
+          </div>
+        </div>
+
+        {/* Requirements */}
+        <div className={`dashboard-breakdown-tasks-row ${isExporting ? 'pdf-stack' : ''}`}>
+          <div className="card" data-pdf-expand style={{ flex: 1, minWidth: 300 }}>
+            <div className="requirements-header">
+              <div className="title">Requirements</div>
+            </div>
+            <div className="requirements-table" data-pdf-expand>
+              <div className="table-head">
+                <div>Requirement</div>
+                <div>Priority</div>
+                <div>Category</div>
+              </div>
+              {requirementsRows.map((r) => (
+                <div className="table-row" key={r.id}>
+                  <div>{r.text}</div>
+                  <div><span className={`pill pill-${r.priority.toLowerCase()}`}>{r.priority}</span></div>
+                  <div>{r.category}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </main>

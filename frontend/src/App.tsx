@@ -14,6 +14,7 @@ import { ManageSites } from "./pages/ManageSites";
 import "./App.css";
 import { EditProfile } from "./pages/EditProfile";
 import "./services/api/apiTest"; // Import to run API tests
+import { ThemeProvider } from "./context/ThemeProvider";
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
@@ -128,9 +129,11 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="App">
-          <AppRoutes />
-        </div>
+        <ThemeProvider>
+          <div className="App">
+            <AppRoutes />
+          </div>
+        </ThemeProvider>
       </AuthProvider>
     </Router>
   );
