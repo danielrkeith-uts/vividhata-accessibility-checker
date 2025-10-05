@@ -8,6 +8,11 @@ import { Button } from "../components/common/Button";
 import { useParams, Navigate } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import PurpleTooltip from "../components/common/PurpleTooltip";
+import { Stack } from '@mui/material';
+import PageStatsCard from '../components/dashboard/PageStatsCard';
+import ComplianceColumn from '../components/dashboard/ComplianceColumn';
+import RequirementsCard from '../components/dashboard/RequirementsCard';
 
 export const DashboardPage: React.FC = () => {
   const { siteId } = useParams<{ siteId: string }>();
@@ -138,23 +143,23 @@ export const DashboardPage: React.FC = () => {
 
   // Transform scan data for dashboard
   // Define WCAG metadata per IssueType
-  const WCAG_MAP: Record<string, { id: string; name: string; level: 'A' | 'AA' | 'AAA' }> = {
-    ALT_TEXT_MISSING: { id: '1.1.1', name: 'Text Alternatives', level: 'A' },
-    CAPTIONS_FOR_VIDEO_AUDIO_MISSING: { id: '1.2.2', name: 'Captions (Prerecorded)', level: 'A' },
-    SEMANTIC_HTML_MISSING: { id: '1.3.1', name: 'Info and Relationships', level: 'A' },
-    CONTENT_MEANINGFUL_SEQUENCE_VIOLATION: { id: '1.3.2', name: 'Meaningful Sequence', level: 'A' },
-    NO_SINGLE_SENSORY_CHARACTERISTIC: { id: '1.3.3', name: 'Sensory Characteristics', level: 'A' },
-    LINE_HEIGHT_SPACING_VIOLATION: { id: '1.4.12', name: 'Text Spacing', level: 'AA' },
-    NOT_JUST_COLOR: { id: '1.4.1', name: 'Use of Color', level: 'A' },
-    TEXT_CONTRAST_VIOLATION: { id: '1.4.3', name: 'Contrast (Minimum)', level: 'AA' },
-    TEXT_RESIZE_VIOLATION: { id: '1.4.4', name: 'Resize Text', level: 'AA' },
-    KEYBOARD_OPERABLE: { id: '2.1.1', name: 'Keyboard', level: 'A' },
-    NO_KEYBOARD_TRAPS: { id: '2.1.2', name: 'No Keyboard Trap', level: 'A' },
-    TIME_LIMITS: { id: '2.2.1', name: 'Timing Adjustable', level: 'A' },
-    CLEAR_PAGE_TITLES: { id: '2.4.2', name: 'Page Titled', level: 'A' },
-    FOCUS_ORDER_LOGICAL: { id: '2.4.3', name: 'Focus Order', level: 'A' },
-    DESCRIPTIVE_LINK_TEXT: { id: '2.4.4', name: 'Link Purpose (In Context)', level: 'A' },
-    MULTIPLE_WAYS_TO_NAVIGATE: { id: '2.4.5', name: 'Multiple Ways', level: 'AA' },
+  const WCAG_MAP: Record<string, { id: string; name: string; level: 'A' | 'AA' | 'AAA'; principle: 'Perceivable' | 'Operable' | 'Understandable' | 'Robust' }> = {
+    ALT_TEXT_MISSING: { id: '1.1.1', name: 'Text Alternatives', level: 'A', principle: 'Perceivable' },
+    CAPTIONS_FOR_VIDEO_AUDIO_MISSING: { id: '1.2.2', name: 'Captions (Prerecorded)', level: 'A', principle: 'Perceivable' },
+    SEMANTIC_HTML_MISSING: { id: '1.3.1', name: 'Info and Relationships', level: 'A', principle: 'Perceivable' },
+    CONTENT_MEANINGFUL_SEQUENCE_VIOLATION: { id: '1.3.2', name: 'Meaningful Sequence', level: 'A', principle: 'Perceivable' },
+    NO_SINGLE_SENSORY_CHARACTERISTIC: { id: '1.3.3', name: 'Sensory Characteristics', level: 'A', principle: 'Perceivable' },
+    LINE_HEIGHT_SPACING_VIOLATION: { id: '1.4.12', name: 'Text Spacing', level: 'AA', principle: 'Perceivable' },
+    NOT_JUST_COLOR: { id: '1.4.1', name: 'Use of Color', level: 'A', principle: 'Perceivable' },
+    TEXT_CONTRAST_VIOLATION: { id: '1.4.3', name: 'Contrast (Minimum)', level: 'AA', principle: 'Perceivable' },
+    TEXT_RESIZE_VIOLATION: { id: '1.4.4', name: 'Resize Text', level: 'AA', principle: 'Perceivable' },
+    KEYBOARD_OPERABLE: { id: '2.1.1', name: 'Keyboard', level: 'A', principle: 'Operable' },
+    NO_KEYBOARD_TRAPS: { id: '2.1.2', name: 'No Keyboard Trap', level: 'A', principle: 'Operable' },
+    TIME_LIMITS: { id: '2.2.1', name: 'Timing Adjustable', level: 'A', principle: 'Operable' },
+    CLEAR_PAGE_TITLES: { id: '2.4.2', name: 'Page Titled', level: 'A', principle: 'Operable' },
+    FOCUS_ORDER_LOGICAL: { id: '2.4.3', name: 'Focus Order', level: 'A', principle: 'Operable' },
+    DESCRIPTIVE_LINK_TEXT: { id: '2.4.4', name: 'Link Purpose (In Context)', level: 'A', principle: 'Operable' },
+    MULTIPLE_WAYS_TO_NAVIGATE: { id: '2.4.5', name: 'Multiple Ways', level: 'AA', principle: 'Operable' },
   };
 
   const totalIssues = scanData.issues.length;
@@ -234,12 +239,13 @@ export const DashboardPage: React.FC = () => {
   const violatedCounts: Record<string, number> = {};
   scanData.issues.forEach(i => { violatedCounts[i.issueType] = (violatedCounts[i.issueType] || 0) + 1; });
   const requirementsRows = Object.entries(violatedCounts).map(([type, count], idx) => {
-    const meta = WCAG_MAP[type] || { id: '—', name: type, level: 'A' as const };
+    const meta = WCAG_MAP[type] || { id: '—', name: type, level: 'A' as const, principle: 'Perceivable' as const };
     return {
       id: idx + 1,
       text: `WCAG ${meta.id} ${meta.name}`,
       priority: wcagPriority[meta.level],
-      category: meta.level,
+      category: meta.principle,
+      level: meta.level,
       count,
     };
   });
@@ -484,21 +490,22 @@ const handleRescan = async () => {
         </div>
       )}
   
-      <main className="dashboard-main">
+      <main id="main" className="dashboard-main" role="main" aria-label="Dashboard main content">
         <div className="dashboard-row">
           <div className="dashboard-url-bar">
             <span className="dashboard-url-value">{websiteUrl}</span>
           </div>
           {!isExporting && (
-            <div className="dashboard-rescan-button-container">
+            <div className="dashboard-rescan-button-container" role="group" aria-label="Dashboard actions">
               <Button 
                 onClick={handleRescan} 
                 variant={rescanComplete ? "primary" : "outline"} 
                 disabled={isRescanning}
+                aria-label="Rescan website for accessibility issues"
               >
                 {isRescanning ? "Rescanning..." : rescanComplete ? "Re-scan Complete!" : "Rescan"}
               </Button>
-              <Button onClick={handleExportToPDF} variant="outline" disabled={isExporting}>
+              <Button onClick={handleExportToPDF} variant="outline" disabled={isExporting} aria-label="Export dashboard to PDF">
                 {isExporting ? "Exporting…" : "Export to PDF"}
               </Button>
             </div>
@@ -507,132 +514,21 @@ const handleRescan = async () => {
   
         {/* Two-column layout: Left (Page Stats + Requirements), Right (Compliance + WCAG) */}
         <div className={`dashboard-two-col ${isExporting ? 'pdf-stack' : ''}`}>
-          <div className="left-column">
-            {/* Page Stats card with donut and indicators */}
-            <div className="card page-stats">
-            <div className="page-stats-content">
-            <div className="donut">
-              <svg viewBox="0 0 36 36">
-                  <path className="bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                  <path className="fg" strokeDasharray={`${complianceScore}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <text x="18" y="20.35" className="percent">{complianceScore}%</text>
-              </svg>
-              <div className="donut-sub">Compliant with WCAG</div>
-            </div>
-              <div className="indicators">
-                <div className="indicator-bar good">
-                  <div className="count-badge">{passed.A + passed.AA + passed.AAA}</div>
-                  <div className="label">WCAG requirements met</div>
-                </div>
-                <div className="indicator-bar bad">
-                  <div className="count-badge">{(totals.A + totals.AA + totals.AAA) - (passed.A + passed.AA + passed.AAA)}</div>
-                  <div className="label">WCAG requirements not met</div>
-                </div>
-                <div className="indicator-bar warn">
-                  <div className="count-badge">{Math.max(0, 100 - complianceScore)}%</div>
-                  <div className="label">Below industry standard</div>
-                </div>
-                <div className="indicator-bar info">
-                  <div className="count-badge">3</div>
-                  <div className="label">Quick wins to increase score by 20%</div>
-                </div>
-              </div>
-            </div>
-            </div>
-
-            {/* Requirements card (same width as Page Stats) */}
-            <div className="card" data-pdf-expand style={{ flex: 1, minWidth: 300 }}>
-              <div className="requirements-header">
-                <div className="title">Requirements</div>
-                <div className="tabs">
-                  <button className={`tab ${requirementsTab === 'requirements' ? 'tab-active' : ''}`} onClick={() => setRequirementsTab('requirements')}>Requirements</button>
-                  <button className={`tab ${requirementsTab === 'quickfixes' ? 'tab-active' : ''}`} onClick={() => setRequirementsTab('quickfixes')}>Suggested Fixes</button>
-                </div>
-              </div>
-              {requirementsTab === 'requirements' ? (
-                <div className="requirements-table" data-pdf-expand>
-                  <div className="table-head">
-                    <div>Requirement</div>
-                    <div>Priority</div>
-                    <div>Level</div>
-                  </div>
-                  {requirementsRows.map((r) => (
-                    <div className="table-row" key={r.id}>
-                      <div>{r.text}</div>
-                      <div><span className={`pill pill-${r.priority.toLowerCase()}`}>{r.priority}</span></div>
-                      <div>{r.category}</div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="suggested-fixes" data-pdf-expand>
-                  {quickWins.length === 0 ? (
-                    <div className="muted" style={{ padding: '8px 12px' }}>No quick fixes detected. Great job!</div>
-                  ) : (
-                    quickWins.map((q) => (
-                      <div className="table-row" key={q.id} style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '8px', padding: '10px 12px', borderTop: '1px solid var(--panel-border)' }}>
-                        <div>{q.text}</div>
-                        <div style={{ textAlign: 'right', color: 'var(--muted)' }}>x{q.count}</div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right column: Compliance Breakdown (stacked) + What is WCAG */}
-          <div className="right-column">
-          <div className="card">
-            <h3 className="card-title">Compliance Breakdown</h3>
-              <div className="compliance-cards">
-                <div className="compliance-card a">
-                  <div className="left">
-                    <div className="badge">A</div>
-                    <div className="copy">
-                      <div className="title">Essential (A)</div>
-                      <div className="desc">Basic accessibility requirements.</div>
-                    </div>
-                  </div>
-                  <div className="right">
-                    <div className="pct">{pct.A}%</div>
-                    <div className="small">{passed.A} out of {totals.A} passed</div>
-                  </div>
-                </div>
-                <div className="compliance-card aa">
-                  <div className="left">
-                    <div className="badge">AA</div>
-                    <div className="copy">
-                      <div className="title">Enhanced (AA)</div>
-                      <div className="desc">Standard compliance level.</div>
-                    </div>
-                  </div>
-                  <div className="right">
-                    <div className="pct">{pct.AA}%</div>
-                    <div className="small">{passed.AA} out of {totals.AA} passed</div>
-                  </div>
-                </div>
-                <div className="compliance-card aaa">
-                  <div className="left">
-                    <div className="badge">AAA</div>
-                    <div className="copy">
-                      <div className="title">Advanced (AAA)</div>
-                      <div className="desc">Highest accessibility standard.</div>
-                    </div>
-                  </div>
-                  <div className="right">
-                    <div className="pct">{pct.AAA}%</div>
-                    <div className="small">{passed.AAA} out of {totals.AAA} passed</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          <div className="card">
-            <h3 className="card-title">What is WCAG?</h3>
-              <p className="muted">WCAG accessibility ensures your site is usable by people with disabilities. It’s important for creating an inclusive web where everyone can access content. Find out more.</p>
-            </div>
-          </div>
+          <Stack className="left-column" spacing={2}>
+            <PageStatsCard
+              complianceScore={complianceScore}
+              metCount={passed.A + passed.AA + passed.AAA}
+              notMetCount={(totals.A + totals.AA + totals.AAA) - (passed.A + passed.AA + passed.AAA)}
+              belowPercent={Math.max(0, 100 - complianceScore)}
+            />
+            <RequirementsCard
+              tab={requirementsTab}
+              setTab={setRequirementsTab}
+              requirementsRows={requirementsRows.map(r => ({ id: r.id, text: r.text, category: r.category, level: r.level }))}
+              quickWins={quickWins}
+            />
+          </Stack>
+          <ComplianceColumn pct={pct} passed={passed} totals={totals} />
         </div>
 
         {/* Requirements moved to left column above */}
