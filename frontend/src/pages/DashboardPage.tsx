@@ -52,7 +52,7 @@ export const DashboardPage: React.FC = () => {
           setError('Site not found');
           return;
         }
-
+        
         // Get the latest scan for this web page
         const scans = await scanService.getWebPageScans(webPageId);
         
@@ -505,89 +505,137 @@ const handleRescan = async () => {
           )}
         </div>
   
-        {/* Overview + Page Stats + Compliance Cards */}
-        <div className={`dashboard-overview-row ${isExporting ? 'pdf-stack' : ''}`}>
-          {/* Page Stats card with donut and indicators */}
-          <div className="card page-stats">
+        {/* Two-column layout: Left (Page Stats + Requirements), Right (Compliance + WCAG) */}
+        <div className={`dashboard-two-col ${isExporting ? 'pdf-stack' : ''}`}>
+          <div className="left-column">
+            {/* Page Stats card with donut and indicators */}
+            <div className="card page-stats">
             <div className="page-stats-content">
-              <div className="donut">
-                <svg viewBox="0 0 36 36">
+            <div className="donut">
+              <svg viewBox="0 0 36 36">
                   <path className="bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                   <path className="fg" strokeDasharray={`${complianceScore}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                  <text x="18" y="20.35" className="percent">{complianceScore}%</text>
-                </svg>
-                <div className="donut-sub">Compliant with WCAG</div>
-              </div>
+                <text x="18" y="20.35" className="percent">{complianceScore}%</text>
+              </svg>
+              <div className="donut-sub">Compliant with WCAG</div>
+            </div>
               <div className="indicators">
-                <div className="indicator success"><span className="kpi">{passed.A + passed.AA + passed.AAA}</span> WCAG requirements met</div>
-                <div className="indicator warn"><span className="kpi">{(totals.A + totals.AA + totals.AAA) - (passed.A + passed.AA + passed.AAA)}</span> WCAG requirements not met</div>
-                <div className="indicator info"><span className="kpi">{Math.max(0, 100 - complianceScore)}%</span> below industry standard</div>
-                <div className="indicator quick"><span className="kpi">3</span> quick wins to increase score by 20%</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Compliance Breakdown as three colored cards */}
-          <div className="compliance-cards">
-            <div className="compliance-card a">
-              <div className="badge">A</div>
-              <div className="title">Essential (A)</div>
-              <div className="meta">{pct.A}% • {passed.A} out of {totals.A} passed</div>
-            </div>
-            <div className="compliance-card aa">
-              <div className="badge">AA</div>
-              <div className="title">Enhanced (AA)</div>
-              <div className="meta">{pct.AA}% • {passed.AA} out of {totals.AA} passed</div>
-            </div>
-            <div className="compliance-card aaa">
-              <div className="badge">AAA</div>
-              <div className="title">Advanced (AAA)</div>
-              <div className="meta">{pct.AAA}% • {passed.AAA} out of {totals.AAA} passed</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Requirements */}
-        <div className={`dashboard-breakdown-tasks-row ${isExporting ? 'pdf-stack' : ''}`}>
-          <div className="card" data-pdf-expand style={{ flex: 1, minWidth: 300 }}>
-            <div className="requirements-header">
-              <div className="title">Requirements</div>
-              <div className="tabs">
-                <button className={`tab ${requirementsTab === 'requirements' ? 'tab-active' : ''}`} onClick={() => setRequirementsTab('requirements')}>Requirements</button>
-                <button className={`tab ${requirementsTab === 'quickfixes' ? 'tab-active' : ''}`} onClick={() => setRequirementsTab('quickfixes')}>Suggested Fixes</button>
-              </div>
-            </div>
-            {requirementsTab === 'requirements' ? (
-              <div className="requirements-table" data-pdf-expand>
-                <div className="table-head">
-                  <div>Requirement</div>
-                  <div>Priority</div>
-                  <div>Category</div>
+                <div className="indicator-bar good">
+                  <div className="count-badge">{passed.A + passed.AA + passed.AAA}</div>
+                  <div className="label">WCAG requirements met</div>
                 </div>
-                {requirementsRows.map((r) => (
-                  <div className="table-row" key={r.id}>
-                    <div>{r.text}</div>
-                    <div><span className={`pill pill-${r.priority.toLowerCase()}`}>{r.priority}</span></div>
-                    <div>{r.category}</div>
+                <div className="indicator-bar bad">
+                  <div className="count-badge">{(totals.A + totals.AA + totals.AAA) - (passed.A + passed.AA + passed.AAA)}</div>
+                  <div className="label">WCAG requirements not met</div>
+                </div>
+                <div className="indicator-bar warn">
+                  <div className="count-badge">{Math.max(0, 100 - complianceScore)}%</div>
+                  <div className="label">Below industry standard</div>
+                </div>
+                <div className="indicator-bar info">
+                  <div className="count-badge">3</div>
+                  <div className="label">Quick wins to increase score by 20%</div>
+                </div>
+              </div>
+            </div>
+            </div>
+
+            {/* Requirements card (same width as Page Stats) */}
+            <div className="card" data-pdf-expand style={{ flex: 1, minWidth: 300 }}>
+              <div className="requirements-header">
+                <div className="title">Requirements</div>
+                <div className="tabs">
+                  <button className={`tab ${requirementsTab === 'requirements' ? 'tab-active' : ''}`} onClick={() => setRequirementsTab('requirements')}>Requirements</button>
+                  <button className={`tab ${requirementsTab === 'quickfixes' ? 'tab-active' : ''}`} onClick={() => setRequirementsTab('quickfixes')}>Suggested Fixes</button>
+                </div>
+              </div>
+              {requirementsTab === 'requirements' ? (
+                <div className="requirements-table" data-pdf-expand>
+                  <div className="table-head">
+                    <div>Requirement</div>
+                    <div>Priority</div>
+                    <div>Level</div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="suggested-fixes" data-pdf-expand>
-                {quickWins.length === 0 ? (
-                  <div className="muted" style={{ padding: '8px 12px' }}>No quick fixes detected. Great job!</div>
-                ) : (
-                  quickWins.map((q) => (
-                    <div className="table-row" key={q.id} style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '8px', padding: '10px 12px', borderTop: '1px solid var(--panel-border)' }}>
-                      <div>{q.text}</div>
-                      <div style={{ textAlign: 'right', color: 'var(--muted)' }}>x{q.count}</div>
+                  {requirementsRows.map((r) => (
+                    <div className="table-row" key={r.id}>
+                      <div>{r.text}</div>
+                      <div><span className={`pill pill-${r.priority.toLowerCase()}`}>{r.priority}</span></div>
+                      <div>{r.category}</div>
                     </div>
-                  ))
-                )}
+                  ))}
+                </div>
+              ) : (
+                <div className="suggested-fixes" data-pdf-expand>
+                  {quickWins.length === 0 ? (
+                    <div className="muted" style={{ padding: '8px 12px' }}>No quick fixes detected. Great job!</div>
+                  ) : (
+                    quickWins.map((q) => (
+                      <div className="table-row" key={q.id} style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '8px', padding: '10px 12px', borderTop: '1px solid var(--panel-border)' }}>
+                        <div>{q.text}</div>
+                        <div style={{ textAlign: 'right', color: 'var(--muted)' }}>x{q.count}</div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right column: Compliance Breakdown (stacked) + What is WCAG */}
+          <div className="right-column">
+          <div className="card">
+            <h3 className="card-title">Compliance Breakdown</h3>
+              <div className="compliance-cards">
+                <div className="compliance-card a">
+                  <div className="left">
+                    <div className="badge">A</div>
+                    <div className="copy">
+                      <div className="title">Essential (A)</div>
+                      <div className="desc">Basic accessibility requirements.</div>
+                    </div>
+                  </div>
+                  <div className="right">
+                    <div className="pct">{pct.A}%</div>
+                    <div className="small">{passed.A} out of {totals.A} passed</div>
+                  </div>
+                </div>
+                <div className="compliance-card aa">
+                  <div className="left">
+                    <div className="badge">AA</div>
+                    <div className="copy">
+                      <div className="title">Enhanced (AA)</div>
+                      <div className="desc">Standard compliance level.</div>
+                    </div>
+                  </div>
+                  <div className="right">
+                    <div className="pct">{pct.AA}%</div>
+                    <div className="small">{passed.AA} out of {totals.AA} passed</div>
+                  </div>
+                </div>
+                <div className="compliance-card aaa">
+                  <div className="left">
+                    <div className="badge">AAA</div>
+                    <div className="copy">
+                      <div className="title">Advanced (AAA)</div>
+                      <div className="desc">Highest accessibility standard.</div>
+                    </div>
+                  </div>
+                  <div className="right">
+                    <div className="pct">{pct.AAA}%</div>
+                    <div className="small">{passed.AAA} out of {totals.AAA} passed</div>
+                  </div>
+                </div>
               </div>
-            )}
+            </div>
+
+          <div className="card">
+            <h3 className="card-title">What is WCAG?</h3>
+              <p className="muted">WCAG accessibility ensures your site is usable by people with disabilities. It’s important for creating an inclusive web where everyone can access content. Find out more.</p>
+            </div>
           </div>
         </div>
+
+        {/* Requirements moved to left column above */}
       </main>
     </div>
   );
