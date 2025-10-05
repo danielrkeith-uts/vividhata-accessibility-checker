@@ -5,6 +5,7 @@ export interface Site {
   name: string;
   lastScanned: string;
   scanData?: any; // Will contain the scan results from the API
+  complianceScore?: number;
 }
 export interface User {
   id: string;

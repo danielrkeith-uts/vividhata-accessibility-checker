@@ -36,8 +36,14 @@ export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRow
           {requirementsRows.map((r) => (
             <div className="table-row" key={r.id}>
               <div>{r.text}</div>
-              <div>{r.category}</div>
-              <div>{r.level}</div>
+              <div>
+                <span className="pill pill-category">{r.category}</span>
+              </div>
+              <div>
+                <span className={`pill pill-level-${r.level.toLowerCase()}`}>
+                  Level {r.level}
+                </span>
+              </div>
             </div>
           ))}
         </div>

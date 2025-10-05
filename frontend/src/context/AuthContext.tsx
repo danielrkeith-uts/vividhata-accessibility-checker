@@ -51,6 +51,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   
   const [isLoading, setIsLoading] = useState(true);
 
+  const updateSiteComplianceScore = (siteId: string, score: number) => {
+    setUserSites(prev => 
+      prev.map(site => 
+        site.id === siteId 
+          ? { ...site, complianceScore: score }
+          : site
+      )
+    );
+  };
+
   const checkAuthStatus = async () => {
     try {
       const userData = await apiService.getCurrentUser();
@@ -103,7 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             name: extractSiteName(webPage.url),
             url: webPage.url,
             lastScanned: latestScan?.timeScanned || new Date().toISOString(),
-            scanData: latestScan || null
+            scanData: latestScan || null,
           };
         })
       );

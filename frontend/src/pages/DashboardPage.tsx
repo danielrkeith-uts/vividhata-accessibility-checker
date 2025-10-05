@@ -9,7 +9,6 @@ import { useParams, Navigate } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import PurpleTooltip from "../components/common/PurpleTooltip";
-import { Stack } from '@mui/material';
 import PageStatsCard from '../components/dashboard/PageStatsCard';
 import ComplianceColumn from '../components/dashboard/ComplianceColumn';
 import RequirementsCard from '../components/dashboard/RequirementsCard';
@@ -25,7 +24,6 @@ export const DashboardPage: React.FC = () => {
   const [pdfMode, setPdfMode] = useState(false);
   const [isRescanning, setIsRescanning] = useState(false);
   const [rescanComplete, setRescanComplete] = useState(false);
-  // Determine the current site (if any) early so effects can use it safely
   const currentSite = userSites.find((site) => site.id === siteId);
   const [requirementsTab, setRequirementsTab] = useState<'requirements' | 'quickfixes'>('requirements');
 
@@ -35,7 +33,6 @@ export const DashboardPage: React.FC = () => {
         setIsLoading(true);
         setError(null);
         
-        // Check if user is authenticated
         if (!isAuthenticated) {
           setError('Please log in to view dashboard');
           return;
@@ -52,31 +49,25 @@ export const DashboardPage: React.FC = () => {
           return;
         }
         
-        // Ensure the site exists before proceeding
         if (!currentSite) {
           setError('Site not found');
           return;
         }
         
-        // Get the latest scan for this web page
         const scans = await scanService.getWebPageScans(webPageId);
         
         if (scans.length === 0) {
-          // No scans yet for this site. Trigger a fresh scan using the site's URL.
           const fresh = await scanService.scanUrl(currentSite.url);
           setScanData(fresh.scan);
           return;
         }
         
-        // Get the most recent scan
         const latestScan = scans.sort((a, b) => 
           new Date(b.timeScanned).getTime() - new Date(a.timeScanned).getTime()
         )[0];
         
-        // Get the issues for this scan
         const issues = await scanService.getScanIssues(latestScan.id);
         
-        // Combine scan data with issues
         const scanWithIssues: Scan = {
           ...latestScan,
           issues: issues
@@ -96,12 +87,10 @@ export const DashboardPage: React.FC = () => {
     }
   }, [siteId]);
 
-  // Redirect to /manage-sites if no siteId param
   if (!siteId) {
     return <Navigate to="/manage-sites" replace />;
   }
 
-  // Redirect if siteId is invalid (not found)
   if (!currentSite) {
     return <Navigate to="/manage-sites" replace />;
   }
@@ -142,7 +131,6 @@ export const DashboardPage: React.FC = () => {
   }
 
   // Transform scan data for dashboard
-  // Define WCAG metadata per IssueType
   const WCAG_MAP: Record<string, { id: string; name: string; level: 'A' | 'AA' | 'AAA'; principle: 'Perceivable' | 'Operable' | 'Understandable' | 'Robust' }> = {
     ALT_TEXT_MISSING: { id: '1.1.1', name: 'Text Alternatives', level: 'A', principle: 'Perceivable' },
     CAPTIONS_FOR_VIDEO_AUDIO_MISSING: { id: '1.2.2', name: 'Captions (Prerecorded)', level: 'A', principle: 'Perceivable' },
@@ -164,7 +152,6 @@ export const DashboardPage: React.FC = () => {
 
   const totalIssues = scanData.issues.length;
 
-  // Map IssueType -> friendly category, priority and quick-fix suggestion
   const ISSUE_CATEGORY_MAP: Record<string, { category: string; priority: 'High' | 'Medium' | 'Low'; quickFix: string }> = {
     ALT_TEXT_MISSING: { category: 'Images', priority: 'High', quickFix: 'Add meaningful alt text to all non-decorative images.' },
     CAPTIONS_FOR_VIDEO_AUDIO_MISSING: { category: 'Media', priority: 'High', quickFix: 'Provide captions/subtitles for videos and transcripts for audio.' },
@@ -184,7 +171,6 @@ export const DashboardPage: React.FC = () => {
     MULTIPLE_WAYS_TO_NAVIGATE: { category: 'Navigation', priority: 'Low', quickFix: 'Provide multiple ways to locate pages (search, sitemap, nav).' },
   };
 
-  // Aggregate by category for Requirements
   type Priority = 'High' | 'Medium' | 'Low';
   const priorityRank: Record<Priority, number> = { High: 3, Medium: 2, Low: 1 };
   const categoryAgg: Record<string, { count: number; priority: Priority }> = {};
@@ -201,7 +187,6 @@ export const DashboardPage: React.FC = () => {
     quickWinsAgg[map.quickFix] = (quickWinsAgg[map.quickFix] || 0) + 1;
   });
 
-  // Build WCAG compliance breakdown
   const allCriteria = Object.keys(WCAG_MAP);
   const violatedTypes = new Set(scanData.issues.map(i => i.issueType));
   const totals = {
@@ -228,13 +213,7 @@ export const DashboardPage: React.FC = () => {
   const overallTotal = totals.A + totals.AA + totals.AAA;
   const overallPassed = passed.A + passed.AA + passed.AAA;
   const complianceScore = overallTotal ? Math.round((overallPassed / overallTotal) * 100) : 0;
-  const breakdown = [
-    { label: 'Essential (A)', grade: 'A', passed: Math.max(0, Math.round(complianceScore * 0.72)), total: 100, color: '#22c55e' },
-    { label: 'Enhanced (AA)', grade: 'AA', passed: Math.max(0, Math.round(complianceScore * 0.6)), total: 100, color: '#f59e0b' },
-    { label: 'Advanced (AAA)', grade: 'AAA', passed: Math.max(0, Math.round(complianceScore * 0.3)), total: 100, color: '#ef4444' },
-  ];
 
-  // Requirements table: list violated WCAG criteria with level-derived priority
   const wcagPriority: Record<'A' | 'AA' | 'AAA', Priority> = { A: 'High', AA: 'Medium', AAA: 'Low' };
   const violatedCounts: Record<string, number> = {};
   scanData.issues.forEach(i => { violatedCounts[i.issueType] = (violatedCounts[i.issueType] || 0) + 1; });
@@ -250,225 +229,210 @@ export const DashboardPage: React.FC = () => {
     };
   });
 
-  // Build quick wins list (sorted by frequency)
   const quickWins = Object.entries(quickWinsAgg)
     .sort((a, b) => b[1] - a[1])
     .map(([text, count], i) => ({ id: i + 1, text, count }));
 
-//allow export to pdf
-const handleExportToPDF = async () => {
-  if (!pdfRef.current) return;
+  const handleExportToPDF = async () => {
+    if (!pdfRef.current) return;
 
-  const overlay = document.createElement("div");
-  overlay.className = "export-overlay";
-  overlay.innerHTML = "<div class='spinner'></div><p>Generating PDF...</p>";
-  document.body.appendChild(overlay);
+    const overlay = document.createElement("div");
+    overlay.className = "export-overlay";
+    overlay.innerHTML = "<div class='spinner'></div><p>Generating PDF...</p>";
+    document.body.appendChild(overlay);
 
-  try {
-    const printable = document.createElement("div");
-    printable.className = "pdf-root";
-    document.body.appendChild(printable);
+    try {
+      const printable = document.createElement("div");
+      printable.className = "pdf-root";
+      document.body.appendChild(printable);
 
-    const title = document.createElement("div");
-    title.className = "pdf-title";
-    title.innerHTML = `
-      <h1>Accessibility Report for ${currentSite.name}</h1>
-      <p>${websiteUrl}</p>
-      <p style="font-size:11px;color:#777;margin-top:4px;">
-        Generated on ${new Date().toLocaleDateString()}
-      </p>
-    `;
-    printable.appendChild(title);
+      const title = document.createElement("div");
+      title.className = "pdf-title";
+      title.innerHTML = `
+        <h1>Accessibility Report for ${currentSite.name}</h1>
+        <p>${websiteUrl}</p>
+        <p style="font-size:11px;color:#777;margin-top:4px;">
+          Generated on ${new Date().toLocaleDateString()}
+        </p>
+      `;
+      printable.appendChild(title);
 
-    const clone = pdfRef.current.cloneNode(true) as HTMLDivElement;
+      const clone = pdfRef.current.cloneNode(true) as HTMLDivElement;
 
-    // remove buttons etc.
-    clone.querySelector(".dashboard-rescan-button-container")?.remove();
+      clone.querySelector(".dashboard-rescan-button-container")?.remove();
 
-    // expand scrollable containers (TaskList, Breakdown)
-    clone.querySelectorAll("[data-pdf-expand]").forEach((el) => {
-      const e = el as HTMLElement;
-      e.style.maxHeight = "none";
-      e.style.overflow = "visible";
-    });
-
-    printable.appendChild(clone);
-
-    await new Promise((r) => requestAnimationFrame(r));
-
-    // PDF setup
-    const pdf = new jsPDF({ orientation: "p", unit: "px", format: "a4" });
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const margin = 20;
-
-    // capture blocks
-    const blocks = Array.from(
-      printable.querySelectorAll(
-        ".pdf-title, .dashboard-overview-row, .dashboard-breakdown-tasks-row"
-      )
-    ) as HTMLElement[];
-
-    let cursorY = margin;
-
-    for (let i = 0; i < blocks.length; i++) {
-      const block = blocks[i];
-      block.style.width = `${printable.clientWidth}px`;
-
-      const canvas = await html2canvas(block, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        windowWidth: printable.scrollWidth,
+      clone.querySelectorAll("[data-pdf-expand]").forEach((el: Element) => {
+        const e = el as HTMLElement;
+        e.style.maxHeight = "none";
+        e.style.overflow = "visible";
       });
 
-      const imgData = canvas.toDataURL("image/png");
-      const imgProps = pdf.getImageProperties(imgData);
+      printable.appendChild(clone);
 
-      let imgW = (pageW - margin * 2) * 0.75;
-      let imgH = (imgProps.height * imgW) / imgProps.width;
+      await new Promise((r) => requestAnimationFrame(r));
 
-      if (imgH > pageH - margin * 2) {
-        let y = 0;
-        while (y < imgProps.height) {
-          const sliceHeight = Math.min(
-            imgProps.height - y,
-            (pageH - margin * 2) * (imgProps.width / imgW)
-          );
+      const pdf = new jsPDF({ orientation: "p", unit: "px", format: "a4" });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 20;
 
-          const sliceCanvas = document.createElement("canvas");
-          sliceCanvas.width = imgProps.width;
-          sliceCanvas.height = sliceHeight;
+      const blocks = Array.from(
+        printable.querySelectorAll(
+          ".pdf-title, .dashboard-two-col"
+        )
+      ) as HTMLElement[];
 
-          const ctx = sliceCanvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(
-              canvas,
-              0,
-              y,
-              imgProps.width,
-              sliceHeight,
-              0,
-              0,
-              imgProps.width,
-              sliceHeight
+      let cursorY = margin;
+
+      for (let i = 0; i < blocks.length; i++) {
+        const block = blocks[i];
+        block.style.width = `${printable.clientWidth}px`;
+
+        const canvas = await html2canvas(block, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          windowWidth: printable.scrollWidth,
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const imgProps = pdf.getImageProperties(imgData);
+
+        let imgW = (pageW - margin * 2) * 0.75;
+        let imgH = (imgProps.height * imgW) / imgProps.width;
+
+        if (imgH > pageH - margin * 2) {
+          let y = 0;
+          while (y < imgProps.height) {
+            const sliceHeight = Math.min(
+              imgProps.height - y,
+              (pageH - margin * 2) * (imgProps.width / imgW)
             );
+
+            const sliceCanvas = document.createElement("canvas");
+            sliceCanvas.width = imgProps.width;
+            sliceCanvas.height = sliceHeight;
+
+            const ctx = sliceCanvas.getContext("2d");
+            if (ctx) {
+              ctx.drawImage(
+                canvas,
+                0,
+                y,
+                imgProps.width,
+                sliceHeight,
+                0,
+                0,
+                imgProps.width,
+                sliceHeight
+              );
+            }
+
+            const sliceData = sliceCanvas.toDataURL("image/png");
+            const sliceH = (sliceHeight * imgW) / imgProps.width;
+
+            if (cursorY + sliceH > pageH - margin) {
+              pdf.addPage();
+              cursorY = margin;
+            }
+
+            const x = margin + (pageW - margin * 2 - imgW) / 2;
+            pdf.addImage(sliceData, "PNG", x, cursorY, imgW, sliceH);
+
+            cursorY += sliceH + margin;
+            y += sliceHeight;
           }
-
-          const sliceData = sliceCanvas.toDataURL("image/png");
-          const sliceH = (sliceHeight * imgW) / imgProps.width;
-
-          if (cursorY + sliceH > pageH - margin) {
+        } else {
+          if (cursorY + imgH > pageH - margin) {
             pdf.addPage();
             cursorY = margin;
           }
 
-          // center the image horizontally
           const x = margin + (pageW - margin * 2 - imgW) / 2;
-          pdf.addImage(sliceData, "PNG", x, cursorY, imgW, sliceH);
-
-          cursorY += sliceH + margin;
-          y += sliceHeight;
+          pdf.addImage(imgData, "PNG", x, cursorY, imgW, imgH);
+          cursorY += imgH + margin;
         }
-      } else {
-        if (cursorY + imgH > pageH - margin) {
-          pdf.addPage();
-          cursorY = margin;
-        }
-
-        const x = margin + (pageW - margin * 2 - imgW) / 2;
-        pdf.addImage(imgData, "PNG", x, cursorY, imgW, imgH);
-        cursorY += imgH + margin;
       }
+
+      const safe = currentSite.name.replace(/[^\w\-]+/g, "_");
+      const dateStr = new Date().toISOString().slice(0, 10);
+      pdf.save(`${safe}-dashboard-${dateStr}.pdf`);
+    } catch (err) {
+      console.error("Export to PDF failed:", err);
+      alert("Sorry, something went wrong while exporting the PDF.");
+    } finally {
+      document.querySelector(".export-overlay")?.remove();
+      document.querySelector(".pdf-root")?.remove();
     }
+  };
 
-    const safe = currentSite.name.replace(/[^\w\-]+/g, "_");
-    const dateStr = new Date().toISOString().slice(0, 10);
-    pdf.save(`${safe}-dashboard-${dateStr}.pdf`);
-  } catch (err) {
-    console.error("Export to PDF failed:", err);
-    alert("Sorry, something went wrong while exporting the PDF.");
-  } finally {
-    document.querySelector(".export-overlay")?.remove();
-    document.querySelector(".pdf-root")?.remove();
-  }
-};
-
-// allow rescanning of the website
-const handleRescan = async () => {
-  if (!currentSite) return;
-  
-  setIsRescanning(true);
-  setRescanComplete(false);
-  setError(null);
-  
-  // Create full-screen loading overlay
-  const overlay = document.createElement("div");
-  overlay.className = "export-overlay";
-  overlay.style.position = "fixed";
-  overlay.style.top = "0";
-  overlay.style.left = "0";
-  overlay.style.width = "100%";
-  overlay.style.height = "100%";
-  overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-  overlay.style.display = "flex";
-  overlay.style.alignItems = "center";
-  overlay.style.justifyContent = "center";
-  overlay.style.zIndex = "9999";
-  document.body.appendChild(overlay);
-  
-  const loadingDiv = document.createElement("div");
-  loadingDiv.style.backgroundColor = "white";
-  loadingDiv.style.padding = "2rem";
-  loadingDiv.style.borderRadius = "8px";
-  loadingDiv.style.textAlign = "center";
-  loadingDiv.innerHTML = `
-    <div style="font-size: 1.2rem; margin-bottom: 1rem;">Rescanning Website...</div>
-    <div style="color: #666;">Please wait while we analyze the accessibility of your site</div>
-  `;
-  overlay.appendChild(loadingDiv);
-  
-  try {
-    // Rescan the current site URL
-    const scanResult = await scanService.scanUrl(currentSite.url);
+  const handleRescan = async () => {
+    if (!currentSite) return;
     
-    // Update the scan data
-    setScanData(scanResult.scan);
+    setIsRescanning(true);
+    setRescanComplete(false);
+    setError(null);
     
-    // Update the site in context with new scan data
-    const updatedSite = {
-      ...currentSite,
-      lastScanned: scanResult.scan.timeScanned,
-      scanData: scanResult.scan,
-    };
+    const overlay = document.createElement("div");
+    overlay.className = "export-overlay";
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.zIndex = "9999";
+    document.body.appendChild(overlay);
     
-    // Show completion message
+    const loadingDiv = document.createElement("div");
+    loadingDiv.style.backgroundColor = "white";
+    loadingDiv.style.padding = "2rem";
+    loadingDiv.style.borderRadius = "8px";
+    loadingDiv.style.textAlign = "center";
     loadingDiv.innerHTML = `
-      <div style="font-size: 1.2rem; margin-bottom: 1rem; color: #22c55e;">✓ Re-scan Complete!</div>
-      <div style="color: #666;">Your website has been successfully re-analyzed</div>
+      <div style="font-size: 1.2rem; margin-bottom: 1rem;">Rescanning Website...</div>
+      <div style="color: #666;">Please wait while we analyze the accessibility of your site</div>
     `;
+    overlay.appendChild(loadingDiv);
     
-    setTimeout(() => {
-      document.querySelector(".export-overlay")?.remove();
-    }, 2000);
-    
-  } catch (err) {
-    console.error('Error during rescan:', err);
-    setError(err instanceof Error ? err.message : 'Failed to rescan. Please try again.');
-    
-    // Show error message
-    loadingDiv.innerHTML = `
-      <div style="font-size: 1.2rem; margin-bottom: 1rem; color: #ef4444;">✗ Rescan Failed</div>
-      <div style="color: #666;">${err instanceof Error ? err.message : 'Failed to rescan. Please try again.'}</div>
-    `;
-    
-    setTimeout(() => {
-      document.querySelector(".export-overlay")?.remove();
-    }, 3000);
-  } finally {
-    setIsRescanning(false);
-  }
-};
+    try {
+      const scanResult = await scanService.scanUrl(currentSite.url);
+      setScanData(scanResult.scan);
+      
+      const updatedSite = {
+        ...currentSite,
+        lastScanned: scanResult.scan.timeScanned,
+        scanData: scanResult.scan,
+      };
+      
+      loadingDiv.innerHTML = `
+        <div style="font-size: 1.2rem; margin-bottom: 1rem; color: #22c55e;">✓ Re-scan Complete!</div>
+        <div style="color: #666;">Your website has been successfully re-analyzed</div>
+      `;
+      
+      setTimeout(() => {
+        document.querySelector(".export-overlay")?.remove();
+      }, 2000);
+      
+    } catch (err) {
+      console.error('Error during rescan:', err);
+      setError(err instanceof Error ? err.message : 'Failed to rescan. Please try again.');
+      
+      loadingDiv.innerHTML = `
+        <div style="font-size: 1.2rem; margin-bottom: 1rem; color: #ef4444;">✗ Rescan Failed</div>
+        <div style="color: #666;">${err instanceof Error ? err.message : 'Failed to rescan. Please try again.'}</div>
+      `;
+      
+      setTimeout(() => {
+        document.querySelector(".export-overlay")?.remove();
+      }, 3000);
+    } finally {
+      setIsRescanning(false);
+    }
+  };
 
   return (
     <div className={`dashboard-page ${isExporting ? 'pdf-mode' : ''}`} ref={pdfRef}>
@@ -505,16 +469,15 @@ const handleRescan = async () => {
               >
                 {isRescanning ? "Rescanning..." : rescanComplete ? "Re-scan Complete!" : "Rescan"}
               </Button>
-              <Button onClick={handleExportToPDF} variant="outline" disabled={isExporting} aria-label="Export dashboard to PDF">
+              <Button onClick={handleExportToPDF} variant="primary" disabled={isExporting} aria-label="Export dashboard to PDF">
                 {isExporting ? "Exporting…" : "Export to PDF"}
               </Button>
             </div>
           )}
         </div>
   
-        {/* Two-column layout: Left (Page Stats + Requirements), Right (Compliance + WCAG) */}
         <div className={`dashboard-two-col ${isExporting ? 'pdf-stack' : ''}`}>
-          <Stack className="left-column" spacing={2}>
+          <div className="left-column">
             <PageStatsCard
               complianceScore={complianceScore}
               metCount={passed.A + passed.AA + passed.AAA}
@@ -527,11 +490,9 @@ const handleRescan = async () => {
               requirementsRows={requirementsRows.map(r => ({ id: r.id, text: r.text, category: r.category, level: r.level }))}
               quickWins={quickWins}
             />
-          </Stack>
+          </div>
           <ComplianceColumn pct={pct} passed={passed} totals={totals} />
         </div>
-
-        {/* Requirements moved to left column above */}
       </main>
     </div>
   );

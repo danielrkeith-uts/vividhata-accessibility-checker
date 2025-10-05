@@ -42,6 +42,27 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 32px;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 32px;
+  align-items: start;
+}
+
+.sites-section {
+  width: 100%;
+}
+
+.sites-section h1 {
+  font-size: 32px;
+  font-weight: 600;
+  color: #2D3748;
+  margin: 0 0 24px 0;
+  text-align: left;
+}
+
+.marketing-section {
+  position: sticky;
+  top: 32px;
 }
 
 /* ---------- ACTIONS BAR ---------- */
@@ -83,104 +104,164 @@
   line-height: 1.5;
 }
 
-/* ---------- SITES GRID ---------- */
+/* ---------- SITES LIST ---------- */
 .sites-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   margin-top: 16px;
 }
 
 /* ---------- SITE CARD ---------- */
 .site-card {
   background: white;
-  opacity: 0.8;
-  border: 1px solid #9C8B80;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 20px 24px;
+  position: relative;
   transition: all 0.2s ease;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 16px;
+  align-items: start;
 }
 
 .site-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .site-card-content {
-  padding: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  display: contents;
 }
 
-
-.site-row {
+.site-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.site-name {
-  font-size: 20px;
-  font-weight: 600;
-  color: #2D3748;
-  margin: 0 0 8px 0;
-  line-height: 1.2;
-  text-align: left;
-}
-
-.site-icon {
-  color: #4A5568;
-  display: flex;
-  align-items: top;
-  justify-content: center;  
-}
-
-.site-text {
-  display: flex;
-  flex-direction: column;
   justify-content: center;
+  background: #f3f4f6;
+  grid-column: 1;
+}
+
+.site-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.site-info {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.site-url-row {
+  margin-bottom: 8px;
 }
 
 .site-url {
-  color: #4A5568;
-  font-family: monospace;
-  font-size: 14px;
-  margin: 0;
-  opacity: 0.8;
-  word-break: break-all;
-  text-align: left;
-}
-
-.site-stats {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-.site-status {
-  background: #C6F6D5;
-  color: #22543D;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
+  font-size: 18px;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: #1f2937;
+  margin: 0;
+  text-decoration: underline;
+  display: inline-block;
+}
+
+.site-meta {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.site-accessibility {
+  grid-column: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding-right: 40px;
+}
+
+.accessibility-percent {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+}
+
+.accessibility-pill {
+  width: 60px;
+  height: 10px;
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.accessibility-pill::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.accessibility-pill.high {
+  background: #d1fae5;
+}
+
+.accessibility-pill.high::before {
+  background: #10b981;
+}
+
+.accessibility-pill.medium {
+  background: #fed7aa;
+}
+
+.accessibility-pill.medium::before {
+  background: #f59e0b;
+}
+
+.accessibility-pill.low {
+  background: #fecaca;
+}
+
+.accessibility-pill.low::before {
+  background: #ef4444;
+}
+
+.site-delete-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.site-delete-btn:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #dc2626;
 }
 
 .site-card-actions {
-  padding: 0 24px 24px 24px;
-  display: flex;
-  gap: 12px;
-  border-top: 1px solid #E2E8F0;
-  margin-top: 16px;
-  padding-top: 16px;
+  display: none;
 }
-
-.site-card-actions button {
-  flex: 1;
-}
-
