@@ -105,6 +105,16 @@
   padding: 16px;
 }
 
+/* Page Stats layout */
+.page-stats .page-stats-content { display: flex; gap: 16px; align-items: center; }
+.page-stats .indicators { display: grid; grid-template-columns: repeat(2, minmax(180px, 1fr)); gap: 10px; width: 100%; }
+.page-stats .indicator { background: #f9fafb; border: 1px solid var(--panel-border); border-radius: 10px; padding: 10px 12px; color: #374151; display: flex; align-items: center; gap: 8px; }
+.page-stats .indicator .kpi { font-weight: 800; color: #111827; margin-right: 4px; }
+.page-stats .indicator.success { background: #ecfdf5; border-color: #d1fae5; color: #065f46; }
+.page-stats .indicator.warn { background: #fff7ed; border-color: #fed7aa; color: #7c2d12; }
+.page-stats .indicator.info { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
+.page-stats .indicator.quick { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+
 .card-title { font-weight: 700; margin: 0 0 8px 0; color: var(--text); }
 .muted { color: var(--muted); font-size: 14px; }
 
@@ -135,9 +145,25 @@
 .breakdown-copy .label { color: var(--text); font-weight: 600; }
 .breakdown-copy .muted { color: var(--muted); font-size: 12px; }
 
+/* Compliance cards block to the right */
+.compliance-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.compliance-card { border-radius: 12px; padding: 16px; color: #111827; border: 1px solid transparent; display: flex; flex-direction: column; gap: 4px; }
+.compliance-card .badge { width: fit-content; font-size: 12px; padding: 4px 8px; border-radius: 999px; color: #fff; }
+.compliance-card .title { font-weight: 700; }
+.compliance-card .meta { color: #374151; font-size: 12px; }
+.compliance-card.a { background: #ecfdf5; border-color: #d1fae5; }
+.compliance-card.a .badge { background: #22c55e; }
+.compliance-card.aa { background: #fffbeb; border-color: #fde68a; }
+.compliance-card.aa .badge { background: #f59e0b; }
+.compliance-card.aaa { background: #fef2f2; border-color: #fecaca; }
+.compliance-card.aaa .badge { background: #ef4444; }
+
 /* Requirements table */
 .requirements-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .requirements-header .title { font-weight: 700; color: var(--text); }
+.requirements-header .tabs { display: flex; gap: 8px; }
+.requirements-header .tab { background: #f3f4f6; border: 1px solid var(--panel-border); color: #374151; padding: 6px 10px; border-radius: 999px; cursor: pointer; font-size: 12px; }
+.requirements-header .tab.tab-active { background: #111827; color: #fff; border-color: #111827; }
 .requirements-table { border: 1px solid var(--panel-border); border-radius: 8px; overflow: hidden; }
 .requirements-table .table-head, .requirements-table .table-row { display: grid; grid-template-columns: 1fr 140px 160px; gap: 8px; padding: 10px 12px; }
 .requirements-table .table-head { background: #f3f4f6; color: #374151; font-weight: 600; }
@@ -146,6 +172,8 @@
 .pill-low { background: #60a5fa; }
 .pill-medium { background: #f59e0b; }
 .pill-high { background: #ef4444; }
+
+.suggested-fixes { border: 1px solid var(--panel-border); border-radius: 8px; overflow: hidden; }
 
 /* ---------- BREAKDOWN + TASKS ROW ---------- */
 .dashboard-breakdown-tasks-row {

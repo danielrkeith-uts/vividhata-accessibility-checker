@@ -20,6 +20,9 @@ export const DashboardPage: React.FC = () => {
   const [pdfMode, setPdfMode] = useState(false);
   const [isRescanning, setIsRescanning] = useState(false);
   const [rescanComplete, setRescanComplete] = useState(false);
+  // Determine the current site (if any) early so effects can use it safely
+  const currentSite = userSites.find((site) => site.id === siteId);
+  const [requirementsTab, setRequirementsTab] = useState<'requirements' | 'quickfixes'>('requirements');
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -44,11 +47,19 @@ export const DashboardPage: React.FC = () => {
           return;
         }
         
+        // Ensure the site exists before proceeding
+        if (!currentSite) {
+          setError('Site not found');
+          return;
+        }
+
         // Get the latest scan for this web page
         const scans = await scanService.getWebPageScans(webPageId);
         
         if (scans.length === 0) {
-          setError('No scans found for this site');
+          // No scans yet for this site. Trigger a fresh scan using the site's URL.
+          const fresh = await scanService.scanUrl(currentSite.url);
+          setScanData(fresh.scan);
           return;
         }
         
@@ -84,9 +95,6 @@ export const DashboardPage: React.FC = () => {
   if (!siteId) {
     return <Navigate to="/manage-sites" replace />;
   }
-
-  // Find the site matching the siteId
-  const currentSite = userSites.find((site) => site.id === siteId);
 
   // Redirect if siteId is invalid (not found)
   if (!currentSite) {
@@ -129,27 +137,117 @@ export const DashboardPage: React.FC = () => {
   }
 
   // Transform scan data for dashboard
-  const totalIssues = scanData.issues.length;
-  const complianceScore = Math.max(0, Math.min(100, 100 - totalIssues * 2));
+  // Define WCAG metadata per IssueType
+  const WCAG_MAP: Record<string, { id: string; name: string; level: 'A' | 'AA' | 'AAA' }> = {
+    ALT_TEXT_MISSING: { id: '1.1.1', name: 'Text Alternatives', level: 'A' },
+    CAPTIONS_FOR_VIDEO_AUDIO_MISSING: { id: '1.2.2', name: 'Captions (Prerecorded)', level: 'A' },
+    SEMANTIC_HTML_MISSING: { id: '1.3.1', name: 'Info and Relationships', level: 'A' },
+    CONTENT_MEANINGFUL_SEQUENCE_VIOLATION: { id: '1.3.2', name: 'Meaningful Sequence', level: 'A' },
+    NO_SINGLE_SENSORY_CHARACTERISTIC: { id: '1.3.3', name: 'Sensory Characteristics', level: 'A' },
+    LINE_HEIGHT_SPACING_VIOLATION: { id: '1.4.12', name: 'Text Spacing', level: 'AA' },
+    NOT_JUST_COLOR: { id: '1.4.1', name: 'Use of Color', level: 'A' },
+    TEXT_CONTRAST_VIOLATION: { id: '1.4.3', name: 'Contrast (Minimum)', level: 'AA' },
+    TEXT_RESIZE_VIOLATION: { id: '1.4.4', name: 'Resize Text', level: 'AA' },
+    KEYBOARD_OPERABLE: { id: '2.1.1', name: 'Keyboard', level: 'A' },
+    NO_KEYBOARD_TRAPS: { id: '2.1.2', name: 'No Keyboard Trap', level: 'A' },
+    TIME_LIMITS: { id: '2.2.1', name: 'Timing Adjustable', level: 'A' },
+    CLEAR_PAGE_TITLES: { id: '2.4.2', name: 'Page Titled', level: 'A' },
+    FOCUS_ORDER_LOGICAL: { id: '2.4.3', name: 'Focus Order', level: 'A' },
+    DESCRIPTIVE_LINK_TEXT: { id: '2.4.4', name: 'Link Purpose (In Context)', level: 'A' },
+    MULTIPLE_WAYS_TO_NAVIGATE: { id: '2.4.5', name: 'Multiple Ways', level: 'AA' },
+  };
 
-  // Group issues by category for requirements table and breakdown
-  const issuesByCategory: Record<string, number> = {};
-  scanData.issues.forEach(issue => {
-    const category = issue.issueType.split('_')[0] || 'Other';
-    issuesByCategory[category] = (issuesByCategory[category] || 0) + 1;
+  const totalIssues = scanData.issues.length;
+
+  // Map IssueType -> friendly category, priority and quick-fix suggestion
+  const ISSUE_CATEGORY_MAP: Record<string, { category: string; priority: 'High' | 'Medium' | 'Low'; quickFix: string }> = {
+    ALT_TEXT_MISSING: { category: 'Images', priority: 'High', quickFix: 'Add meaningful alt text to all non-decorative images.' },
+    CAPTIONS_FOR_VIDEO_AUDIO_MISSING: { category: 'Media', priority: 'High', quickFix: 'Provide captions/subtitles for videos and transcripts for audio.' },
+    SEMANTIC_HTML_MISSING: { category: 'Semantic HTML', priority: 'Medium', quickFix: 'Use proper landmark and heading elements to structure content.' },
+    CONTENT_MEANINGFUL_SEQUENCE_VIOLATION: { category: 'Content Order', priority: 'Medium', quickFix: 'Ensure DOM reading order matches visual order.' },
+    NO_SINGLE_SENSORY_CHARACTERISTIC: { category: 'Perceivable', priority: 'Low', quickFix: 'Do not rely on color/shape alone to convey information.' },
+    LINE_HEIGHT_SPACING_VIOLATION: { category: 'Typography', priority: 'Low', quickFix: 'Increase line-height and spacing to recommended WCAG values.' },
+    NOT_JUST_COLOR: { category: 'Color Use', priority: 'Medium', quickFix: 'Provide non-color indicators like icons or text labels.' },
+    TEXT_CONTRAST_VIOLATION: { category: 'Contrast', priority: 'High', quickFix: 'Increase text/background contrast to meet AA (4.5:1) or AAA.' },
+    TEXT_RESIZE_VIOLATION: { category: 'Reflow & Zoom', priority: 'Medium', quickFix: 'Ensure text remains readable and functional at 200% zoom.' },
+    KEYBOARD_OPERABLE: { category: 'Keyboard', priority: 'High', quickFix: 'Make all interactive elements operable via keyboard.' },
+    NO_KEYBOARD_TRAPS: { category: 'Keyboard', priority: 'High', quickFix: 'Remove focus traps; ensure focus can move into and out of widgets.' },
+    TIME_LIMITS: { category: 'Timing', priority: 'Low', quickFix: 'Provide controls to turn off, adjust, or extend time limits.' },
+    CLEAR_PAGE_TITLES: { category: 'Semantics', priority: 'Low', quickFix: 'Set a clear, descriptive <title> for each page.' },
+    FOCUS_ORDER_LOGICAL: { category: 'Focus', priority: 'High', quickFix: 'Ensure focus order follows a logical, predictable sequence.' },
+    DESCRIPTIVE_LINK_TEXT: { category: 'Links', priority: 'Medium', quickFix: 'Use descriptive link text that makes sense out of context.' },
+    MULTIPLE_WAYS_TO_NAVIGATE: { category: 'Navigation', priority: 'Low', quickFix: 'Provide multiple ways to locate pages (search, sitemap, nav).' },
+  };
+
+  // Aggregate by category for Requirements
+  type Priority = 'High' | 'Medium' | 'Low';
+  const priorityRank: Record<Priority, number> = { High: 3, Medium: 2, Low: 1 };
+  const categoryAgg: Record<string, { count: number; priority: Priority }> = {};
+  const quickWinsAgg: Record<string, number> = {};
+  scanData.issues.forEach((issue) => {
+    const map = ISSUE_CATEGORY_MAP[issue.issueType] || { category: 'Other', priority: 'Low' as Priority, quickFix: 'Review this element for accessibility.' };
+    if (!categoryAgg[map.category]) {
+      categoryAgg[map.category] = { count: 0, priority: map.priority };
+    }
+    categoryAgg[map.category].count += 1;
+    if (priorityRank[map.priority] > priorityRank[categoryAgg[map.category].priority]) {
+      categoryAgg[map.category].priority = map.priority;
+    }
+    quickWinsAgg[map.quickFix] = (quickWinsAgg[map.quickFix] || 0) + 1;
   });
+
+  // Build WCAG compliance breakdown
+  const allCriteria = Object.keys(WCAG_MAP);
+  const violatedTypes = new Set(scanData.issues.map(i => i.issueType));
+  const totals = {
+    A: allCriteria.filter(t => WCAG_MAP[t].level === 'A').length,
+    AA: allCriteria.filter(t => WCAG_MAP[t].level === 'AA').length,
+    AAA: allCriteria.filter(t => WCAG_MAP[t].level === 'AAA').length,
+  };
+  const violated = {
+    A: Array.from(violatedTypes).filter(t => WCAG_MAP[t]?.level === 'A').length,
+    AA: Array.from(violatedTypes).filter(t => WCAG_MAP[t]?.level === 'AA').length,
+    AAA: Array.from(violatedTypes).filter(t => WCAG_MAP[t]?.level === 'AAA').length,
+  };
+  const passed = {
+    A: Math.max(0, totals.A - violated.A),
+    AA: Math.max(0, totals.AA - violated.AA),
+    AAA: Math.max(0, totals.AAA - violated.AAA),
+  };
+  const pct = {
+    A: totals.A ? Math.round((passed.A / totals.A) * 100) : 0,
+    AA: totals.AA ? Math.round((passed.AA / totals.AA) * 100) : 0,
+    AAA: totals.AAA ? Math.round((passed.AAA / totals.AAA) * 100) : 0,
+  };
+
+  const overallTotal = totals.A + totals.AA + totals.AAA;
+  const overallPassed = passed.A + passed.AA + passed.AAA;
+  const complianceScore = overallTotal ? Math.round((overallPassed / overallTotal) * 100) : 0;
   const breakdown = [
     { label: 'Essential (A)', grade: 'A', passed: Math.max(0, Math.round(complianceScore * 0.72)), total: 100, color: '#22c55e' },
     { label: 'Enhanced (AA)', grade: 'AA', passed: Math.max(0, Math.round(complianceScore * 0.6)), total: 100, color: '#f59e0b' },
     { label: 'Advanced (AAA)', grade: 'AAA', passed: Math.max(0, Math.round(complianceScore * 0.3)), total: 100, color: '#ef4444' },
   ];
 
-  const requirementsRows = Object.entries(issuesByCategory).map(([category, count], i) => ({
-    id: i + 1,
-    text: `Fix ${category.toLowerCase()} accessibility issues`,
-    priority: count > 3 ? 'High' : count > 1 ? 'Medium' : 'Low',
-    category,
-  }));
+  // Requirements table: list violated WCAG criteria with level-derived priority
+  const wcagPriority: Record<'A' | 'AA' | 'AAA', Priority> = { A: 'High', AA: 'Medium', AAA: 'Low' };
+  const violatedCounts: Record<string, number> = {};
+  scanData.issues.forEach(i => { violatedCounts[i.issueType] = (violatedCounts[i.issueType] || 0) + 1; });
+  const requirementsRows = Object.entries(violatedCounts).map(([type, count], idx) => {
+    const meta = WCAG_MAP[type] || { id: '—', name: type, level: 'A' as const };
+    return {
+      id: idx + 1,
+      text: `WCAG ${meta.id} ${meta.name}`,
+      priority: wcagPriority[meta.level],
+      category: meta.level,
+      count,
+    };
+  });
+
+  // Build quick wins list (sorted by frequency)
+  const quickWins = Object.entries(quickWinsAgg)
+    .sort((a, b) => b[1] - a[1])
+    .map(([text, count], i) => ({ id: i + 1, text, count }));
 
 //allow export to pdf
 const handleExportToPDF = async () => {
@@ -407,48 +505,45 @@ const handleRescan = async () => {
           )}
         </div>
   
-        {/* Overview + Stats ring */}
+        {/* Overview + Page Stats + Compliance Cards */}
         <div className={`dashboard-overview-row ${isExporting ? 'pdf-stack' : ''}`}>
-          <div className="card" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <div className="donut">
-              <svg viewBox="0 0 36 36">
-                <path className="bg" d="M18 2.0845
-                  a 15.9155 15.9155 0 0 1 0 31.831
-                  a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <path className="fg" strokeDasharray={`${complianceScore}, 100`} d="M18 2.0845
-                  a 15.9155 15.9155 0 0 1 0 31.831
-                  a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <text x="18" y="20.35" className="percent">{complianceScore}%</text>
-              </svg>
-              <div className="donut-sub">Compliant with WCAG</div>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div className="callout">You're on the right track! Keep improving.</div>
-              <ul className="bullets">
-                <li><b>{Math.round(complianceScore / 4)}</b> WCAG requirements met</li>
-                <li><b>{Math.max(0, 100 - Math.round(complianceScore / 4))}</b> WCAG requirements not met</li>
-                <li><b>{Math.max(0, 100 - complianceScore)}%</b> below industry standard</li>
-                <li><b>3</b> quick wins to increase score by 20%</li>
-              </ul>
+          {/* Page Stats card with donut and indicators */}
+          <div className="card page-stats">
+            <div className="page-stats-content">
+              <div className="donut">
+                <svg viewBox="0 0 36 36">
+                  <path className="bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path className="fg" strokeDasharray={`${complianceScore}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <text x="18" y="20.35" className="percent">{complianceScore}%</text>
+                </svg>
+                <div className="donut-sub">Compliant with WCAG</div>
+              </div>
+              <div className="indicators">
+                <div className="indicator success"><span className="kpi">{passed.A + passed.AA + passed.AAA}</span> WCAG requirements met</div>
+                <div className="indicator warn"><span className="kpi">{(totals.A + totals.AA + totals.AAA) - (passed.A + passed.AA + passed.AAA)}</span> WCAG requirements not met</div>
+                <div className="indicator info"><span className="kpi">{Math.max(0, 100 - complianceScore)}%</span> below industry standard</div>
+                <div className="indicator quick"><span className="kpi">3</span> quick wins to increase score by 20%</div>
+              </div>
             </div>
           </div>
-          <div className="card">
-            <h3 className="card-title">Compliance Breakdown</h3>
-            <div className="breakdown-list">
-              {breakdown.map((b) => (
-                <div key={b.grade} className="breakdown-item">
-                  <div className="badge" style={{ background: b.color }}>{b.grade}</div>
-                  <div className="breakdown-copy">
-                    <div className="label">{b.label}</div>
-                    <div className="muted">{b.passed}% passed</div>
-                  </div>
-                </div>
-              ))}
+
+          {/* Compliance Breakdown as three colored cards */}
+          <div className="compliance-cards">
+            <div className="compliance-card a">
+              <div className="badge">A</div>
+              <div className="title">Essential (A)</div>
+              <div className="meta">{pct.A}% • {passed.A} out of {totals.A} passed</div>
             </div>
-          </div>
-          <div className="card">
-            <h3 className="card-title">What is WCAG?</h3>
-            <p className="muted">WCAG ensures your site is usable by people with disabilities. It creates an inclusive web where everyone can access content. Find out more.</p>
+            <div className="compliance-card aa">
+              <div className="badge">AA</div>
+              <div className="title">Enhanced (AA)</div>
+              <div className="meta">{pct.AA}% • {passed.AA} out of {totals.AA} passed</div>
+            </div>
+            <div className="compliance-card aaa">
+              <div className="badge">AAA</div>
+              <div className="title">Advanced (AAA)</div>
+              <div className="meta">{pct.AAA}% • {passed.AAA} out of {totals.AAA} passed</div>
+            </div>
           </div>
         </div>
 
@@ -457,21 +552,40 @@ const handleRescan = async () => {
           <div className="card" data-pdf-expand style={{ flex: 1, minWidth: 300 }}>
             <div className="requirements-header">
               <div className="title">Requirements</div>
-            </div>
-            <div className="requirements-table" data-pdf-expand>
-              <div className="table-head">
-                <div>Requirement</div>
-                <div>Priority</div>
-                <div>Category</div>
+              <div className="tabs">
+                <button className={`tab ${requirementsTab === 'requirements' ? 'tab-active' : ''}`} onClick={() => setRequirementsTab('requirements')}>Requirements</button>
+                <button className={`tab ${requirementsTab === 'quickfixes' ? 'tab-active' : ''}`} onClick={() => setRequirementsTab('quickfixes')}>Suggested Fixes</button>
               </div>
-              {requirementsRows.map((r) => (
-                <div className="table-row" key={r.id}>
-                  <div>{r.text}</div>
-                  <div><span className={`pill pill-${r.priority.toLowerCase()}`}>{r.priority}</span></div>
-                  <div>{r.category}</div>
-                </div>
-              ))}
             </div>
+            {requirementsTab === 'requirements' ? (
+              <div className="requirements-table" data-pdf-expand>
+                <div className="table-head">
+                  <div>Requirement</div>
+                  <div>Priority</div>
+                  <div>Category</div>
+                </div>
+                {requirementsRows.map((r) => (
+                  <div className="table-row" key={r.id}>
+                    <div>{r.text}</div>
+                    <div><span className={`pill pill-${r.priority.toLowerCase()}`}>{r.priority}</span></div>
+                    <div>{r.category}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="suggested-fixes" data-pdf-expand>
+                {quickWins.length === 0 ? (
+                  <div className="muted" style={{ padding: '8px 12px' }}>No quick fixes detected. Great job!</div>
+                ) : (
+                  quickWins.map((q) => (
+                    <div className="table-row" key={q.id} style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '8px', padding: '10px 12px', borderTop: '1px solid var(--panel-border)' }}>
+                      <div>{q.text}</div>
+                      <div style={{ textAlign: 'right', color: 'var(--muted)' }}>x{q.count}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
       </main>
