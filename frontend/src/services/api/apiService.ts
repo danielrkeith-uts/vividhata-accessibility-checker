@@ -87,7 +87,11 @@ class ApiService {
         if (response.status === 401) {
           throw new Error('Unauthorized');
         }
-        throw new Error(`HTTP error! status: ${response.status}`);
+        
+        // Try to get error message from response body
+        const errorText = await response.text();
+        const errorMessage = errorText || `HTTP error! status: ${response.status}`;
+        throw new Error(errorMessage);
       }
 
       const text = await response.text();

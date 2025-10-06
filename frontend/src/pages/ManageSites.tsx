@@ -7,15 +7,11 @@ import { SiteCard } from "../components/dashboard";
 import "./ManageSites.css";
 
 export const ManageSites: React.FC = () => {
-  const { user, userSites, removeSite } = useAuth();
+  const { user, userSites } = useAuth();
   const navigate = useNavigate();
 
   const goToDashboard = (siteId: string) => {
     navigate(`/dashboard/${siteId}`);
-  };
-
-  const handleDeleteSite = (siteId: string) => {
-    removeSite(siteId);
   };
 
   const formatTimeAgo = (date: string) => {
@@ -63,14 +59,13 @@ export const ManageSites: React.FC = () => {
             </div>
           ) : (
             <div className="sites-grid">
-              {userSites.map((site) => (
-                <SiteCard
-                  key={site.id}
-                  site={site}
-                  onCardClick={goToDashboard}
-                  onDeleteClick={handleDeleteSite}
-                />
-              ))}
+                  {userSites.map((site) => (
+                    <SiteCard
+                      key={site.id}
+                      site={site}
+                      onCardClick={goToDashboard}
+                    />
+                  ))}
             </div>
           )}
         </div>

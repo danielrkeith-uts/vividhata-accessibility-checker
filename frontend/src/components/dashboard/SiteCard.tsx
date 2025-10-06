@@ -5,13 +5,11 @@ import "./SiteCard.css";
 interface SiteCardProps {
   site: Site;
   onCardClick: (siteId: string) => void;
-  onDeleteClick: (siteId: string) => void;
 }
 
 export const SiteCard: React.FC<SiteCardProps> = ({ 
   site, 
-  onCardClick, 
-  onDeleteClick 
+  onCardClick
 }) => {
   const getAccessibilityLevel = (score: number) => {
     if (score >= 70) return 'high';
@@ -42,19 +40,6 @@ export const SiteCard: React.FC<SiteCardProps> = ({
       className="site-card"
       onClick={() => onCardClick(site.id)}
     >
-      <button
-        className="site-delete-btn"
-        onClick={(e) => {
-          e.stopPropagation();
-          if (window.confirm(`Are you sure you want to delete ${site.name}?`)) {
-            onDeleteClick(site.id);
-          }
-        }}
-        aria-label={`Delete ${site.name}`}
-      >
-        ✕
-      </button>
-      
       <div className="site-card-content">
         <div className="site-logo">
           <img 

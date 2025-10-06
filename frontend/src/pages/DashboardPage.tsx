@@ -5,7 +5,7 @@ import { Scan } from "../services/api/apiService";
 import { scanService } from "../services/scan/scanService";
 import "./DashboardPage.css";
 import { Button } from "../components/common/Button";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams, Navigate, useNavigate } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import PurpleTooltip from "../components/common/PurpleTooltip";
@@ -15,6 +15,7 @@ import RequirementsCard from '../components/dashboard/RequirementsCard';
 
 export const DashboardPage: React.FC = () => {
   const { siteId } = useParams<{ siteId: string }>();
+  const navigate = useNavigate();
   const { user, userSites, isAuthenticated } = useAuth();
   const [scanData, setScanData] = useState<Scan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -452,6 +453,10 @@ export const DashboardPage: React.FC = () => {
     }
   };
 
+  const handleScanNewSite = () => {
+    navigate('/enter-url');
+  };
+
   return (
     <div className={`dashboard-page ${isExporting ? 'pdf-mode' : ''}`} ref={pdfRef}>
       {!isExporting && (
@@ -459,6 +464,7 @@ export const DashboardPage: React.FC = () => {
           siteUrl={currentSite?.url}
           onRescan={handleRescan}
           onExportPDF={handleExportToPDF}
+          onScanNewSite={handleScanNewSite}
           isRescanning={isRescanning}
           isExporting={isExporting}
           showLogoText={false}

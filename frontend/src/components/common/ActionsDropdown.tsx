@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import FindReplaceIcon from '@mui/icons-material/FindReplace';
+import AddIcon from '@mui/icons-material/Add';
 import { Button } from './Button';
 import MenuIcon from '@mui/icons-material/Menu';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
@@ -8,6 +9,7 @@ import './ActionsDropdown.css';
 interface ActionsDropdownProps {
   onRescan?: () => void;
   onExportPDF?: () => void;
+  onScanNewSite?: () => void;
   isRescanning?: boolean;
   isExporting?: boolean;
 }
@@ -15,6 +17,7 @@ interface ActionsDropdownProps {
 export const ActionsDropdown: React.FC<ActionsDropdownProps> = ({
   onRescan,
   onExportPDF,
+  onScanNewSite,
   isRescanning = false,
   isExporting = false
 }) => {
@@ -54,6 +57,16 @@ export const ActionsDropdown: React.FC<ActionsDropdownProps> = ({
       
       {isOpen && (
         <div className="actions-menu" role="menu" aria-label="Actions menu">
+          <button
+            className="action-item"
+            onClick={() => onScanNewSite && handleAction(onScanNewSite)}
+            role="menuitem"
+            aria-label="Scan a new website for accessibility issues"
+          >
+            <span className="action-icon"><AddIcon /></span>
+            <span className="action-text">Scan New Site</span>
+          </button>
+          
           <button
             className="action-item"
             onClick={() => onRescan && handleAction(onRescan)}

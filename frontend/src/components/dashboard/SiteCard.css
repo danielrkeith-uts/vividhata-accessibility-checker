@@ -125,31 +125,3 @@
 .accessibility-pill.low::before {
   background: #ef4444;
 }
-
-.site-delete-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 18px;
-  color: #6b7280;
-}
-
-.site-delete-btn:hover {
-  background: #fee2e2;
-  border-color: #fecaca;
-  color: #dc2626;
-}
-
-.site-card-actions {
-  display: none;
-}

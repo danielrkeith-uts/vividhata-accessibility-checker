@@ -8,6 +8,7 @@ interface GlobalHeaderProps {
   siteUrl?: string;
   onRescan?: () => void;
   onExportPDF?: () => void;
+  onScanNewSite?: () => void;
   isRescanning?: boolean;
   isExporting?: boolean;
   showLogoText?: boolean;
@@ -18,6 +19,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
   siteUrl,
   onRescan,
   onExportPDF,
+  onScanNewSite,
   isRescanning = false,
   isExporting = false,
   showLogoText = true,
@@ -49,6 +51,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
             <ActionsDropdown
               onRescan={onRescan}
               onExportPDF={onExportPDF}
+              onScanNewSite={onScanNewSite}
               isRescanning={isRescanning}
               isExporting={isExporting}
             />
