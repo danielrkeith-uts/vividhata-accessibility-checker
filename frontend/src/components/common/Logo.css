@@ -1,0 +1,68 @@
+/* Logo Styles */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.logo-text {
+  font-weight: 700;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* Logo sizes */
+.logo-small {
+  font-size: 14px;
+}
+
+.logo-small .logo-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.logo-medium {
+  font-size: 18px;
+}
+
+.logo-medium .logo-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.logo-large {
+  font-size: 24px;
+}
+
+.logo-large .logo-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.logo-xlarge {
+  font-size: 32px;
+}
+
+.logo-xlarge .logo-icon {
+  width: 36px;
+  height: 36px;
+}

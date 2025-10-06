@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { Button } from "../components/common/Button";
 import { Input } from "../components/common/Input";
 import { Select } from "../components/common/Select";
-import { UserDropDown } from "../components/common/UserDropDown";
+import { GlobalHeader } from "../components/common/GlobalHeader";
 import "./EditProfile.css";
 
 
@@ -190,14 +190,7 @@ export const EditProfile: React.FC = () => {
 
   return (
     <div className="edit-profile-page">
-      <header className="edit-profile-header">
-        <div className="edit-profile-header-content">
-          <h1 className="edit-profile-title">Edit Profile</h1>
-          <div className="edit-profile-user-info">
-          <UserDropDown />
-          </div>
-        </div>
-      </header>
+      <GlobalHeader />
 
       <main className="edit-profile-main">
         <div className="edit-profile-container">

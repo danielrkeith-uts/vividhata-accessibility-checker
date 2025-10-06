@@ -1,0 +1,108 @@
+/* Page Stats Card Styles */
+.page-stats {
+  padding: 20px;
+}
+
+.page-stats-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Donut Chart */
+.donut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  overflow: visible;
+}
+
+.donut svg {
+  width: 180px;
+  height: 180px;
+  overflow: visible;
+}
+
+.donut .bg {
+  fill: none;
+  stroke: #e5e7eb;
+  stroke-width: 4;
+}
+
+.donut .fg {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: butt;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke 0.3s ease;
+}
+
+/* Dynamic donut colors based on score */
+.donut .fg.score-excellent {
+  stroke: #10b981; /* Green for 90-100% */
+}
+
+.donut .fg.score-good {
+  stroke: #3b82f6; /* Blue for 70-89% */
+}
+
+.donut .fg.score-fair {
+  stroke: #f59e0b; /* Orange for 50-69% */
+}
+
+.donut .fg.score-poor {
+  stroke: #ef4444; /* Red for 0-49% */
+}
+
+.donut .percent {
+  font-size: 10px;
+  font-weight: 600;
+  fill: var(--text);
+  text-anchor: middle;
+}
+
+.donut-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Indicators */
+.indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.indicator-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.indicator-bar .label {
+  font-size: 14px;
+  color: var(--text);
+  flex: 1;
+}
+
+/* Indicator bar variants */
+.indicator-bar.good {
+  color: var(--success);
+}
+
+.indicator-bar.bad {
+  color: var(--error);
+}
+
+.indicator-bar.warn {
+  color: var(--warning);
+}
+
+.indicator-bar.info {
+  color: var(--info);
+}

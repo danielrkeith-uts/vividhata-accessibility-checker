@@ -1,0 +1,120 @@
+/* Chip Filter Container */
+.chip-filter-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Base Chip Styles */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chip:focus {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.chip-small {
+  padding: 3px 6px;
+  font-size: 11px;
+}
+
+.chip-medium {
+  padding: 5px 10px;
+  font-size: 13px;
+}
+
+/* Color Variants */
+.chip-green {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #059669;
+}
+
+.chip-blue {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #2563eb;
+}
+
+.chip-orange {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #d97706;
+}
+
+.chip-red {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+
+.chip-purple {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.3);
+  color: #7c3aed;
+}
+
+.chip-yellow {
+  background: rgba(234, 179, 8, 0.1);
+  border-color: rgba(234, 179, 8, 0.3);
+  color: #ca8a04;
+}
+
+.chip-gray {
+  background: rgba(107, 114, 128, 0.1);
+  border-color: rgba(107, 114, 128, 0.3);
+  color: #6b7280;
+}
+
+.chip-default {
+  background: rgba(107, 114, 128, 0.1);
+  border-color: rgba(107, 114, 128, 0.3);
+  color: var(--text);
+}
+
+/* Chip Filter Dropdown */
+.chip-filter-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-width: 120px;
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+/* Chip Filter Options */
+.chip-filter-option {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 11px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  border-radius: 3px;
+  margin: 1px;
+  transition: background-color 0.2s ease;
+}
+
+.chip-filter-option:hover {
+  background: var(--panel-bg);
+}
+
+.chip-filter-option:focus {
+  outline: none;
+  background: var(--panel-bg);
+}

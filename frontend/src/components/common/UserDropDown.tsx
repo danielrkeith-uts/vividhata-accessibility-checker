@@ -5,9 +5,6 @@ import './UserDropDown.css';
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-
-
-// TODO: replace with mui
 export const UserDropDown: React.FC = ({ 
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,8 +56,18 @@ export const UserDropDown: React.FC = ({
       onClick={() => setIsOpen(!isOpen)} 
       tabIndex={0} 
       role="button" 
-      aria-haspopup="true" 
+      aria-haspopup="menu" 
       aria-expanded={isOpen}
+      aria-label={`User menu for ${displayName}`}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setIsOpen(!isOpen);
+        }
+        if (e.key === 'Escape') {
+          setIsOpen(false);
+        }
+      }}
     >
       <div className='user-avatar'>
         <AccountCircleIcon fontSize='large' />
@@ -71,17 +78,17 @@ export const UserDropDown: React.FC = ({
         <span className="user-role">{user.ocupation}</span>
       </div>
       
-      <button className="user-dropdown">▼</button>
+      <button className="user-dropdown" aria-hidden="true">▼</button>
 
       {isOpen && (
-        <ul className="user-dropdown-menu">
-          <li onClick={handleProfile} className="user-dropdown-item">
+        <ul className="user-dropdown-menu" role="menu" aria-label="User menu">
+          <li onClick={handleProfile} className="user-dropdown-item" role="menuitem">
             Profile
           </li>
-          <li onClick={handleManageSites} className="user-dropdown-item">
+          <li onClick={handleManageSites} className="user-dropdown-item" role="menuitem">
             Manage Sites
           </li>
-          <li onClick={handleLogout} className="user-dropdown-item">
+          <li onClick={handleLogout} className="user-dropdown-item" role="menuitem">
             Logout
           </li>
         </ul>

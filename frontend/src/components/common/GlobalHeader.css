@@ -1,0 +1,134 @@
+/* Global Header Styles */
+.global-header {
+  background: white;
+  border-bottom: 1px solid var(--panel-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.global-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 64px;
+}
+
+.header-left {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header-right {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Inline Site URL (next to logo) */
+.site-url-inline {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+  background: var(--panel-bg);
+  padding: 0px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.site-url-inline .url-label {
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.site-url-inline .url-link {
+  font-size: 18px;
+  color: var(--brand);
+  text-decoration: none;
+  font-weight: 700;
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  align-content: center;
+}
+
+.site-url-inline .url-link:hover {
+  color: #553C9A;
+  text-decoration: underline;
+}
+
+/* Site URL */
+.site-url {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  padding: 6px 12px;
+  border-radius: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.url-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.url-link {
+  font-size: 14px;
+  color: var(--brand);
+  text-decoration: none;
+  font-weight: 600;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.url-link:hover {
+  text-decoration: underline;
+  color: #553C9A;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .global-header-content {
+    padding: 8px 16px;
+  }
+  
+  .header-center {
+    display: none;
+  }
+  
+  .header-actions {
+    gap: 8px;
+  }
+  
+  .rescan-button,
+  .export-button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}

@@ -42,6 +42,145 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 32px;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 32px;
+  align-items: start;
+}
+
+.sites-section {
+  width: 100%;
+}
+
+.sites-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.sites-section h1 {
+  font-size: 32px;
+  font-weight: 600;
+  color: #2D3748;
+  margin: 0;
+  text-align: left;
+}
+
+.marketing-section {
+  position: sticky;
+  top: 32px;
+}
+
+/* ---------- MARKETING BILLBOARD ---------- */
+.marketing-billboard {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* ---------- VIVIDHATA STORY ---------- */
+.vividhata-story {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.story-image {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.story-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.story-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.story-content h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2D3748;
+  margin: 0;
+}
+
+.story-intro {
+  font-size: 14px;
+  font-weight: 600;
+  color: #8B5CF6;
+  margin: 0;
+  font-style: italic;
+}
+
+.story-text {
+  font-size: 13px;
+  color: #4A5568;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.marketing-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.marketing-feature {
+  text-align: center;
+  padding: 16px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.marketing-feature .feature-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.marketing-feature h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2D3748;
+  margin: 0 0 8px 0;
+}
+
+.marketing-feature p {
+  font-size: 12px;
+  color: #4A5568;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.marketing-cta {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.marketing-cta p {
+  font-size: 14px;
+  color: #4A5568;
+  margin: 0 0 16px 0;
 }
 
 /* ---------- ACTIONS BAR ---------- */
@@ -83,104 +222,10 @@
   line-height: 1.5;
 }
 
-/* ---------- SITES GRID ---------- */
+/* ---------- SITES LIST ---------- */
 .sites-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 24px;
-  margin-top: 16px;
-}
-
-/* ---------- SITE CARD ---------- */
-.site-card {
-  background: white;
-  opacity: 0.8;
-  border: 1px solid #9C8B80;
-  border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: all 0.2s ease;
-}
-
-.site-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.15);
-}
-
-.site-card-content {
-  padding: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-
-.site-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.site-name {
-  font-size: 20px;
-  font-weight: 600;
-  color: #2D3748;
-  margin: 0 0 8px 0;
-  line-height: 1.2;
-  text-align: left;
-}
-
-.site-icon {
-  color: #4A5568;
-  display: flex;
-  align-items: top;
-  justify-content: center;  
-}
-
-.site-text {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-}
-
-.site-url {
-  color: #4A5568;
-  font-family: monospace;
-  font-size: 14px;
-  margin: 0;
-  opacity: 0.8;
-  word-break: break-all;
-  text-align: left;
-}
-
-.site-stats {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-.site-status {
-  background: #C6F6D5;
-  color: #22543D;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.site-card-actions {
-  padding: 0 24px 24px 24px;
-  display: flex;
-  gap: 12px;
-  border-top: 1px solid #E2E8F0;
+  gap: 16px;
   margin-top: 16px;
-  padding-top: 16px;
 }
-
-.site-card-actions button {
-  flex: 1;
-}
-

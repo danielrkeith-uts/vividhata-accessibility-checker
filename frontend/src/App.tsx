@@ -14,6 +14,7 @@ import { ManageSites } from "./pages/ManageSites";
 import "./App.css";
 import { EditProfile } from "./pages/EditProfile";
 import "./services/api/apiTest"; // Import to run API tests
+import { ThemeProvider } from "./context/ThemeProvider";
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
@@ -128,9 +129,18 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="App">
-          <AppRoutes />
-        </div>
+        <ThemeProvider>
+          <div className="App">
+            {/* Skip Links for WCAG 2.2 compliance */}
+            <a href="#main-content" className="skip-to-content">
+              Skip to main content
+            </a>
+            <a href="#navigation" className="skip-to-content">
+              Skip to navigation
+            </a>
+            <AppRoutes />
+          </div>
+        </ThemeProvider>
       </AuthProvider>
     </Router>
   );

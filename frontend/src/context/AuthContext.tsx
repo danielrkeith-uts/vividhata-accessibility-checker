@@ -51,6 +51,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   
   const [isLoading, setIsLoading] = useState(true);
 
+  const updateSiteComplianceScore = (siteId: string, score: number) => {
+    setUserSites(prev => 
+      prev.map(site => 
+        site.id === siteId 
+          ? { ...site, complianceScore: score }
+          : site
+      )
+    );
+  };
+
   const checkAuthStatus = async () => {
     try {
       const userData = await apiService.getCurrentUser();
@@ -84,29 +94,121 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const calculateComplianceScore = (issues: any[]): number => {
+    
+    if (!issues || issues.length === 0) {
+      return 100; // Perfect score if no issues
+    }
+    
+    // Use the same calculation as the dashboard
+    // Based on WCAG compliance levels (A, AA, AAA)
+    const WCAG_MAP: { [key: string]: { level: string } } = {
+      'ALT_TEXT_MISSING': { level: 'A' },
+      'CAPTIONS_FOR_VIDEO_AUDIO_MISSING': { level: 'A' },
+      'SEMANTIC_HTML_MISSING': { level: 'A' },
+      'CONTENT_MEANINGFUL_SEQUENCE_VIOLATION': { level: 'A' },
+      'NO_SINGLE_SENSORY_CHARACTERISTIC': { level: 'A' },
+      'LINE_HEIGHT_SPACING_VIOLATION': { level: 'AA' },
+      'NOT_JUST_COLOR': { level: 'A' },
+      'TEXT_CONTRAST_VIOLATION': { level: 'AA' },
+      'TEXT_RESIZE_VIOLATION': { level: 'AA' },
+      'KEYBOARD_OPERABLE': { level: 'A' },
+      'NO_KEYBOARD_TRAPS': { level: 'A' },
+      'TIME_LIMITS': { level: 'A' },
+      'CLEAR_PAGE_TITLES': { level: 'A' },
+      'FOCUS_ORDER_LOGICAL': { level: 'A' },
+      'DESCRIPTIVE_LINK_TEXT': { level: 'A' },
+      'MULTIPLE_WAYS_TO_NAVIGATE': { level: 'AA' }
+    };
+    
+    const allCriteria = Object.keys(WCAG_MAP);
+    const violatedTypes = new Set(issues.map(i => i.issueType));
+    
+    console.log(`🔍 All criteria: ${allCriteria.length}`);
+    console.log(`🔍 Violated types:`, Array.from(violatedTypes));
+    
+    const totals = {
+      A: allCriteria.filter(t => WCAG_MAP[t].level === 'A').length,
+      AA: allCriteria.filter(t => WCAG_MAP[t].level === 'AA').length,
+      AAA: allCriteria.filter(t => WCAG_MAP[t].level === 'AAA').length,
+    };
+    
+    const violated = {
+      A: Array.from(violatedTypes).filter(t => WCAG_MAP[t]?.level === 'A').length,
+      AA: Array.from(violatedTypes).filter(t => WCAG_MAP[t]?.level === 'AA').length,
+      AAA: Array.from(violatedTypes).filter(t => WCAG_MAP[t]?.level === 'AAA').length,
+    };
+    
+    const passed = {
+      A: Math.max(0, totals.A - violated.A),
+      AA: Math.max(0, totals.AA - violated.AA),
+      AAA: Math.max(0, totals.AAA - violated.AAA),
+    };
+    
+    console.log(`🔍 Totals: A=${totals.A}, AA=${totals.AA}, AAA=${totals.AAA}`);
+    console.log(`🔍 Violated: A=${violated.A}, AA=${violated.AA}, AAA=${violated.AAA}`);
+    console.log(`🔍 Passed: A=${passed.A}, AA=${passed.AA}, AAA=${passed.AAA}`);
+    
+    const overallTotal = totals.A + totals.AA + totals.AAA;
+    const overallPassed = passed.A + passed.AA + passed.AAA;
+    const complianceScore = overallTotal ? Math.round((overallPassed / overallTotal) * 100) : 0;
+    
+    console.log(`🔍 Final calculation: ${overallPassed}/${overallTotal} = ${complianceScore}%`);
+    return complianceScore;
+  };
+
   const loadUserSites = async (userId: string) => {
     try {
       // Fetch web pages from backend
       const webPages = await scanService.getWebPages();
       
-      // Convert WebPage objects to Site objects
-      const sites: Site[] = await Promise.all(
-        webPages.map(async (webPage) => {
+      // Convert WebPage objects to Site objects sequentially to avoid race conditions
+      const sites: Site[] = [];
+      
+      for (const webPage of webPages) {
+        try {
           // Get the latest scan for this web page to get last scanned time
           const scans = await scanService.getWebPageScans(webPage.id);
           const latestScan = scans.length > 0 
             ? scans.sort((a, b) => new Date(b.timeScanned).getTime() - new Date(a.timeScanned).getTime())[0]
             : null;
           
-          return {
+          // Fetch issues for the latest scan to calculate compliance score
+          let complianceScore = 0;
+          if (latestScan) {
+            try {
+              const issues = await scanService.getScanIssues(latestScan.id);
+              if (issues.length > 0) {
+              }
+              complianceScore = calculateComplianceScore(issues);
+            } catch (error) {
+              complianceScore = 0;
+            }
+          } else {
+          }
+          
+          const site: Site = {
             id: webPage.id.toString(),
             name: extractSiteName(webPage.url),
             url: webPage.url,
-            lastScanned: latestScan?.timeScanned || new Date().toISOString(),
-            scanData: latestScan || null
+            lastScanned: latestScan?.timeScanned || null,
+            scanData: latestScan || null,
+            complianceScore: complianceScore,
           };
-        })
-      );
+          
+          sites.push(site);
+        } catch (error) {
+          // Add site with default values if there's an error
+          sites.push({
+            id: webPage.id.toString(),
+            name: extractSiteName(webPage.url),
+            url: webPage.url,
+            lastScanned: null,
+            scanData: null,
+            complianceScore: 0,
+          });
+        }
+      }
       
       setUserSites(sites);
       
