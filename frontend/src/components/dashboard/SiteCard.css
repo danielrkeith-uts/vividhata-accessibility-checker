@@ -1,0 +1,155 @@
+/* ---------- SITE CARD ---------- */
+.site-card {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 20px 24px;
+  position: relative;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 16px;
+  align-items: start;
+}
+
+.site-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.site-card-content {
+  display: contents;
+}
+
+.site-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  grid-column: 1;
+}
+
+.site-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.site-info {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.site-url-row {
+  text-align: left;
+}
+
+.site-url {
+  font-size: 18px;
+  font-weight: 500;
+  color: #1f2937;
+  margin: 0;
+  text-decoration: underline;
+  display: inline-block;
+  align-content: center;
+}
+
+.site-meta {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.site-accessibility {
+  grid-column: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding-right: 40px;
+}
+
+.accessibility-percent {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+}
+
+.accessibility-pill {
+  width: 60px;
+  height: 10px;
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.accessibility-pill::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: var(--progress-width, 0%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.accessibility-pill.high {
+  background: #d1fae5;
+}
+
+.accessibility-pill.high::before {
+  background: #10b981;
+}
+
+.accessibility-pill.medium {
+  background: #fed7aa;
+}
+
+.accessibility-pill.medium::before {
+  background: #f59e0b;
+}
+
+.accessibility-pill.low {
+  background: #fecaca;
+}
+
+.accessibility-pill.low::before {
+  background: #ef4444;
+}
+
+.site-delete-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 18px;
+  color: #6b7280;
+}
+
+.site-delete-btn:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.site-card-actions {
+  display: none;
+}

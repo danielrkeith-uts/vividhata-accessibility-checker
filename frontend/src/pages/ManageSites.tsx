@@ -1,8 +1,9 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { UserDropDown } from "../components/common/UserDropDown";
+import { GlobalHeader } from "../components/common/GlobalHeader";
 import { Button } from "../components/common/Button";
+import { SiteCard } from "../components/dashboard";
 import "./ManageSites.css";
 
 export const ManageSites: React.FC = () => {
@@ -13,10 +14,8 @@ export const ManageSites: React.FC = () => {
     navigate(`/dashboard/${siteId}`);
   };
 
-  const getAccessibilityLevel = (score: number) => {
-    if (score >= 70) return 'high';
-    if (score >= 40) return 'medium';
-    return 'low';
+  const handleDeleteSite = (siteId: string) => {
+    removeSite(siteId);
   };
 
   const formatTimeAgo = (date: string) => {
@@ -36,18 +35,18 @@ export const ManageSites: React.FC = () => {
 
   return (
     <div className="manage-sites-page">
-      <header className="manage-sites-header">
-        <div className="manage-sites-header-content">
-          <h1 className="manage-sites-title">vividhata</h1>
-          <div className="manage-sites-user-info">
-            <UserDropDown />
-          </div>
-        </div>
-      </header>
+      <GlobalHeader />
 
       <main className="manage-sites-main">
         <div className="sites-section">
-          <h1>Manage your sites</h1>
+          <div className="sites-header">
+            <h1>Manage your sites</h1>
+            {userSites.length > 0 && (
+              <Button onClick={() => navigate("/enter-url")} variant="primary">
+                Scan new site
+              </Button>
+            )}
+          </div>
 
           {userSites.length === 0 ? (
             <div className="no-sites-container">
@@ -64,106 +63,43 @@ export const ManageSites: React.FC = () => {
             </div>
           ) : (
             <div className="sites-grid">
-              {userSites.map((site) => {
-                // Get actual accessibility score from scan data
-                // Adjust this path based on your actual data structure
-                const accessibilityScore = site.scanData?.complianceScore || 
-                                          site.complianceScore || 
-                                          0;
-                const level = getAccessibilityLevel(accessibilityScore);
-                
-                return (
-                  <div 
-                    key={site.id} 
-                    className="site-card"
-                    onClick={() => goToDashboard(site.id)}
-                  >
-                    <button
-                      className="site-delete-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (window.confirm(`Are you sure you want to delete ${site.name}?`)) {
-                          removeSite(site.id);
-                        }
-                      }}
-                      aria-label={`Delete ${site.name}`}
-                    >
-                      ✕
-                    </button>
-                    
-                    <div className="site-card-content">
-                      <div className="site-logo">
-                        <img 
-                          src={`https://www.google.com/s2/favicons?domain=${site.url}&sz=128`}
-                          alt={`${site.name} favicon`}
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                      
-                      <div className="site-info">
-                        <div className="site-url-row">
-                          <a 
-                            href={site.url} 
-                            className="site-url"
-                            onClick={(e) => e.stopPropagation()}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {site.url}
-                          </a>
-                        </div>
-                      </div>
-                      
-                      {site.lastScanned && (
-                        <p className="site-meta">
-                          {formatTimeAgo(site.lastScanned)}
-                        </p>
-                      )}
-                      
-                      <div className="site-accessibility">
-                        <span className="accessibility-percent">
-                          {accessibilityScore}% accessible
-                        </span>
-                        <div 
-                          className={`accessibility-pill ${level}`}
-                        >
-                          <div 
-                            style={{ 
-                              width: `${accessibilityScore}%`,
-                              height: '100%',
-                              position: 'absolute',
-                              left: 0,
-                              top: 0,
-                              borderRadius: '5px'
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {userSites.map((site) => (
+                <SiteCard
+                  key={site.id}
+                  site={site}
+                  onCardClick={goToDashboard}
+                  onDeleteClick={handleDeleteSite}
+                />
+              ))}
             </div>
           )}
         </div>
 
         <div className="marketing-section">
-          {/* Add marketing billboard here */}
-          <div style={{
-            background: 'white',
-            border: '1px solid #d1d5db',
-            borderRadius: '12px',
-            padding: '24px',
-            textAlign: 'center',
-            minHeight: '400px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#9ca3af'
-          }}>
-            Marketing Billboard Area
+          <div className="marketing-billboard">
+            <div className="vividhata-story">
+              <div className="story-image">
+                <img src="/about-us.png" alt="Vividhata Story - Diversity and Inclusion" />
+              </div>
+              
+              <div className="story-content">
+                <h2>The Vividhata Story</h2>
+                <p className="story-intro">
+                  Vividhata means "diversity" in Sanskrit, and that's exactly what drives our mission.
+                </p>
+                <p className="story-text">
+                  We believe the web should be accessible to everyone, regardless of their abilities, 
+                  background, or circumstances. Our accessibility checker helps you create inclusive 
+                  digital experiences that welcome all users.
+                </p>
+                <p className="story-text">
+                  Every scan brings us closer to a more inclusive internet—one where diversity 
+                  isn't just celebrated, but built into the very foundation of our digital world.
+                </p>
+              </div>
+            </div>
+            
+           
           </div>
         </div>
       </main>

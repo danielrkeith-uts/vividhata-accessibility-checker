@@ -11,10 +11,15 @@ const PurpleBase = styled(({ className, ...props }: TooltipProps) => (
     padding: '8px 10px',
     fontSize: '12px',
     borderRadius: 14,
-    boxShadow: '0 6px 18px rgba(0,0,0,0.15)'
+    boxShadow: '0 6px 18px rgba(0,0,0,0.15)',
+    zIndex: 999999999,
+    textAlign: 'center'
   },
   [`& .${tooltipClasses.arrow}`]: {
     color: '#5b21b6'
+  },
+  [`& .${tooltipClasses.popper}`]: {
+    zIndex: 999999999
   }
 }));
 

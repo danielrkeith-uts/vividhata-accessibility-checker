@@ -1,0 +1,152 @@
+/* Compliance Column Styles */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.card-title span {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tooltip-icon {
+  cursor: help;
+  color: #6b21a8;
+  font-weight: 700;
+  margin-left: 8px;
+}
+
+.card-title h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 16px 0;
+}
+
+/* Compliance Cards */
+.compliance-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.compliance-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+}
+
+.compliance-card .left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.compliance-card .copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.compliance-card .title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+}
+
+.compliance-card .desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.compliance-card .right {
+  text-align: right;
+}
+
+.compliance-card .pct {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.compliance-card .small {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* Compliance card variants */
+.compliance-card.a {
+  border-left: 4px solid #10b981;
+}
+
+.compliance-card.aa {
+  border-left: 4px solid #f59e0b;
+}
+
+.compliance-card.aaa {
+  border-left: 4px solid #ef4444;
+}
+
+/* WCAG Info Card */
+.wcag-info-card {
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border: 1px solid #e2e8f0;
+}
+
+.wcag-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.wcag-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.wcag-icon {
+  font-size: 24px;
+  opacity: 0.7;
+}
+
+.wcag-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+}
+
+.wcag-link {
+  text-align: center;
+}
+
+.wcag-documentation-link {
+  color: var(--brand);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.wcag-documentation-link:hover {
+  color: #553C9A;
+  text-decoration: underline;
+}

@@ -15,6 +15,6 @@ code {
 /* WCAG 2.2 improvements */
 html:focus-within { scroll-behavior: smooth; }
 :focus-visible { outline: 3px solid #7c3aed; outline-offset: 2px; }
-button, [role="button"], a, .pill { min-height: 44px; }
+button, [role="button"], a { min-height: 44px; }
 .skip-to-content { position: absolute; left: -9999px; top: 0; background: #111827; color: #fff; padding: 8px 12px; border-radius: 8px; }
 .skip-to-content:focus-visible { left: 12px; top: 12px; z-index: 10000; }

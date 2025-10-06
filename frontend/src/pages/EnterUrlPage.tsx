@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import './EnterUrlPage.css';
 import { useAuth } from '../context/AuthContext';
 import { scanService } from '../services/scan/scanService';
+import { GlobalHeader } from '../components/common/GlobalHeader';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
+import ChecklistIcon from '@mui/icons-material/Checklist';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 export const EnterUrlPage: React.FC = () => {
   const [url, setUrl] = useState('');
@@ -60,28 +65,59 @@ export const EnterUrlPage: React.FC = () => {
 
   return (
     <div className="enter-url-page">
-      <div className="url-box">
-        <h1>Enter a Website URL</h1>
-        <form onSubmit={handleSubmit} className="url-form">
-          <input
-            type="url"
-            placeholder="https://www.example.com"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            required
-            className="url-input"
-            disabled={isLoading}
-          />
-          <button type="submit" className="url-submit-button" disabled={isLoading}>
-            {isLoading ? 'Scanning Website...' : 'Scan Website'}
-          </button>
-        </form>
-        
-        {error && (
-          <div className="error-message">
-            {error}
+      <GlobalHeader />
+      
+      <div className="enter-url-content">
+        <div className="page-title">
+          <h1>Ready to Scan</h1>
+        </div>
+        <div className="enter-url-cards">
+          <div className="url-box">
+            <h1>Enter a Website URL</h1>
+            <form onSubmit={handleSubmit} className="url-form">
+              <input
+                type="url"
+                placeholder="https://www.example.com"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                required
+                className="url-input"
+                disabled={isLoading}
+              />
+              <button type="submit" className="url-submit-button" disabled={isLoading}>
+                {isLoading ? 'Scanning Website...' : 'Scan Website'}
+              </button>
+            </form>
+            
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
           </div>
-        )}
+
+          <div className="what-you-get-card">
+            <h2>What You'll Get</h2>
+            <ul className="feature-list">
+              <li className="feature-item">
+                <span className="feature-icon"><TrackChangesIcon /></span>
+                <span>Overall compliance score</span>
+              </li>
+              <li className="feature-item">
+                <span className="feature-icon"><ChecklistIcon /></span>
+                <span>Suggested Fixes</span>
+              </li>
+              <li className="feature-item">
+                <span className="feature-icon"><PriorityHighIcon /></span>
+                <span>Breakdown by priority</span>
+              </li>
+              <li className="feature-item">
+                <span className="feature-icon"><ExitToAppIcon /> </span>
+                <span>Export to PDF</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );

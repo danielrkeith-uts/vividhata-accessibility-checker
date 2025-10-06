@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
-import { UserDropDown } from "../components/common/UserDropDown";
+import { GlobalHeader } from "../components/common/GlobalHeader";
 import { Scan } from "../services/api/apiService";
 import { scanService } from "../services/scan/scanService";
 import "./DashboardPage.css";
@@ -231,7 +231,25 @@ export const DashboardPage: React.FC = () => {
 
   const quickWins = Object.entries(quickWinsAgg)
     .sort((a, b) => b[1] - a[1])
-    .map(([text, count], i) => ({ id: i + 1, text, count }));
+    .map(([text, count], i) => {
+      // Find the priority for this quick fix by looking at the issue types that generate it
+      const issueTypes = Object.entries(ISSUE_CATEGORY_MAP)
+        .filter(([_, map]) => map.quickFix === text)
+        .map(([issueType, _]) => issueType);
+      
+      const priorities = issueTypes.map(issueType => ISSUE_CATEGORY_MAP[issueType]?.priority || 'Low');
+      const highestPriority = priorities.reduce((highest, current) => 
+        priorityRank[current as Priority] > priorityRank[highest as Priority] ? current : highest, 'Low' as Priority
+      );
+      
+      return { 
+        id: i + 1, 
+        text, 
+        count, 
+        priority: highestPriority,
+        issueTypes 
+      };
+    });
 
   const handleExportToPDF = async () => {
     if (!pdfRef.current) return;
@@ -437,14 +455,15 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className={`dashboard-page ${isExporting ? 'pdf-mode' : ''}`} ref={pdfRef}>
       {!isExporting && (
-        <header className="dashboard-header">
-          <div className="dashboard-header-content">
-            <h1 className="dashboard-title">Dashboard for {currentSite.name}</h1>
-            <div className="dashboard-user-info">
-              <UserDropDown />
-            </div>
-          </div>
-        </header>
+        <GlobalHeader
+          siteUrl={currentSite?.url}
+          onRescan={handleRescan}
+          onExportPDF={handleExportToPDF}
+          isRescanning={isRescanning}
+          isExporting={isExporting}
+          showLogoText={false}
+          showActions={true}
+        />
       )}
   
       {isExporting && (
@@ -455,27 +474,6 @@ export const DashboardPage: React.FC = () => {
       )}
   
       <main id="main" className="dashboard-main" role="main" aria-label="Dashboard main content">
-        <div className="dashboard-row">
-          <div className="dashboard-url-bar">
-            <span className="dashboard-url-value">{websiteUrl}</span>
-          </div>
-          {!isExporting && (
-            <div className="dashboard-rescan-button-container" role="group" aria-label="Dashboard actions">
-              <Button 
-                onClick={handleRescan} 
-                variant={rescanComplete ? "primary" : "outline"} 
-                disabled={isRescanning}
-                aria-label="Rescan website for accessibility issues"
-              >
-                {isRescanning ? "Rescanning..." : rescanComplete ? "Re-scan Complete!" : "Rescan"}
-              </Button>
-              <Button onClick={handleExportToPDF} variant="primary" disabled={isExporting} aria-label="Export dashboard to PDF">
-                {isExporting ? "Exporting…" : "Export to PDF"}
-              </Button>
-            </div>
-          )}
-        </div>
-  
         <div className={`dashboard-two-col ${isExporting ? 'pdf-stack' : ''}`}>
           <div className="left-column">
             <PageStatsCard

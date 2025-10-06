@@ -131,6 +131,13 @@ function App() {
       <AuthProvider>
         <ThemeProvider>
           <div className="App">
+            {/* Skip Links for WCAG 2.2 compliance */}
+            <a href="#main-content" className="skip-to-content">
+              Skip to main content
+            </a>
+            <a href="#navigation" className="skip-to-content">
+              Skip to navigation
+            </a>
             <AppRoutes />
           </div>
         </ThemeProvider>

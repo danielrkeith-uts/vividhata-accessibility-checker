@@ -15,10 +15,19 @@ const lightVars: Record<string, string> = {
   "--panel-border": "#e5e7eb",
   "--text": "#1f2937",
   "--muted": "#6b7280",
-  "--brand": "#4A5568",
+  "--brand": "#8B5CF6",
   "--accent": "#22c55e",
   "--warn": "#f97316",
   "--danger": "#ef4444",
+  "--success": "#10B981",
+  "--info": "#3B82F6",
+  "--focus-outline": "#8B5CF6",
+  "--focus-outline-offset": "2px",
+  "--link-color": "#8B5CF6",
+  "--link-hover": "#7C3AED",
+  "--button-text": "#FFFFFF",
+  "--button-bg": "#8B5CF6",
+  "--button-hover": "#7C3AED",
 };
 
 const darkVars: Record<string, string> = {
@@ -27,10 +36,19 @@ const darkVars: Record<string, string> = {
   "--panel-border": "#374151",
   "--text": "#e5e7eb",
   "--muted": "#9ca3af",
-  "--brand": "#60a5fa",
+  "--brand": "#A78BFA",
   "--accent": "#34d399",
   "--warn": "#fb923c",
   "--danger": "#f87171",
+  "--success": "#34D399",
+  "--info": "#60A5FA",
+  "--focus-outline": "#A78BFA",
+  "--focus-outline-offset": "2px",
+  "--link-color": "#A78BFA",
+  "--link-hover": "#8B5CF6",
+  "--button-text": "#FFFFFF",
+  "--button-bg": "#A78BFA",
+  "--button-hover": "#8B5CF6",
 };
 
 function applyCssVars(vars: Record<string, string>) {

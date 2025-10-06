@@ -1,0 +1,23 @@
+/* Purple Tooltip Styles */
+.purple-tooltip {
+  z-index: 999999999;
+}
+
+.purple-tooltip .MuiTooltip-tooltip {
+  background-color: #6b21a8 !important;
+  color: white !important;
+  font-size: 12px !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  max-width: 300px !important;
+  text-align: center !important;
+  z-index: 999999999 !important;
+}
+
+.purple-tooltip .MuiTooltip-popper {
+  z-index: 999999999 !important;
+}
+
+.purple-tooltip .MuiTooltip-arrow {
+  color: #6b21a8 !important;
+}

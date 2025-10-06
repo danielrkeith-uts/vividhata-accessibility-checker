@@ -3,7 +3,7 @@ export interface Site {
   id: string;
   url: string;
   name: string;
-  lastScanned: string;
+  lastScanned: string | null;
   scanData?: any; // Will contain the scan results from the API
   complianceScore?: number;
 }
