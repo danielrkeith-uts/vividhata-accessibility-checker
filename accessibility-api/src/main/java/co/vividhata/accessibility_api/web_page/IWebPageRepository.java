@@ -14,4 +14,6 @@ public interface IWebPageRepository {
 
     List<WebPage> getAll(int accountId);
 
+    void delete(int webPageId);
+
 }

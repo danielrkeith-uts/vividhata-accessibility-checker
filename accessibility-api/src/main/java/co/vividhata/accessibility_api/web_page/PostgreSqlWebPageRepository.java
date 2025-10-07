@@ -59,4 +59,11 @@ public class PostgreSqlWebPageRepository implements IWebPageRepository {
         return jdbcTemplate.query(sql, (rs, _) -> WebPage.fromRow(rs), accountId);
     }
 
+    @Override
+    public void delete(int webPageId) {
+        String sql = "DELETE FROM ac.web_page WHERE id = ?;";
+
+        jdbcTemplate.update(sql, webPageId);
+    }
+
 }
