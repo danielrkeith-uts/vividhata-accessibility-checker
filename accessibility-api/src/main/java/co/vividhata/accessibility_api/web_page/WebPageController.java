@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,6 +32,16 @@ public class WebPageController {
         }
 
         return ResponseEntity.ok(scanService.getScans(webPageId));
+    }
+
+    @DeleteMapping("/web-page/{webPageId}")
+    public ResponseEntity<?> deletePage(@PathVariable int webPageId, @AuthenticationPrincipal Account account) {
+        if (webPageService.getOwner(webPageId) != account.id()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Web page does not belong to current user");
+        }
+
+        webPageService.deleteWebPage(webPageId);
+        return ResponseEntity.ok().build();
     }
 
 }

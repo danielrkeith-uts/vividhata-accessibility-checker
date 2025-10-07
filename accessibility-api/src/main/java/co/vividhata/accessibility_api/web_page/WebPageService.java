@@ -1,6 +1,7 @@
 package co.vividhata.accessibility_api.web_page;
 
 import co.vividhata.accessibility_api.model.WebPage;
+import co.vividhata.accessibility_api.web_page.exceptions.WebPageDoesNotExistException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,17 @@ public class WebPageService implements IWebPageService {
 
     @Override
     public int getOwner(int webPageId) {
-        return webPageRepository.get(webPageId).accountId();
+        WebPage webPage = webPageRepository.get(webPageId);
+
+        if (webPage == null) {
+            throw new WebPageDoesNotExistException();
+        }
+
+        return webPage.accountId();
     }
 
+    @Override
+    public void deleteWebPage(int webPageId) {
+        webPageRepository.delete(webPageId);
+    }
 }
