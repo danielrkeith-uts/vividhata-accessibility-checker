@@ -127,6 +127,17 @@ Returns (JSON):
 ```
 
 ---
+#### `DELETE /web-page/{webPageId}`
+Deletes a web page (and all connected scans and issues)
+Replace `webPageId` with the relevant web page id.
+
+Requires login: *true*
+
+No body required
+
+Returns nothing
+
+---
 
 #### `GET /web-page/{webPageId}/scans`
 Fetches all the scans associated with a single web page.
