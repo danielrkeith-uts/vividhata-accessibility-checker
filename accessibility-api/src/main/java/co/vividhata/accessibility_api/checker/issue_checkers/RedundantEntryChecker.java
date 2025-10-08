@@ -11,7 +11,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RedundantEntryChecker implements IIssueChecker {
@@ -24,7 +26,7 @@ public class RedundantEntryChecker implements IIssueChecker {
     public List<Issue> check(Document document) {
         List<Issue> issues = new ArrayList<>();
         String[] tagsToCheck = {"input", "textarea", "select"};
-        Map<String, String>> previous = new HashMap<>();
+        Map<String, String> previous = new HashMap<>();
 
         for (String tag : tagsToCheck) {
             NodeList nodeList = document.getElementsByTagName(tag);
@@ -39,19 +41,19 @@ public class RedundantEntryChecker implements IIssueChecker {
                     continue; 
                 }
 
-                if (name == null || name.isEmpty()) {
+                if (name.isEmpty()) {
                     continue;
                 }
 
                 if (previous.containsKey(name)) {
-                    boolean hasAutoFill = value != null && !value.isEmpty();
+                    boolean hasAutoFill = !value.isEmpty();
                     boolean hasOptions = tag.equals("select") && element.getElementsByTagName("option").getLength() > 0;
 
                     if (!hasAutoFill && !hasOptions) {
                         issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));                   
                     }
                 } else {
-                    if (value != null && !value.isEmpty()) {
+                    if (!value.isEmpty()) {
                         previous.put(name, value);
                     }
                 }
