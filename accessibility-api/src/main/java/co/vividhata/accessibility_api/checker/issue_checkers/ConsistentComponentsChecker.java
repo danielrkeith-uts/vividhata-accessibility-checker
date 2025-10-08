@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;;
+import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -118,7 +118,7 @@ public class ConsistentComponentsChecker implements IIssueChecker {
             }
         }
         String placeholder = element.getAttribute("placeholder");
-        return (placeholder != null && !placeholder.isEmpty()) ? placeholder : null;
+        return !placeholder.isEmpty() ? placeholder : null;
     }
 
     // Check <img> alt consistency
@@ -132,7 +132,7 @@ public class ConsistentComponentsChecker implements IIssueChecker {
             String src = img.getAttribute("src");
             String alt = img.getAttribute("alt");
 
-            if (alt == null || alt.isEmpty()) {
+            if (alt.isEmpty()) {
                 issues.add(new Issue(-1, -1, ISSUE_TYPE,
                         "Missing alt text for image " + nodeParser.nodeToHtml(img)));
                 continue;
@@ -161,7 +161,7 @@ public class ConsistentComponentsChecker implements IIssueChecker {
         for (int i = 0; i < allNodes.getLength(); i++) {
             Element element = (Element) allNodes.item(i);
             String role = element.getAttribute("role");
-            if (role != null && !role.isEmpty()) {
+            if (!role.isEmpty()) {
                 String label = element.getTextContent().trim();
                 if (label.isEmpty()) {
                     issues.add(new Issue(-1, -1, ISSUE_TYPE,
