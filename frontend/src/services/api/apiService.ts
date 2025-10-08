@@ -160,6 +160,12 @@ class ApiService {
   async getWebPageScans(webPageId: number): Promise<Scan[]> {
     return this.makeRequest<Scan[]>(`/web-page/${webPageId}/scans`);
   }
+
+  async deleteWebPage(webPageId: number): Promise<void> {
+    return this.makeRequest<void>(`/web-page/${webPageId}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const apiService = new ApiService();

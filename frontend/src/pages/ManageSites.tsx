@@ -1,17 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { GlobalHeader } from "../components/common/GlobalHeader";
 import { Button } from "../components/common/Button";
 import { SiteCard } from "../components/dashboard";
+import { ConfirmModal } from "../components/common/ConfirmModal";
 import "./ManageSites.css";
 
 export const ManageSites: React.FC = () => {
-  const { user, userSites } = useAuth();
+  const { user, userSites, deleteSite } = useAuth();
   const navigate = useNavigate();
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [siteToDelete, setSiteToDelete] = useState<string | null>(null);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const goToDashboard = (siteId: string) => {
     navigate(`/dashboard/${siteId}`);
+  };
+
+  const handleDeleteClick = (siteId: string) => {
+    setSiteToDelete(siteId);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteSite || !siteToDelete) return;
+    
+    setIsDeleting(siteToDelete);
+    setShowDeleteModal(false);
+    
+    try {
+      await deleteSite(siteToDelete);
+    } catch (error) {
+      console.error('Error deleting site:', error);
+      setErrorMessage('Failed to delete site. Please try again.');
+      setShowErrorModal(true);
+    } finally {
+      setIsDeleting(null);
+      setSiteToDelete(null);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setSiteToDelete(null);
+  };
+
+  const handleErrorClose = () => {
+    setShowErrorModal(false);
+    setErrorMessage("");
   };
 
   const formatTimeAgo = (date: string) => {
@@ -64,6 +103,8 @@ export const ManageSites: React.FC = () => {
                       key={site.id}
                       site={site}
                       onCardClick={goToDashboard}
+                      onDelete={handleDeleteClick}
+                      isDeleting={isDeleting === site.id}
                     />
                   ))}
             </div>
@@ -98,6 +139,26 @@ export const ManageSites: React.FC = () => {
           </div>
         </div>
       </main>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        title="Delete Site"
+        message="Are you sure you want to delete this site? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        isLoading={isDeleting === siteToDelete}
+      />
+
+      <ConfirmModal
+        isOpen={showErrorModal}
+        title="Error"
+        message={errorMessage}
+        confirmText="OK"
+        onConfirm={handleErrorClose}
+        onCancel={handleErrorClose}
+      />
     </div>
   );
 };
