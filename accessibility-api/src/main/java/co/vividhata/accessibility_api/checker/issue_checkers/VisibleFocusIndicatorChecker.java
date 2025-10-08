@@ -41,20 +41,17 @@ public class VisibleFocusIndicatorChecker implements IIssueChecker {
         }
         
         String role = element.getAttribute("role");
-        if (role != null && (role.equals("button") || role.equals("link") || role.equals("checkbox") || role.equals("radio") || role.equals("menuitem") || role.equals("tab"))) {
+        if (role.equals("button") || role.equals("link") || role.equals("checkbox") || role.equals("radio") || role.equals("menuitem") || role.equals("tab")) {
             return true;
         }
 
         String tabindex = element.getAttribute("tabindex");
-        if (tabindex != null && !tabindex.isEmpty() && Integer.parseInt(tabindex) >= 0) {
-            return true;
-        }
-        return false;
+        return !tabindex.isEmpty() && Integer.parseInt(tabindex) >= 0;
     }
 
     private boolean hidesFocus(Element element) {
         String style = element.getAttribute("style");
-        if (style == null || style.isEmpty()) {
+        if (style.isEmpty()) {
             return false;
         }
         style = style.toLowerCase().replaceAll("\\s+", "");

@@ -39,9 +39,9 @@ public class LanguageChangesChecker implements IIssueChecker {
             Element element = (Element) allNodes.item(i);
             String language = element.getAttribute("lang");
 
-            if (language == null || language.isEmpty()) {
+            if (language.isEmpty()) {
                 String textContent = element.getTextContent().trim();
-                if (!textContent.isEmpty() && textContent.length() > 3 && defaultLanguage != null) {
+                if (textContent.length() > 3 && defaultLanguage != null) {
                     Language detected = detector.detectLanguageOf(textContent);
                     if (!detected.toString().equalsIgnoreCase(defaultLanguage)) {
                         issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));

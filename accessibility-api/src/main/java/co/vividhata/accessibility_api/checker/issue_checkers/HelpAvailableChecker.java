@@ -46,7 +46,7 @@ public class HelpAvailableChecker implements IIssueChecker {
         Document doc = element.getOwnerDocument();
 
         String ariaDesc = element.getAttribute("aria-describedby");
-        if (ariaDesc != null && !ariaDesc.isEmpty()) {
+        if (!ariaDesc.isEmpty()) {
             Node describedNode = doc.getElementById(ariaDesc);
             if (describedNode != null && !describedNode.getTextContent().trim().isEmpty()) {
                 return true;
@@ -66,7 +66,7 @@ public class HelpAvailableChecker implements IIssueChecker {
         }
 
         String placeholder = element.getAttribute("placeholder");
-        if (placeholder != null && !placeholder.isEmpty()) {
+        if (!placeholder.isEmpty()) {
             return true;
         }
 
@@ -82,10 +82,6 @@ public class HelpAvailableChecker implements IIssueChecker {
             prev = prev.getPreviousSibling();
         }
 
-        if (element.hasAttribute("pattern")) {
-            return true;
-        }
-
-        return false;
+        return element.hasAttribute("pattern");
     }
 }

@@ -33,7 +33,7 @@ public class StatusMessageChecker implements IIssueChecker {
             String ariaHidden = element.getAttribute("aria-hidden");
             String textContent = element.getTextContent();
 
-            if (textContent != null && !textContent.replaceAll("\\s+", "").isEmpty() && !(("status".equalsIgnoreCase(role) || "alert".equalsIgnoreCase(role)) || ("polite".equalsIgnoreCase(ariaLive) || "assertive".equalsIgnoreCase(ariaLive))) && !((style != null && (style.contains("display:none") || style.contains("visibility:hidden"))) || "true".equalsIgnoreCase(ariaHidden))) {
+            if (textContent != null && !textContent.replaceAll("\\s+", "").isEmpty() && !("status".equalsIgnoreCase(role) || "alert".equalsIgnoreCase(role) || "polite".equalsIgnoreCase(ariaLive) || "assertive".equalsIgnoreCase(ariaLive)) && !(style.contains("display:none") || style.contains("visibility:hidden") || "true".equalsIgnoreCase(ariaHidden))) {
                 issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
             }
         }

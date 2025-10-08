@@ -31,7 +31,7 @@ public class DragAndDropAlternativeChecker implements IIssueChecker {
 
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Element element = (Element) nodeList.item(i);
-                if (!hasKeyboardAlternative(element)) {
+                if (doesNotHaveKeyboardAlternative(element)) {
                     issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
                 }
             }
@@ -42,7 +42,7 @@ public class DragAndDropAlternativeChecker implements IIssueChecker {
         for (int i = 0; i < allNodes.getLength(); i++) {
             Element element = (Element) allNodes.item(i);
             for (String attr : customDragAttributes) {
-                if (element.hasAttribute(attr) && !hasKeyboardAlternative(element)) {
+                if (element.hasAttribute(attr) && doesNotHaveKeyboardAlternative(element)) {
                     issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
                     break;
                 }
@@ -51,9 +51,9 @@ public class DragAndDropAlternativeChecker implements IIssueChecker {
         return issues;
     }
 
-    private boolean hasKeyboardAlternative(Element element) {
+    private boolean doesNotHaveKeyboardAlternative(Element element) {
         String tabindex = element.getAttribute("tabindex");
 
-        return (tabindex != null && !tabindex.isEmpty() && Integer.parseInt(tabindex) >= 0);
+        return tabindex.isEmpty() || Integer.parseInt(tabindex) < 0;
     }
 }

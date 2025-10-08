@@ -8,12 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 
 @Service
 public class AriaRoleChecker implements IIssueChecker {
@@ -35,9 +33,7 @@ public class AriaRoleChecker implements IIssueChecker {
         "spinbutton", "status", "switch", "tab", "table", "tablist", "tabpanel", "textbox",
         "timer", "toolbar", "tooltip", "tree", 	"treegrid",	"treeitem"
         };
-        for (String role : roles) {
-            VALID_ROLES.add(role);
-        }
+        Collections.addAll(VALID_ROLES, roles);
     }
 
     private static final Map<String, String> NATIVE_ROLES = new HashMap<>();
@@ -91,16 +87,16 @@ public class AriaRoleChecker implements IIssueChecker {
                 issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
             }
 
-            if (!role.isEmpty() && !VALID_ROLES.contains(role)) 
+            if (!role.isEmpty() && !VALID_ROLES.contains(role)) {
                 issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
             }
-            
+
             String nativeRole = NATIVE_ROLES.get(tagName);
             if (nativeRole != null && !role.isEmpty() && !role.equals(nativeRole)) {
                 issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
             }
 
-            NodeList attributes = element.getAttributes();
+            NamedNodeMap attributes = element.getAttributes();
             for (int j = 0; j < attributes.getLength(); j++) {
                 String attrName = attributes.item(j).getNodeName();
                 if (attrName.startsWith("aria-")) {
@@ -110,7 +106,9 @@ public class AriaRoleChecker implements IIssueChecker {
                     }
                 }
             }
-            return issues;
+        }
+
+        return issues;
     }
 }
 

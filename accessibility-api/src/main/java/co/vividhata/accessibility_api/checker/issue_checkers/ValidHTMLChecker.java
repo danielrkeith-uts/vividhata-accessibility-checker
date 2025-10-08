@@ -46,12 +46,12 @@ public class ValidHTMLChecker implements IIssueChecker {
         if (!role.isEmpty()) return false;
 
         if ("div".equals(tagName) || "span".equals(tagName) || "p".equals(tagName) ||
-            "section".equals(tagName) || "article".equals(tagName) || "aside".equals(tagName) ||
-            "header".equals(tagName) || "footer".equals(tagName) || "main".equals(tagName)) {
+                "section".equals(tagName) || "article".equals(tagName) || "aside".equals(tagName) ||
+                "header".equals(tagName) || "footer".equals(tagName) || "main".equals(tagName)) {
 
             String[] Keywords = {
-                "nav","menu","header","banner","footer","main","content",
-                "article","post","section","chapter","sidebar","aside"
+                    "nav", "menu", "header", "banner", "footer", "main", "content",
+                    "article", "post", "section", "chapter", "sidebar", "aside"
             };
 
             for (String keyword : Keywords) {
@@ -61,4 +61,5 @@ public class ValidHTMLChecker implements IIssueChecker {
             }
         }
         return false;
+    }
 }

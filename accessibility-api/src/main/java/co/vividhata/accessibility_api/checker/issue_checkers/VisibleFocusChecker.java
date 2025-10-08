@@ -29,10 +29,9 @@ public class VisibleFocusChecker implements IIssueChecker {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Element element = (Element) nodeList.item(i);
                 String style = element.getAttribute("style");
-                String class = element.getAttribute("class");
+                String classAttr = element.getAttribute("class");
 
-                if ((style != null && (style.contains("outline:none") || style.contains("display:none") || style.contains("visibility:hidden")))
-                || (classAttr != null && classAttr.toLowerCase().contains("no-focus"))) {
+                if (style.contains("outline:none") || style.contains("display:none") || style.contains("visibility:hidden") || classAttr.toLowerCase().contains("no-focus")) {
                     issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
                 }
             }
