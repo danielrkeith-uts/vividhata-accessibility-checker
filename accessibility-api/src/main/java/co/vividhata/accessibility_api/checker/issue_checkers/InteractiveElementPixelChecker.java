@@ -47,7 +47,7 @@ public class InteractiveElementPixelChecker implements IIssueChecker {
         }
 
         String role = element.getAttribute("role");
-        if (role != null && (role.equals("button") || role.equals("link") || role.equals("menuitem") || role.equals("tab"))) {
+        if (role.equals("button") || role.equals("link") || role.equals("menuitem") || role.equals("tab")) {
             return true;
         }
 
@@ -59,7 +59,7 @@ public class InteractiveElementPixelChecker implements IIssueChecker {
         }
 
         String tabindex = element.getAttribute("tabindex");
-        if (tabindex != null && !tabindex.isEmpty()) {
+        if (!tabindex.isEmpty()) {
             try {
                 if (Integer.parseInt(tabindex) >= 0) {
                     return true;
@@ -74,7 +74,7 @@ public class InteractiveElementPixelChecker implements IIssueChecker {
         int width = 0;
         int height = 0;
 
-        if (style != null && !style.isEmpty()) {
+        if (!style.isEmpty()) {
             String[] styles = style.split(";");
 
             for (String s : styles) {
@@ -87,13 +87,13 @@ public class InteractiveElementPixelChecker implements IIssueChecker {
         if (element.hasAttribute("width")) {
             try {
                 width = Integer.parseInt(element.getAttribute("width").replace("px", "").trim());
-            } catch (Exception e) {}
+            } catch (Exception _) {}
         }
 
         if (element.hasAttribute("height")) {
             try {
                 height = Integer.parseInt(element.getAttribute("height").replace("px", "").trim());
-            } catch (Exception e) {}
+            } catch (Exception _) {}
         }
 
         return width < 24 || height < 24;
