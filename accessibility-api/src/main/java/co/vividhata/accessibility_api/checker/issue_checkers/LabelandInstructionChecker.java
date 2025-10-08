@@ -31,7 +31,7 @@ public class LabelandInstructionChecker implements IIssueChecker {
             NodeList nodeList = document.getElementsByTagName(tag);
 
             for (int i = 0; i < nodeList.getLength(); i++) {
-                Element element - (Element) nodeList.item(i);
+                Element element = (Element) nodeList.item(i);
                 
                 String id = element.getAttribute("id");
                 String placeholder = element.getAttribute("placeholder");
@@ -39,7 +39,7 @@ public class LabelandInstructionChecker implements IIssueChecker {
                 String ariaLabelledBy = element.getAttribute("aria-labelledby");
 
                 boolean hasLabel = false;
-                if (id != null && !id.isEmpty()) {
+                if (!id.isEmpty()) {
                     NodeList labels = document.getElementsByTagName("label");
                     for (int j = 0; j < labels.getLength(); j++) {
                         Element label = (Element) labels.item(j);
@@ -49,9 +49,7 @@ public class LabelandInstructionChecker implements IIssueChecker {
                         }
                     }
                 }
-                if (!hasLabel && (placeholder == null || placeholder.isEmpty()) &&
-                    (ariaLabel == null || ariaLabel.isEmpty()) &&
-                    (ariaLabelledBy == null || ariaLabelledBy.isEmpty())) {
+                if (!hasLabel && placeholder.isEmpty() && ariaLabel.isEmpty() && ariaLabelledBy.isEmpty()) {
                     issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(element)));
                 }
             }
