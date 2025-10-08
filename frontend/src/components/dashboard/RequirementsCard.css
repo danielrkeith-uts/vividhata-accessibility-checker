@@ -71,7 +71,8 @@
 }
 
 .requirements-table .table-head > div:nth-child(2),
-.requirements-table .table-head > div:nth-child(3) {
+.requirements-table .table-head > div:nth-child(3),
+.requirements-table .table-head > div:nth-child(4) {
   text-align: left;
 }
 
@@ -85,12 +86,50 @@
 }
 
 .requirements-table .table-row > div:nth-child(2),
-.requirements-table .table-row > div:nth-child(3) {
+.requirements-table .table-row > div:nth-child(3),
+.requirements-table .table-row > div:nth-child(4) {
   text-align: left;
 }
 
 .requirements-table .table-row:hover {
   background: var(--panel-bg);
+}
+
+/* Expanded content styles */
+.requirements-table .expanded-content {
+  padding: 12px 16px;
+  background: var(--panel-bg);
+  border-top: 1px solid var(--panel-border);
+}
+
+.requirements-table .violation-item {
+  margin-bottom: 12px;
+  padding: 8px;
+  background: var(--bg-primary);
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.requirements-table .violation-header {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.requirements-table .code-block {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  background: var(--code-bg);
+  padding: 6px 8px;
+  border-radius: 3px;
+  border: 1px solid var(--border-color);
+  overflow: auto;
+  max-height: 100px;
+}
+
+.requirements-table .code-block pre {
+  margin: 0;
+  white-space: pre-wrap;
 }
 
 /* Disclaimer */

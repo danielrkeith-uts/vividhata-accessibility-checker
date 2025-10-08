@@ -4,7 +4,14 @@ import PurpleTooltip from '../common/PurpleTooltip';
 import { Chip } from '../common/Chip';
 import './RequirementsCard.css';
 
-type Row = { id: number; text: string; category: string; level: 'A' | 'AA' | 'AAA'; };
+type Row = { 
+  id: number; 
+  text: string; 
+  category: string; 
+  level: 'A' | 'AA' | 'AAA'; 
+  count: number;
+  issues: { htmlSnippet: string; issueType: string }[];
+};
 
 type Props = {
   tab: 'requirements' | 'quickfixes';
@@ -16,6 +23,18 @@ type Props = {
 export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRows, quickWins }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedPriority, setSelectedPriority] = useState<string>('All');
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+
+  const toggleRowExpansion = (rowId: number) => {
+    const newExpanded = new Set(expandedRows);
+    if (newExpanded.has(rowId)) {
+      newExpanded.delete(rowId);
+    } else {
+      newExpanded.add(rowId);
+    }
+    setExpandedRows(newExpanded);
+  };
+
   // Map current categories to WCAG principles
   const categoryToWCAG: Record<string, string> = {
     'Images': 'Perceivable',
@@ -141,35 +160,70 @@ export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRow
             <div>Requirement</div>
             <div>Category</div>
             <div>Priority</div>
+            <div>Count</div>
           </div>
           {filteredRequirements.map((r) => {
             const wcagCategory = categoryToWCAG[r.category] || 'Robust';
+            const isExpanded = expandedRows.has(r.id);
             
             return (
-              <div className="table-row" key={r.id}>
-                <div>{r.text}</div>
-                <div>
-                  <PurpleTooltip title={wcagCategoryTooltips[wcagCategory]} placement="top" arrow>
-                    <div>
-                      <Chip variant={
-                        wcagCategory === 'Perceivable' ? 'purple' :
-                        wcagCategory === 'Operable' ? 'blue' :
-                        wcagCategory === 'Understandable' ? 'orange' : 'gray'
-                      }>
-                        {wcagCategory}
-                      </Chip>
-                    </div>
-                  </PurpleTooltip>
+              <div key={r.id}>
+                <div className="table-row" style={{ cursor: 'pointer' }} onClick={() => toggleRowExpansion(r.id)}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '14px' }}>{isExpanded ? '▼' : '▶'}</span>
+                    <span>{r.text}</span>
+                  </div>
+                  <div>
+                    <PurpleTooltip title={wcagCategoryTooltips[wcagCategory]} placement="top" arrow>
+                      <div>
+                        <Chip variant={
+                          wcagCategory === 'Perceivable' ? 'purple' :
+                          wcagCategory === 'Operable' ? 'blue' :
+                          wcagCategory === 'Understandable' ? 'orange' : 'gray'
+                        }>
+                          {wcagCategory}
+                        </Chip>
+                      </div>
+                    </PurpleTooltip>
+                  </div>
+                  <div>
+                    <PurpleTooltip title={priorityTooltips[r.level]} placement="top" arrow>
+                      <div>
+                        <Chip variant={r.level === 'A' ? 'green' : r.level === 'AA' ? 'orange' : 'red'}>
+                          Level {r.level}
+                        </Chip>
+                      </div>
+                    </PurpleTooltip>
+                  </div>
+                  <div>
+                    <PurpleTooltip 
+                      title={`${r.count} violation${r.count !== 1 ? 's' : ''} of WCAG ${r.level} guideline "${r.text.replace('WCAG ', '').split(' ').slice(1).join(' ')}" found in your page`} 
+                      placement="top" 
+                      arrow
+                    >
+                      <div>
+                        <Chip variant="blue">{r.count} violation{r.count !== 1 ? 's' : ''}</Chip>
+                      </div>
+                    </PurpleTooltip>
+                  </div>
                 </div>
-                <div>
-                  <PurpleTooltip title={priorityTooltips[r.level]} placement="top" arrow>
-                    <div>
-                      <Chip variant={r.level === 'A' ? 'green' : r.level === 'AA' ? 'orange' : 'red'}>
-                        Level {r.level}
-                      </Chip>
+                {isExpanded && (
+                  <div className="expanded-content">
+                    <div style={{ marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                      Found {r.count} violation{r.count !== 1 ? 's' : ''}:
                     </div>
-                  </PurpleTooltip>
-                </div>
+                    {r.issues.map((issue, idx) => (
+                      <div key={idx} className="violation-item">
+                        <div className="violation-header">
+                          Violation #{idx + 1} - {issue.issueType}
+                        </div>
+                        <div className="code-block">
+                          <pre>{issue.htmlSnippet}</pre>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             );
           })}

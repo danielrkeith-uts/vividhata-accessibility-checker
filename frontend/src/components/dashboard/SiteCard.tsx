@@ -5,11 +5,15 @@ import "./SiteCard.css";
 interface SiteCardProps {
   site: Site;
   onCardClick: (siteId: string) => void;
+  onDelete?: (siteId: string) => void;
+  isDeleting?: boolean;
 }
 
 export const SiteCard: React.FC<SiteCardProps> = ({ 
   site, 
-  onCardClick
+  onCardClick,
+  onDelete,
+  isDeleting = false
 }) => {
   const getAccessibilityLevel = (score: number) => {
     if (score >= 70) return 'high';
@@ -34,6 +38,13 @@ export const SiteCard: React.FC<SiteCardProps> = ({
 
   const accessibilityScore = site.complianceScore || 0;
   const level = getAccessibilityLevel(accessibilityScore);
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDelete) {
+      onDelete(site.id);
+    }
+  };
 
   return (
     <div 
@@ -87,6 +98,17 @@ export const SiteCard: React.FC<SiteCardProps> = ({
           />
         </div>
       </div>
+      
+      {onDelete && (
+        <button 
+          className="site-delete-button"
+          onClick={handleDelete}
+          title="Delete site"
+          disabled={isDeleting}
+        >
+          {isDeleting ? '...' : '×'}
+        </button>
+      )}
     </div>
   );
 };

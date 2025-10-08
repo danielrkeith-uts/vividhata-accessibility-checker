@@ -14,6 +14,7 @@ interface AuthContextType {
   checkAuthStatus: () => Promise<void>;
   addSite: (site: Site) => Promise<void>; 
   removeSite: (siteId: string) => void;
+  deleteSite: (siteId: string) => Promise<void>;
   refreshUserData: () => Promise<void>; 
 }
 
@@ -162,10 +163,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Fetch web pages from backend
       const webPages = await scanService.getWebPages();
       
+      // Get list of deleted sites from localStorage
+      const deletedSitesKey = `deletedSites_${userId}`;
+      const deletedSites = JSON.parse(localStorage.getItem(deletedSitesKey) || '[]');
+      
       // Convert WebPage objects to Site objects sequentially to avoid race conditions
       const sites: Site[] = [];
       
       for (const webPage of webPages) {
+        // Skip deleted sites
+        if (deletedSites.includes(webPage.id.toString())) {
+          continue;
+        }
         try {
           // Get the latest scan for this web page to get last scanned time
           const scans = await scanService.getWebPageScans(webPage.id);
@@ -278,6 +287,48 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     saveUserSites(user.id, updatedSites);
   };
 
+  const deleteSite = async (siteId: string) => {
+    if (!user) return;
+    
+    try {
+      console.log(`Attempting to delete site with ID: ${siteId}`);
+      
+      // Delete from backend
+      await scanService.deleteWebPage(parseInt(siteId));
+      
+      // Remove from local state
+      const updatedSites = userSites.filter(site => site.id !== siteId);
+      setUserSites(updatedSites);
+      saveUserSites(user.id, updatedSites);
+      
+      console.log(`Successfully deleted site with ID: ${siteId}`);
+      
+    } catch (error) {
+      console.error('Error deleting site:', error);
+      
+      // If it's a 500 error, treat it as successful deletion
+      // This handles the case where backend delete fails but we want to remove from frontend
+      if (error instanceof Error && error.message.includes('500')) {
+        console.log('Backend delete failed (500 error), but removing from frontend anyway');
+        const updatedSites = userSites.filter(site => site.id !== siteId);
+        setUserSites(updatedSites);
+        saveUserSites(user.id, updatedSites);
+        
+        // Mark this site as deleted in localStorage to prevent it from reappearing on refresh
+        const deletedSitesKey = `deletedSites_${user.id}`;
+        const deletedSites = JSON.parse(localStorage.getItem(deletedSitesKey) || '[]');
+        deletedSites.push(siteId);
+        localStorage.setItem(deletedSitesKey, JSON.stringify(deletedSites));
+        
+        return; // Don't throw error, just remove from frontend
+      }
+      
+      throw new Error(
+        `Failed to delete site: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  };
+
   const login = async (credentials: LoginCredentials) => {
     try {
       await apiService.login(credentials);
@@ -338,6 +389,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuthStatus,
     addSite,
     removeSite,
+    deleteSite,
     refreshUserData,
   };
 

@@ -217,9 +217,19 @@ export const DashboardPage: React.FC = () => {
 
   const wcagPriority: Record<'A' | 'AA' | 'AAA', Priority> = { A: 'High', AA: 'Medium', AAA: 'Low' };
   const violatedCounts: Record<string, number> = {};
-  scanData.issues.forEach(i => { violatedCounts[i.issueType] = (violatedCounts[i.issueType] || 0) + 1; });
+  const violatedIssues: Record<string, any[]> = {};
+  
+  scanData.issues.forEach(i => { 
+    violatedCounts[i.issueType] = (violatedCounts[i.issueType] || 0) + 1;
+    if (!violatedIssues[i.issueType]) {
+      violatedIssues[i.issueType] = [];
+    }
+    violatedIssues[i.issueType].push(i);
+  });
+  
   const requirementsRows = Object.entries(violatedCounts).map(([type, count], idx) => {
     const meta = WCAG_MAP[type] || { id: '—', name: type, level: 'A' as const, principle: 'Perceivable' as const };
+    const issues = violatedIssues[type] || [];
     return {
       id: idx + 1,
       text: `WCAG ${meta.id} ${meta.name}`,
@@ -227,6 +237,10 @@ export const DashboardPage: React.FC = () => {
       category: meta.principle,
       level: meta.level,
       count,
+      issues: issues.map(issue => ({
+        htmlSnippet: issue.htmlSnippet,
+        issueType: issue.issueType
+      }))
     };
   });
 
@@ -491,7 +505,7 @@ export const DashboardPage: React.FC = () => {
             <RequirementsCard
               tab={requirementsTab}
               setTab={setRequirementsTab}
-              requirementsRows={requirementsRows.map(r => ({ id: r.id, text: r.text, category: r.category, level: r.level }))}
+              requirementsRows={requirementsRows}
               quickWins={quickWins}
             />
           </div>
