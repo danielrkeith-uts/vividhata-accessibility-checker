@@ -26,7 +26,7 @@ public class DefinedLanguageChecker implements IIssueChecker {
         if (htmlElement != null) {
             String language = htmlElement.getAttribute("lang");
             String xmlLang = htmlElement.getAttribute("xml:lang");
-            if ((language == null || language.isEmpty()) && (xmlLang == null || xmlLang.isEmpty())) {
+            if (language.isEmpty() && xmlLang.isEmpty()) {
                 issues.add(new Issue(-1, -1, ISSUE_TYPE, nodeParser.nodeToHtml(htmlElement)));
             }
         }
