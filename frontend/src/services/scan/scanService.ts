@@ -86,9 +86,10 @@ class ScanService {
   // Delete a web page
   async deleteWebPage(webPageId: number): Promise<void> {
     try {
-      return await apiService.deleteWebPage(webPageId);
+      const result = await apiService.deleteWebPage(webPageId);
+      return result;
     } catch (error) {
-      console.error('Error deleting web page:', error);
+      console.error('ScanService: Error deleting web page:', error);
       
       // Don't treat 500 errors as successful - they indicate real server problems
       // Only treat 404 errors as "already deleted"
@@ -96,13 +97,11 @@ class ScanService {
         try {
           const errorData = JSON.parse(error.message);
           if (errorData.status === 404) {
-            console.log('Web page not found on backend (404 error), treating as successful deletion');
             return; // Don't throw error, treat as successful
           }
         } catch {
           // If we can't parse the error, check if it contains 404
           if (error.message.includes('404')) {
-            console.log('Web page not found on backend (404 error), treating as successful deletion');
             return; // Don't throw error, treat as successful
           }
         }

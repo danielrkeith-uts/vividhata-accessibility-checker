@@ -554,7 +554,156 @@
   border-radius: 8px !important; 
 }
 
-.pdf-root .pdf-section { 
+
+/* ---------- SKELETON LOADING ---------- */
+.skeleton-card {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.skeleton-content {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.skeleton-donut {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, var(--panel-border) 25%, var(--bg) 50%, var(--panel-border) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.6s linear infinite;
+}
+
+.skeleton-indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.skeleton-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.skeleton-indicator::before {
+  content: '';
+  width: 40px;
+  height: 24px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, var(--panel-border) 25%, var(--bg) 50%, var(--panel-border) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.6s linear infinite;
+}
+
+.skeleton-indicator::after {
+  content: '';
+  flex: 1;
+  height: 16px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--panel-border) 25%, var(--bg) 50%, var(--panel-border) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.6s linear infinite;
+}
+
+.skeleton-header {
+  margin-bottom: 20px;
+}
+
+.skeleton-title {
+  width: 150px;
+  height: 24px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--panel-border) 25%, var(--bg) 50%, var(--panel-border) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.6s linear infinite;
+  margin-bottom: 16px;
+}
+
+.skeleton-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.skeleton-tab {
+  width: 100px;
+  height: 28px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, var(--panel-border) 25%, var(--bg) 50%, var(--panel-border) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.6s linear infinite;
+}
+
+.skeleton-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-row {
+  height: 40px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--panel-border) 25%, var(--bg) 50%, var(--panel-border) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.6s linear infinite;
+}
+
+.skeleton-compliance {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-compliance-item {
+  height: 60px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--panel-border) 25%, var(--bg) 50%, var(--panel-border) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.6s linear infinite;
+}
+
+.skeleton-text {
+  height: 16px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--panel-border) 25%, var(--bg) 50%, var(--panel-border) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.6s linear infinite;
+  margin-bottom: 8px;
+}
+
+.skeleton-text:nth-child(2) {
+  width: 90%;
+}
+
+.skeleton-text:nth-child(3) {
+  width: 80%;
+}
+
+.skeleton-link {
+  width: 180px;
+  height: 16px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--panel-border) 25%, var(--bg) 50%, var(--panel-border) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave 1.6s linear infinite;
+  margin-top: 12px;
+}
+
+@keyframes skeleton-wave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.pdf-root .card {
   break-inside: avoid !important; 
   page-break-inside: avoid !important; 
   margin: 0 0 16px 0 !important; 

@@ -60,26 +60,29 @@
 
 .requirements-table .table-head {
   display: grid;
-  grid-template-columns: 1fr auto auto auto;
-  gap: 12px;
+  grid-template-columns: 1fr 120px 100px 120px;
+  gap: 0px;
   padding: 8px 16px;
   background: var(--panel-bg);
   border-bottom: 1px solid var(--panel-border);
   font-weight: 600;
-  font-size: 11px;
+  font-size: 13px;
   color: var(--text-secondary);
+  align-items: center;
 }
 
 .requirements-table .table-head > div:nth-child(2),
 .requirements-table .table-head > div:nth-child(3),
 .requirements-table .table-head > div:nth-child(4) {
-  text-align: left;
+  text-align: left !important;
+  padding: 0;
+  margin: 0;
 }
 
 .requirements-table .table-row {
   display: grid;
-  grid-template-columns: 1fr auto auto auto;
-  gap: 12px;
+  grid-template-columns: 1fr 120px 100px 120px;
+  gap: 0px;
   padding: 8px 16px;
   border-bottom: 1px solid var(--panel-border);
   align-items: center;
@@ -88,6 +91,20 @@
 .requirements-table .table-row > div:nth-child(2),
 .requirements-table .table-row > div:nth-child(3),
 .requirements-table .table-row > div:nth-child(4) {
+  display: flex;
+  justify-content: flex-start !important;
+  align-items: center;
+  text-align: left !important;
+  padding: 0;
+  margin: 0;
+}
+
+.requirements-table .table-row > div:nth-child(2) > div,
+.requirements-table .table-row > div:nth-child(3) > div,
+.requirements-table .table-row > div:nth-child(4) > div {
+  display: flex;
+  justify-content: flex-start !important;
+  align-items: center;
   text-align: left;
 }
 
@@ -100,6 +117,8 @@
   padding: 12px 16px;
   background: var(--panel-bg);
   border-top: 1px solid var(--panel-border);
+  text-align: left;
+  font-family: inherit;
 }
 
 .requirements-table .violation-item {
@@ -108,16 +127,24 @@
   background: var(--bg-primary);
   border-radius: 4px;
   border: 1px solid var(--border-color);
+  text-align: left;
+  font-family: inherit;
 }
 
 .requirements-table .violation-header {
   font-size: 12px;
   color: var(--text-secondary);
   margin-bottom: 4px;
+  text-align: left;
+  font-family: inherit;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .requirements-table .code-block {
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Courier New', monospace;
   font-size: 12px;
   background: var(--code-bg);
   padding: 6px 8px;
@@ -125,12 +152,29 @@
   border: 1px solid var(--border-color);
   overflow: auto;
   max-height: 100px;
+  text-align: left;
 }
 
 .requirements-table .code-block pre {
   margin: 0;
   white-space: pre-wrap;
+  text-align: left;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Courier New', monospace;
 }
+
+.requirements-table .code-block-container {
+  position: relative;
+}
+
+.requirements-table .code-block {
+  transition: max-height 0.3s ease;
+}
+
+.requirements-table .code-block.expanded {
+  max-height: none;
+  overflow: visible;
+}
+
 
 /* Disclaimer */
 .disclaimer {
@@ -195,4 +239,63 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Suggested fixes section */
+.suggested-fixes .table-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--panel-border);
+  align-items: center;
+}
+
+.suggested-fixes .table-row > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.suggested-fixes .table-row > div:last-child > div {
+  padding: 0;
+  margin: 0;
+}
+
+/* Ensure all chips have consistent height and no text wrapping */
+.requirements-table .chip,
+.suggested-fixes .chip {
+  height: 20px !important;
+  min-height: 20px !important;
+  font-size: 11px !important;
+  padding: 0 12px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Make tabs and filter chips slightly bigger and longer */
+.tabs-filters-row .chip {
+  height: 20px !important;
+  min-height: 20px !important;
+  font-size: 11px !important;
+  padding: 3px 24px !important;
+  text-align: center !important;
+  justify-content: center !important;
+  min-width: 120px !important;
+}
+
+/* Ensure tabs and filters are properly aligned */
+.tabs-filters-row .tabs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tabs-filters-row .filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }

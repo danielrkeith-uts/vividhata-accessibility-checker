@@ -50,7 +50,6 @@
   
   /* DROPDOWN ICON BUTTON */
   .user-dropdown {
-    margin-left: 8px;
     background: none;
     border: none;
     color: white;
@@ -71,7 +70,7 @@
     top: 100%;
     left: 0;
     margin-top: 8px;
-    width: 160px;
+    width: 200px;
     background: white;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
@@ -89,6 +88,8 @@
     cursor: pointer;
     transition: background-color 0.2s ease;
     color: #374151;
+    display: flex;
+    align-items: center;
   }
   
 .user-dropdown-item:hover {
@@ -99,5 +100,45 @@
 .user-dropdown-item:focus {
   outline: 2px solid var(--brand);
   outline-offset: -2px;
+}
+
+.user-dropdown-item.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.user-dropdown-item.disabled:hover {
+  background-color: transparent;
+}
+
+.user-dropdown-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 4px 0;
+  padding: 0;
+  cursor: default;
+}
+
+.user-dropdown-divider:hover {
+  background-color: #e5e7eb;
+}
+
+.action-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 12px;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.logout-item {
+  color: #dc2626;
+}
+
+.logout-item:hover {
+  background-color: #fef2f2;
+  color: #b91c1c;
 }
   

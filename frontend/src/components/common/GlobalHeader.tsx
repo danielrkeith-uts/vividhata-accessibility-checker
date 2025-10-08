@@ -1,7 +1,6 @@
 import React from 'react';
 import { Logo } from './Logo';
 import { UserDropDown } from './UserDropDown';
-import { ActionsDropdown } from './ActionsDropdown';
 import './GlobalHeader.css';
 
 interface GlobalHeaderProps {
@@ -12,7 +11,7 @@ interface GlobalHeaderProps {
   isRescanning?: boolean;
   isExporting?: boolean;
   showLogoText?: boolean;
-  showActions?: boolean;
+  showDashboardActions?: boolean;
 }
 
 export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
@@ -23,7 +22,7 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
   isRescanning = false,
   isExporting = false,
   showLogoText = true,
-  showActions = false
+  showDashboardActions = false
 }) => {
   return (
     <header className="global-header" role="banner">
@@ -47,17 +46,14 @@ export const GlobalHeader: React.FC<GlobalHeaderProps> = ({
         </div>
         
         <div className="header-right">
-          {showActions && (
-            <ActionsDropdown
-              onRescan={onRescan}
-              onExportPDF={onExportPDF}
-              onScanNewSite={onScanNewSite}
-              isRescanning={isRescanning}
-              isExporting={isExporting}
-            />
-          )}
-          
-          <UserDropDown />
+          <UserDropDown
+            onRescan={onRescan}
+            onExportPDF={onExportPDF}
+            onScanNewSite={onScanNewSite}
+            isRescanning={isRescanning}
+            isExporting={isExporting}
+            showDashboardActions={showDashboardActions}
+          />
         </div>
       </div>
     </header>
