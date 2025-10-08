@@ -78,7 +78,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await loadUserSites(user.id);
     } catch (error) {
       if (error instanceof Error && error.message.includes('Unauthorized')) {
-        console.log('User not authenticated - this is normal');
         setUser(null);
         setUserSites([]);
       } else if (error instanceof Error && error.message.includes('Failed to fetch')) {
@@ -125,8 +124,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const allCriteria = Object.keys(WCAG_MAP);
     const violatedTypes = new Set(issues.map(i => i.issueType));
     
-    console.log(`🔍 All criteria: ${allCriteria.length}`);
-    console.log(`🔍 Violated types:`, Array.from(violatedTypes));
     
     const totals = {
       A: allCriteria.filter(t => WCAG_MAP[t].level === 'A').length,
@@ -146,15 +143,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       AAA: Math.max(0, totals.AAA - violated.AAA),
     };
     
-    console.log(`🔍 Totals: A=${totals.A}, AA=${totals.AA}, AAA=${totals.AAA}`);
-    console.log(`🔍 Violated: A=${violated.A}, AA=${violated.AA}, AAA=${violated.AAA}`);
-    console.log(`🔍 Passed: A=${passed.A}, AA=${passed.AA}, AAA=${passed.AAA}`);
     
     const overallTotal = totals.A + totals.AA + totals.AAA;
     const overallPassed = passed.A + passed.AA + passed.AAA;
     const complianceScore = overallTotal ? Math.round((overallPassed / overallTotal) * 100) : 0;
     
-    console.log(`🔍 Final calculation: ${overallPassed}/${overallTotal} = ${complianceScore}%`);
     return complianceScore;
   };
 
@@ -261,7 +254,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const refreshUserSites = async () => {
     // Since we only have the scan endpoint, keep sites in localStorage
     // todo: fetch sites from the API
-    console.log('User sites refreshed from localStorage');
   };
 
   const addSite = async (site: Site) => {
@@ -291,17 +283,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!user) return;
     
     try {
-      console.log(`Attempting to delete site with ID: ${siteId}`);
       
       // Delete from backend
-      await scanService.deleteWebPage(parseInt(siteId));
+      const deleteResult = await scanService.deleteWebPage(parseInt(siteId));
       
       // Remove from local state
       const updatedSites = userSites.filter(site => site.id !== siteId);
       setUserSites(updatedSites);
       saveUserSites(user.id, updatedSites);
       
-      console.log(`Successfully deleted site with ID: ${siteId}`);
+      
+      // Mark this site as deleted in localStorage to prevent it from reappearing on refresh
+      const deletedSitesKey = `deletedSites_${user.id}`;
+      const deletedSites = JSON.parse(localStorage.getItem(deletedSitesKey) || '[]');
+      if (!deletedSites.includes(siteId)) {
+        deletedSites.push(siteId);
+        localStorage.setItem(deletedSitesKey, JSON.stringify(deletedSites));
+      }
       
     } catch (error) {
       console.error('Error deleting site:', error);
@@ -309,7 +307,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // If it's a 500 error, treat it as successful deletion
       // This handles the case where backend delete fails but we want to remove from frontend
       if (error instanceof Error && error.message.includes('500')) {
-        console.log('Backend delete failed (500 error), but removing from frontend anyway');
         const updatedSites = userSites.filter(site => site.id !== siteId);
         setUserSites(updatedSites);
         saveUserSites(user.id, updatedSites);

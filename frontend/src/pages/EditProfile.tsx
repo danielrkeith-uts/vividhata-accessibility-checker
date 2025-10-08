@@ -5,6 +5,8 @@ import { Button } from "../components/common/Button";
 import { Input } from "../components/common/Input";
 import { Select } from "../components/common/Select";
 import { GlobalHeader } from "../components/common/GlobalHeader";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import "./EditProfile.css";
 
 
@@ -30,6 +32,9 @@ export const EditProfile: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Pre-populate form with current user data
   useEffect(() => {
@@ -298,24 +303,40 @@ export const EditProfile: React.FC = () => {
                   <div className="form-field">
                     <Input
                       label="Current Password"
-                      type="password"
+                      type={showCurrentPassword ? "text" : "password"}
                       value={formData.currentPassword}
                       onChange={(value) => handleInputChange("currentPassword", value)}
                       error={errors.currentPassword}
                       required
                       placeholder="Enter your current password"
+                      endAdornment={<button 
+                        type="button" 
+                        className="password-toggle"
+                        aria-label={showCurrentPassword ? "Hide password" : "Show password"}
+                        aria-pressed={showCurrentPassword}
+                        onClick={() => setShowCurrentPassword((v) => !v)}>
+                        {showCurrentPassword ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+                      </button>}
                     />
                   </div>
 
                   <div className="form-field">
                     <Input
                       label="New Password"
-                      type="password"
+                      type={showNewPassword ? "text" : "password"}
                       value={formData.newPassword}
                       onChange={(value) => handleInputChange("newPassword", value)}
                       error={errors.newPassword}
                       required
                       placeholder="Enter your new password"
+                      endAdornment={<button 
+                        type="button" 
+                        className="password-toggle"
+                        aria-label={showNewPassword ? "Hide password" : "Show password"}
+                        aria-pressed={showNewPassword}
+                        onClick={() => setShowNewPassword((v) => !v)}>
+                        {showNewPassword ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+                      </button>}
                     />
                   </div>
 
@@ -366,12 +387,20 @@ export const EditProfile: React.FC = () => {
                   <div className="form-field">
                     <Input
                       label="Confirm New Password"
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       value={formData.confirmNewPassword}
                       onChange={(value) => handleInputChange("confirmNewPassword", value)}
                       error={errors.confirmNewPassword}
                       required
                       placeholder="Confirm your new password"
+                      endAdornment={<button 
+                        type="button" 
+                        className="password-toggle"
+                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        aria-pressed={showConfirmPassword}
+                        onClick={() => setShowConfirmPassword((v) => !v)}>
+                        {showConfirmPassword ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+                      </button>}
                     />
                   </div>
                 </>

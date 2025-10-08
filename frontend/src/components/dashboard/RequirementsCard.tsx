@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Paper } from '@mui/material';
 import PurpleTooltip from '../common/PurpleTooltip';
 import { Chip } from '../common/Chip';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import './RequirementsCard.css';
+import { Lightbulb } from '@mui/icons-material';
 
 type Row = { 
   id: number; 
@@ -18,12 +21,14 @@ type Props = {
   setTab: (t: 'requirements' | 'quickfixes') => void;
   requirementsRows: Row[];
   quickWins: { id: number; text: string; count: number; priority: 'High' | 'Medium' | 'Low'; issueTypes: string[] }[];
+  isExporting?: boolean;
 };
 
-export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRows, quickWins }) => {
+export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRows, quickWins, isExporting = false }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedPriority, setSelectedPriority] = useState<string>('All');
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const [expandedCodeBlocks, setExpandedCodeBlocks] = useState<Set<string>>(new Set());
 
   const toggleRowExpansion = (rowId: number) => {
     const newExpanded = new Set(expandedRows);
@@ -33,6 +38,16 @@ export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRow
       newExpanded.add(rowId);
     }
     setExpandedRows(newExpanded);
+  };
+
+  const toggleCodeBlockExpansion = (codeBlockId: string) => {
+    const newExpanded = new Set(expandedCodeBlocks);
+    if (newExpanded.has(codeBlockId)) {
+      newExpanded.delete(codeBlockId);
+    } else {
+      newExpanded.add(codeBlockId);
+    }
+    setExpandedCodeBlocks(newExpanded);
   };
 
   // Map current categories to WCAG principles
@@ -107,7 +122,7 @@ export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRow
         
         {/* Tabs and filters in the same row */}
         <div className="tabs-filters-row">
-          <div className="tabs">
+        <div className="tabs">
             <Chip 
               variant={tab === 'requirements' ? 'purple' : 'default'}
               size="small"
@@ -175,22 +190,28 @@ export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRow
                   </div>
                   <div>
                     <PurpleTooltip title={wcagCategoryTooltips[wcagCategory]} placement="top" arrow>
-                      <div>
-                        <Chip variant={
-                          wcagCategory === 'Perceivable' ? 'purple' :
-                          wcagCategory === 'Operable' ? 'blue' :
-                          wcagCategory === 'Understandable' ? 'orange' : 'gray'
-                        }>
+              <div>
+                        <Chip 
+                          variant={
+                            wcagCategory === 'Perceivable' ? 'purple' :
+                            wcagCategory === 'Operable' ? 'blue' :
+                            wcagCategory === 'Understandable' ? 'orange' : 'gray'
+                          }
+                          style={{ height: '20px', minHeight: '20px', fontSize: '11px', padding: '0 12px' }}
+                        >
                           {wcagCategory}
                         </Chip>
                       </div>
                     </PurpleTooltip>
-                  </div>
-                  <div>
+              </div>
+              <div>
                     <PurpleTooltip title={priorityTooltips[r.level]} placement="top" arrow>
                       <div>
-                        <Chip variant={r.level === 'A' ? 'green' : r.level === 'AA' ? 'orange' : 'red'}>
-                          Level {r.level}
+                        <Chip 
+                          variant={r.level === 'A' ? 'green' : r.level === 'AA' ? 'orange' : 'red'}
+                          style={{ height: '20px', minHeight: '20px', fontSize: '11px', padding: '0 12px' }}
+                        >
+                  Level {r.level}
                         </Chip>
                       </div>
                     </PurpleTooltip>
@@ -202,27 +223,119 @@ export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRow
                       arrow
                     >
                       <div>
-                        <Chip variant="blue">{r.count} violation{r.count !== 1 ? 's' : ''}</Chip>
+                        <Chip 
+                          variant="blue"
+                          style={{ height: '20px', minHeight: '20px', fontSize: '11px', padding: '0 12px' }}
+                        >
+                          {r.count} violation{r.count !== 1 ? 's' : ''}
+                        </Chip>
                       </div>
                     </PurpleTooltip>
                   </div>
                 </div>
                 {isExpanded && (
-                  <div className="expanded-content">
-                    <div style={{ marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                      Found {r.count} violation{r.count !== 1 ? 's' : ''}:
-                    </div>
-                    {r.issues.map((issue, idx) => (
-                      <div key={idx} className="violation-item">
-                        <div className="violation-header">
-                          Violation #{idx + 1} - {issue.issueType}
-                        </div>
-                        <div className="code-block">
-                          <pre>{issue.htmlSnippet}</pre>
-                        </div>
+                  <>
+                    <div className="expanded-content">
+                      <div style={{ marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)', textAlign: 'left' }}>
+                        Found {r.count} violation{r.count !== 1 ? 's' : ''}:
                       </div>
-                    ))}
-                  </div>
+                    {r.issues && r.issues.length > 0 ? (
+                      <>
+                        {!isExporting && r.issues.length > 10 && (
+                          <div style={{ padding: '8px', background: '#f0f0f0', borderRadius: '4px', marginBottom: '8px', fontSize: '12px', color: '#666' }}>
+                            Showing first 10 of {r.issues.length} violations. Large datasets are truncated for performance.
+                            <br />
+                             <strong><Lightbulb fontSize='small' sx={{ verticalAlign: 'top'}}/> Tip:</strong> Export to PDF to see all {r.issues.length} violations with complete details.
+                          </div>
+                        )}
+                        {(isExporting ? r.issues : r.issues.slice(0, 10)).map((issue, idx) => {
+                          try {
+                            const codeBlockId = `${r.id}-${idx}`;
+                            const isCodeExpanded = expandedCodeBlocks.has(codeBlockId);
+                            
+                            // Count lines in the snippet
+                            const lineCount = issue.htmlSnippet ? issue.htmlSnippet.split('\n').length : 0;
+                            const hasScrollableContent = lineCount > 3; // Expand for anything over 3 lines
+                            
+                            // Clean up the snippet - remove extra blank lines
+                            const cleanedSnippet = issue.htmlSnippet 
+                              ? issue.htmlSnippet
+                                  .split('\n')
+                                  .filter(line => line.trim() !== '') // Remove empty lines
+                                  .join('\n')
+                              : '';
+                            
+                            // Truncate very large snippets to prevent performance issues
+                            const maxSnippetLength = isExporting ? 50000 : 5000; // 50KB limit for PDF, 5KB for web
+                            const displaySnippet = cleanedSnippet && cleanedSnippet.length > maxSnippetLength 
+                              ? cleanedSnippet.substring(0, maxSnippetLength) + '\n\n... [Content truncated for performance - ' + (cleanedSnippet.length - maxSnippetLength) + ' characters omitted]'
+                              : cleanedSnippet;
+                          
+                          return (
+                          <div key={idx} className="violation-item">
+                            <div className="violation-header" style={{ textAlign: 'left', fontFamily: 'inherit', fontWeight: 'bold', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span>Violation #{idx + 1} - {issue.issueType}</span>
+                              {hasScrollableContent && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <Chip 
+                                    variant="blue"
+                                    onClick={() => toggleCodeBlockExpansion(codeBlockId)}
+                                    style={{ cursor: 'pointer', fontSize: '10px', padding: '0 8px', height: '18px', minHeight: '18px' }}
+                                  >
+                                    {isCodeExpanded ? (
+                                      <>
+                                        <ArrowDropUpIcon style={{ fontSize: '12px', marginRight: '2px' }} />
+                                        Collapse
+                                      </>
+                                    ) : (
+                                      <>
+                                        <ArrowDropDownIcon style={{ fontSize: '12px', marginRight: '2px' }} />
+                                        Expand
+                                      </>
+                                    )}
+                                  </Chip>
+                                </div>
+                              )}
+                            </div>
+                            <div className="code-block-container">
+                              <div 
+                                className={`code-block ${isCodeExpanded ? 'expanded' : ''}`} 
+                                style={{ 
+                                  textAlign: 'left', 
+                                  fontFamily: 'Monaco, Menlo, Ubuntu Mono, Consolas, Courier New, monospace',
+                                  maxHeight: isCodeExpanded ? 'none' : '100px'
+                                }}
+                              >
+                                <pre style={{ textAlign: 'left', fontFamily: 'Monaco, Menlo, Ubuntu Mono, Consolas, Courier New, monospace', margin: 0, whiteSpace: 'pre-line' }}>
+                                  {displaySnippet}
+                                </pre>
+                              </div>
+                            </div>
+                          </div>
+                          );
+                        } catch (error) {
+                          console.error(`Error rendering violation ${idx} for requirement ${r.id}:`, error);
+                          console.error('Issue data:', issue);
+                          return (
+                            <div key={idx} className="violation-item">
+                              <div className="violation-header" style={{ textAlign: 'left', fontFamily: 'inherit', fontWeight: 'bold' }}>
+                                Error rendering violation #{idx + 1} - {issue.issueType || 'Unknown'}
+                              </div>
+                              <div style={{ color: 'red', fontSize: '12px', padding: '8px' }}>
+                                Error: {error instanceof Error ? error.message : 'Unknown error'}
+                              </div>
+                            </div>
+                          );
+                        }
+                      })}
+                      </>
+                    ) : (
+                      <div style={{ textAlign: 'left', fontFamily: 'inherit', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                        No specific violations found for this requirement.
+                      </div>
+                    )}
+                    </div>
+                  </>
                 )}
               </div>
             );
@@ -246,18 +359,28 @@ export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRow
                     {isQuickWin ? (
                       <PurpleTooltip title="This is a high-impact fix that affects multiple issues and can significantly improve your accessibility score." placement="top" arrow>
                         <div>
-                          <Chip variant="green">Quick Win</Chip>
+                          <Chip 
+                            variant="green"
+                            style={{ height: '20px', minHeight: '20px', fontSize: '11px', padding: '0 12px' }}
+                          >
+                            Quick Win
+                          </Chip>
                         </div>
                       </PurpleTooltip>
                     ) : (
                       <PurpleTooltip title={`Implementing this fix could improve your accessibility score by approximately ${impactPercentage}%.`} placement="top" arrow>
                         <div>
-                          <Chip variant="blue">+{impactPercentage}%</Chip>
+                          <Chip 
+                            variant="blue"
+                            style={{ height: '20px', minHeight: '20px', fontSize: '11px', padding: '0 12px' }}
+                          >
+                            +{impactPercentage}%
+                          </Chip>
                         </div>
                       </PurpleTooltip>
                     )}
                   </div>
-                </div>
+              </div>
               );
             })
           )}

@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "../components/common/Button";
 import { Input } from "../components/common/Input";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import "./LoginPage.css";
 
 export const LoginPage: React.FC = () => {
@@ -16,6 +18,7 @@ export const LoginPage: React.FC = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -99,7 +102,7 @@ export const LoginPage: React.FC = () => {
           <div className="form-row">
             <Input
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={(value) => handleInputChange("password", value)}
               error={errors.password}
@@ -107,6 +110,14 @@ export const LoginPage: React.FC = () => {
               fullWidth
               autoComplete="current-password"
               placeholder="Enter your password"
+              endAdornment={<button 
+                type="button" 
+                className="password-toggle"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+                onClick={() => setShowPassword((v) => !v)}>
+                {showPassword ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+              </button>}
             />
           </div>
           <div className="form-row">

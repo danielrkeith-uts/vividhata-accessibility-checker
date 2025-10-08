@@ -6,7 +6,6 @@ import { scanService } from "../services/scan/scanService";
 import "./DashboardPage.css";
 import { Button } from "../components/common/Button";
 import { useParams, Navigate, useNavigate } from "react-router-dom";
-import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import PurpleTooltip from "../components/common/PurpleTooltip";
 import PageStatsCard from '../components/dashboard/PageStatsCard';
@@ -101,9 +100,62 @@ export const DashboardPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="dashboard-page">
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-          <h2>Loading dashboard data...</h2>
+        <GlobalHeader />
+        <main className="dashboard-main">
+          <div className="dashboard-two-col">
+            <div className="left-column">
+              {/* Page Stats Card Skeleton */}
+              <div className="card skeleton-card">
+                <div className="skeleton-content">
+                  <div className="skeleton-donut"></div>
+                  <div className="skeleton-indicators">
+                    <div className="skeleton-indicator"></div>
+                    <div className="skeleton-indicator"></div>
+                    <div className="skeleton-indicator"></div>
+                    <div className="skeleton-indicator"></div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Requirements Card Skeleton */}
+              <div className="card skeleton-card">
+                <div className="skeleton-header">
+                  <div className="skeleton-title"></div>
+                  <div className="skeleton-tabs">
+                    <div className="skeleton-tab"></div>
+                    <div className="skeleton-tab"></div>
+                  </div>
+                </div>
+                <div className="skeleton-table">
+                  <div className="skeleton-row"></div>
+                  <div className="skeleton-row"></div>
+                  <div className="skeleton-row"></div>
+                  <div className="skeleton-row"></div>
+                  <div className="skeleton-row"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="right-column">
+              {/* Compliance Column Skeleton */}
+              <div className="card skeleton-card">
+                <div className="skeleton-title"></div>
+                <div className="skeleton-compliance">
+                  <div className="skeleton-compliance-item"></div>
+                  <div className="skeleton-compliance-item"></div>
+                  <div className="skeleton-compliance-item"></div>
+                </div>
+              </div>
+              
+              <div className="card skeleton-card">
+                <div className="skeleton-title"></div>
+                <div className="skeleton-text"></div>
+                <div className="skeleton-text"></div>
+                <div className="skeleton-link"></div>
+              </div>
+            </div>
         </div>
+        </main>
       </div>
     );
   }
@@ -267,135 +319,180 @@ export const DashboardPage: React.FC = () => {
     });
 
   const handleExportToPDF = async () => {
-    if (!pdfRef.current) return;
+    setIsExporting(true);
 
     const overlay = document.createElement("div");
     overlay.className = "export-overlay";
-    overlay.innerHTML = "<div class='spinner'></div><p>Generating PDF...</p>";
+    overlay.innerHTML = "<div class='spinner'></div><p>Generating Accessibility Report...</p>";
     document.body.appendChild(overlay);
 
     try {
-      const printable = document.createElement("div");
-      printable.className = "pdf-root";
-      document.body.appendChild(printable);
+      const pdf = new jsPDF({ orientation: "p", unit: "mm", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 15;
+      let yPosition = margin;
 
-      const title = document.createElement("div");
-      title.className = "pdf-title";
-      title.innerHTML = `
-        <h1>Accessibility Report for ${currentSite.name}</h1>
-        <p>${websiteUrl}</p>
-        <p style="font-size:11px;color:#777;margin-top:4px;">
-          Generated on ${new Date().toLocaleDateString()}
-        </p>
-      `;
-      printable.appendChild(title);
+      // Helper function to add text with word wrapping
+      const addText = (text: string, fontSize: number = 12, isBold: boolean = false) => {
+        pdf.setFontSize(fontSize);
+        pdf.setFont("helvetica", isBold ? "bold" : "normal");
+        
+        const lines = pdf.splitTextToSize(text, pageWidth - (margin * 2));
+        const lineHeight = fontSize * 0.4;
+        
+        for (const line of lines) {
+          if (yPosition + lineHeight > pageHeight - margin) {
+            pdf.addPage();
+            yPosition = margin;
+          }
+          pdf.text(line, margin, yPosition);
+          yPosition += lineHeight;
+        }
+        yPosition += lineHeight * 0.5; // Add some spacing
+      };
 
-      const clone = pdfRef.current.cloneNode(true) as HTMLDivElement;
+      // Helper function to add a new page if needed
+      const checkNewPage = (requiredSpace: number = 10) => {
+        if (yPosition + requiredSpace > pageHeight - margin) {
+          pdf.addPage();
+          yPosition = margin;
+        }
+      };
 
-      clone.querySelector(".dashboard-rescan-button-container")?.remove();
+      // Report Header
+      pdf.setFillColor(74, 85, 104);
+      pdf.rect(0, 0, pageWidth, 25, 'F');
+      
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(20);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Accessibility Report", margin, 15);
+      
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(`Website: ${websiteUrl}`, margin, 22);
+      
+      yPosition = 35;
 
-      clone.querySelectorAll("[data-pdf-expand]").forEach((el: Element) => {
-        const e = el as HTMLElement;
-        e.style.maxHeight = "none";
-        e.style.overflow = "visible";
+      // Executive Summary
+      pdf.setTextColor(0, 0, 0);
+      addText("EXECUTIVE SUMMARY", 16, true);
+      
+      const totalIssues = scanData?.issues?.length || 0;
+      const totalRequirements = requirementsRows.length;
+      const violatedRequirements = requirementsRows.filter(r => r.count > 0).length;
+      
+      addText(`Overall Accessibility Score: ${complianceScore}%`, 14, true);
+      addText(`Total Issues Found: ${totalIssues}`, 12);
+      addText(`Requirements Violated: ${violatedRequirements} out of ${totalRequirements}`, 12);
+      addText(`Scan Date: ${new Date().toLocaleDateString()}`, 12);
+
+      // Compliance Breakdown
+      checkNewPage(20);
+      addText("COMPLIANCE BREAKDOWN", 16, true);
+      
+      const complianceData = [
+        { level: "A", passed: passed.A, total: totals.A, color: [34, 197, 94] },
+        { level: "AA", passed: passed.AA, total: totals.AA, color: [249, 115, 22] },
+        { level: "AAA", passed: passed.AAA, total: totals.AAA, color: [239, 68, 68] }
+      ];
+
+      complianceData.forEach(({ level, passed, total, color }) => {
+        const percentage = total > 0 ? Math.round((passed / total) * 100) : 100;
+        addText(`Level ${level}: ${passed}/${total} requirements met (${percentage}%)`, 12);
       });
 
-      printable.appendChild(clone);
+      // Detailed Violations Report
+      checkNewPage(30);
+      addText("DETAILED VIOLATIONS REPORT", 16, true);
+      
+      // Group violations by requirement
+      const violationsByRequirement = requirementsRows
+        .filter(r => r.count > 0)
+        .sort((a, b) => b.count - a.count);
 
-      await new Promise((r) => requestAnimationFrame(r));
-
-      const pdf = new jsPDF({ orientation: "p", unit: "px", format: "a4" });
-      const pageW = pdf.internal.pageSize.getWidth();
-      const pageH = pdf.internal.pageSize.getHeight();
-      const margin = 20;
-
-      const blocks = Array.from(
-        printable.querySelectorAll(
-          ".pdf-title, .dashboard-two-col"
-        )
-      ) as HTMLElement[];
-
-      let cursorY = margin;
-
-      for (let i = 0; i < blocks.length; i++) {
-        const block = blocks[i];
-        block.style.width = `${printable.clientWidth}px`;
-
-        const canvas = await html2canvas(block, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          windowWidth: printable.scrollWidth,
-        });
-
-        const imgData = canvas.toDataURL("image/png");
-        const imgProps = pdf.getImageProperties(imgData);
-
-        let imgW = (pageW - margin * 2) * 0.75;
-        let imgH = (imgProps.height * imgW) / imgProps.width;
-
-        if (imgH > pageH - margin * 2) {
-          let y = 0;
-          while (y < imgProps.height) {
-            const sliceHeight = Math.min(
-              imgProps.height - y,
-              (pageH - margin * 2) * (imgProps.width / imgW)
-            );
-
-            const sliceCanvas = document.createElement("canvas");
-            sliceCanvas.width = imgProps.width;
-            sliceCanvas.height = sliceHeight;
-
-            const ctx = sliceCanvas.getContext("2d");
-            if (ctx) {
-              ctx.drawImage(
-                canvas,
-                0,
-                y,
-                imgProps.width,
-                sliceHeight,
-                0,
-                0,
-                imgProps.width,
-                sliceHeight
-              );
+      violationsByRequirement.forEach((requirement, reqIndex) => {
+        checkNewPage(25);
+        
+        // Requirement header
+        addText(`${reqIndex + 1}. ${requirement.text}`, 14, true);
+        addText(`Level: ${requirement.level} | Category: ${requirement.category}`, 10);
+        addText(`Violations Found: ${requirement.count}`, 12, true);
+        
+        // List all violations for this requirement
+        if (requirement.issues && requirement.issues.length > 0) {
+          requirement.issues.forEach((issue, issueIndex) => {
+            checkNewPage(15);
+            addText(`Violation ${issueIndex + 1}: ${issue.issueType}`, 12, true);
+            
+            // Add code snippet (truncated for PDF)
+            if (issue.htmlSnippet) {
+              const maxSnippetLength = 2000; // 2KB limit for PDF
+              const snippet = issue.htmlSnippet.length > maxSnippetLength 
+                ? issue.htmlSnippet.substring(0, maxSnippetLength) + "... [truncated]"
+                : issue.htmlSnippet;
+              
+              // Clean up snippet
+              const cleanedSnippet = snippet
+                .split('\n')
+                .filter((line: string) => line.trim() !== '')
+                .join('\n');
+              
+              addText("Code:", 10, true);
+              pdf.setFont("courier", "normal");
+              pdf.setFontSize(8);
+              const codeLines: string[] = pdf.splitTextToSize(cleanedSnippet, pageWidth - (margin * 2));
+              
+              for (const line of codeLines) {
+                checkNewPage(5);
+                pdf.text(line, margin + 5, yPosition);
+                yPosition += 3;
+              }
+              
+              pdf.setFont("helvetica", "normal");
+              pdf.setFontSize(12);
+              yPosition += 5;
             }
-
-            const sliceData = sliceCanvas.toDataURL("image/png");
-            const sliceH = (sliceHeight * imgW) / imgProps.width;
-
-            if (cursorY + sliceH > pageH - margin) {
-              pdf.addPage();
-              cursorY = margin;
-            }
-
-            const x = margin + (pageW - margin * 2 - imgW) / 2;
-            pdf.addImage(sliceData, "PNG", x, cursorY, imgW, sliceH);
-
-            cursorY += sliceH + margin;
-            y += sliceHeight;
-          }
-        } else {
-          if (cursorY + imgH > pageH - margin) {
-            pdf.addPage();
-            cursorY = margin;
-          }
-
-          const x = margin + (pageW - margin * 2 - imgW) / 2;
-          pdf.addImage(imgData, "PNG", x, cursorY, imgW, imgH);
-          cursorY += imgH + margin;
+          });
         }
+        
+        yPosition += 5; // Space between requirements
+      });
+
+      // Quick Wins Section
+      if (quickWins.length > 0) {
+        checkNewPage(30);
+        addText("RECOMMENDED QUICK WINS", 16, true);
+        
+        quickWins.forEach((quickWin, index) => {
+          checkNewPage(15);
+          addText(`${index + 1}. ${quickWin.text}`, 12, true);
+          addText(`Priority: ${quickWin.priority} | Affects ${quickWin.count} issues`, 10);
+        });
       }
 
-      const safe = currentSite.name.replace(/[^\w\-]+/g, "_");
-      const dateStr = new Date().toISOString().slice(0, 10);
-      pdf.save(`${safe}-dashboard-${dateStr}.pdf`);
+      // Footer
+      const totalPages = pdf.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(8);
+        pdf.setTextColor(128, 128, 128);
+        pdf.text(`Page ${i} of ${totalPages}`, pageWidth - 30, pageHeight - 5);
+        pdf.text(`Generated by Vividhata Accessibility Checker`, margin, pageHeight - 5);
+      }
+
+      // Save the PDF
+      const safe = websiteUrl.replace(/[^a-zA-Z0-9]/g, '-');
+      const dateStr = new Date().toISOString().split('T')[0];
+      pdf.save(`${safe}-accessibility-report-${dateStr}.pdf`);
+
     } catch (err) {
       console.error("Export to PDF failed:", err);
-      alert("Sorry, something went wrong while exporting the PDF.");
+      alert("Sorry, something went wrong while generating the accessibility report.");
     } finally {
-      document.querySelector(".export-overlay")?.remove();
-      document.querySelector(".pdf-root")?.remove();
+      setIsExporting(false);
+      document.body.removeChild(overlay);
     }
   };
 
@@ -482,7 +579,7 @@ export const DashboardPage: React.FC = () => {
           isRescanning={isRescanning}
           isExporting={isExporting}
           showLogoText={false}
-          showActions={true}
+          showDashboardActions={true}
         />
       )}
   
@@ -507,6 +604,7 @@ export const DashboardPage: React.FC = () => {
               setTab={setRequirementsTab}
               requirementsRows={requirementsRows}
               quickWins={quickWins}
+              isExporting={isExporting}
             />
           </div>
           <ComplianceColumn pct={pct} passed={passed} totals={totals} />

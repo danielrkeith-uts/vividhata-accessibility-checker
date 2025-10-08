@@ -2,11 +2,9 @@
 import { apiService } from './apiService';
 
 export const testApiConnection = async () => {
-  console.log('Testing API connection...');
   
   try {
     // Test basic connectivity
-    console.log('Testing basic connectivity...');
     const response = await fetch('http://localhost:8080/api/account/me', {
       credentials: 'include'
     });
@@ -24,7 +22,6 @@ export const testApiConnection = async () => {
 };
 
 export const testScanEndpoint = async () => {
-  console.log('Testing scan endpoint...');
   
   try {
     // Test scan endpoint (this will fail without authentication, but we can check if it's reachable)
@@ -38,21 +35,15 @@ export const testScanEndpoint = async () => {
     });
     
     if (response.status === 401) {
-      console.log('Scan endpoint is reachable - got expected 401 (not authenticated)');
       return true;
     } else if (response.status === 502) {
-      console.log('Scan endpoint returned 502 - this is expected when not authenticated');
-      console.log('To use scan functionality, please log in first through the frontend');
       return true; // Still consider this a success since the endpoint is reachable
     } else if (response.ok) {
-      console.log('Scan endpoint is working');
       return true;
     } else {
-      console.log(`Scan endpoint responded with status: ${response.status}`);
       return false;
     }
   } catch (error) {
-    console.log('Scan endpoint test failed:', error);
     return false;
   }
 };
