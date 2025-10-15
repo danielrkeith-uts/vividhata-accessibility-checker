@@ -43,10 +43,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
   
   const [userSites, setUserSites] = useState<Site[]>([]);
   
@@ -69,8 +66,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const user: User = {
         id: userData.id.toString(),
         email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || '',
         ocupation: '',
         purpose: ''
       };
@@ -78,8 +75,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await loadUserSites(user.id);
     } catch (error) {
       if (error instanceof Error && error.message.includes('Unauthorized')) {
+        // Session expired or not authenticated - clear state
         setUser(null);
         setUserSites([]);
+        localStorage.removeItem("user");
       } else if (error instanceof Error && error.message.includes('Failed to fetch')) {
         console.error('Network error - backend may not be running');
         setUser(null);
@@ -238,8 +237,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const user: User = {
         id: userData.id.toString(),
         email: userData.email,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || '',
         ocupation: '',
         purpose: ''
       };
@@ -248,6 +247,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await loadUserSites(user.id);
     } catch (error) {
       console.error('Error refreshing user data:', error);
+      // If refresh fails due to auth issues, clear state
+      if (error instanceof Error && error.message.includes('Unauthorized')) {
+        setUser(null);
+        setUserSites([]);
+        localStorage.removeItem("user");
+      }
     }
   };
 
@@ -264,12 +269,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUserSites(updatedSites);
     saveUserSites(user.id, updatedSites);
     
-    // Refresh from backend to get the actual data
-    try {
-      await loadUserSites(user.id);
-    } catch (error) {
-      console.error('Error refreshing sites after adding:', error);
-    }
+    // Don't immediately refresh from backend - site added locally first
+    // The backend refresh later or triggered by user action
   };
 
   const removeSite = (siteId: string) => {
@@ -305,7 +306,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Error deleting site:', error);
       
       // If it's a 500 error, treat it as successful deletion
-      // This handles the case where backend delete fails but we want to remove from frontend
+      // Handles the case where backend delete fails but we want to remove from frontend
       if (error instanceof Error && error.message.includes('500')) {
         const updatedSites = userSites.filter(site => site.id !== siteId);
         setUserSites(updatedSites);
@@ -359,12 +360,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       setUserSites([]); 
       localStorage.removeItem("user");
+      // Clear all user-specific localStorage data
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith('userSites_') || key.startsWith('deletedSites_')) {
+          localStorage.removeItem(key);
+        }
+      });
     }
   };
 
   useEffect(() => {
     checkAuthStatus();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (user) {
