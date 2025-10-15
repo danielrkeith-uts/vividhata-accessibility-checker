@@ -59,7 +59,9 @@ public class AccountController {
     public ResponseEntity<Map<String, Object>> getCurrentUser(@AuthenticationPrincipal Account account) {
         return ResponseEntity.ok(Map.of(
                 "email", account.email(),
-                "id", account.id()
+                "id", account.id(),
+                "firstName", account.firstName(),
+                "lastName", account.lastName()
         ));
     }
 

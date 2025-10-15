@@ -20,17 +20,11 @@ import { ThemeProvider } from "./context/ThemeProvider";
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { isAuthenticated, isLoading, userSites } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  const getInitialRedirectPath = () => {
-    if (!isAuthenticated) return "/login";
-    if (userSites.length > 0) return "/manage-sites";
-    return "/enter-url";
-  };
 
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 };
@@ -40,7 +34,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
 // Main App Routes
 const AppRoutes: React.FC = () => {
   
-  const { isAuthenticated, userSites } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <Routes>
@@ -48,11 +42,7 @@ const AppRoutes: React.FC = () => {
         path="/login"
         element={
           isAuthenticated ? (
-            userSites.length > 0 ? (
-              <Navigate to="/manage-sites" replace />
-            ) : (
-              <Navigate to="/enter-url" replace />
-            )
+            <Navigate to="/manage-sites" replace />
           ) : (
             <LoginPage />
           )
@@ -62,11 +52,7 @@ const AppRoutes: React.FC = () => {
         path="/register"
         element={
           isAuthenticated ? (
-            userSites.length > 0 ? (
-              <Navigate to="/manage-sites" replace />
-            ) : (
-              <Navigate to="/enter-url" replace />
-            )
+            <Navigate to="/manage-sites" replace />
           ) : (
             <RegisterPage />
           )
@@ -110,11 +96,7 @@ const AppRoutes: React.FC = () => {
         path="/"
         element={
           isAuthenticated ? (
-            userSites.length > 0 ? (
-              <Navigate to="/manage-sites" replace />
-            ) : (
-              <Navigate to="/enter-url" replace />
-            )
+            <Navigate to="/manage-sites" replace />
           ) : (
             <Navigate to="/login" replace />
           )
