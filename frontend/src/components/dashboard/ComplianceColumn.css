@@ -2,7 +2,6 @@
 .right-column {
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
 .card-title {
@@ -112,7 +111,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
 }
 
 .wcag-title {

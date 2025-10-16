@@ -114,11 +114,19 @@
 
 /* Expanded content styles */
 .requirements-table .expanded-content {
+  display: grid;
+  grid-template-columns: 1fr 120px 100px 120px;
+  gap: 0px;
   padding: 12px 16px;
   background: var(--panel-bg);
   border-top: 1px solid var(--panel-border);
   text-align: left;
   font-family: inherit;
+}
+
+.requirements-table .expanded-content .expanded-content-main {
+  grid-column: 1 / -1; /* Span all columns */
+  padding: 0;
 }
 
 .requirements-table .violation-item {
