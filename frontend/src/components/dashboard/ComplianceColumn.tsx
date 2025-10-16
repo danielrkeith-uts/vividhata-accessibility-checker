@@ -2,6 +2,7 @@ import React from 'react';
 import { Stack, Paper } from '@mui/material';
 import PurpleTooltip from '../common/PurpleTooltip';
 import { Chip } from '../common/Chip';
+import WCAGExplanationCards from './WCAGExplanationCards';
 import './ComplianceColumn.css';
 
 type Props = {
@@ -85,6 +86,8 @@ export const ComplianceColumn: React.FC<Props> = ({ pct, passed, totals }) => {
           </a>
         </div>
       </Paper>
+
+      <WCAGExplanationCards />
     </Stack>
   );
 };

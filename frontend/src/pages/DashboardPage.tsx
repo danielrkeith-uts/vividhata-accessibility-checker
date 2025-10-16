@@ -641,6 +641,7 @@ export const DashboardPage: React.FC = () => {
           </div>
           <ComplianceColumn pct={pct} passed={passed} totals={totals} />
         </div>
+        
       </main>
     </div>
   );

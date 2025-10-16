@@ -49,6 +49,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   
   const [isLoading, setIsLoading] = useState(true);
 
+  // Clear only userSites_ on startup to remove any large data, but keep deletedSites_ to prevent reappearing
+  useEffect(() => {
+    try {
+      const keys = Object.keys(localStorage);
+      keys.forEach(key => {
+        if (key.startsWith('userSites_')) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (error) {
+      console.warn('Could not clear localStorage:', error);
+    }
+  }, []);
+
   const updateSiteComplianceScore = (siteId: string, score: number) => {
     setUserSites(prev => 
       prev.map(site => 
@@ -229,9 +243,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       setUserSites(sites);
       
-      // Also save to localStorage as backup
-      const userSpecificKey = `userSites_${userId}`;
-      localStorage.setItem(userSpecificKey, JSON.stringify(sites));
+      // Also save to localStorage as backup (using minimal data)
+      saveUserSites(userId, sites);
     } catch (error) {
       console.error('Error loading user sites:', error);
       // Fallback to localStorage if backend fails
@@ -244,7 +257,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const saveUserSites = (userId: string, sites: Site[]) => {
     const userSpecificKey = `userSites_${userId}`;
-    localStorage.setItem(userSpecificKey, JSON.stringify(sites));
+    // Store only essential data to avoid localStorage quota issues
+    const minimalSites = sites.map(site => ({
+      id: site.id,
+      url: site.url,
+      name: site.name,
+      lastScanned: site.lastScanned,
+      complianceScore: site.complianceScore
+      // Don't store scanData - it's too large and can be fetched when needed
+    }));
+    
+    try {
+      localStorage.setItem(userSpecificKey, JSON.stringify(minimalSites));
+    } catch (error) {
+      if (error instanceof Error && error.name === 'QuotaExceededError') {
+        console.warn('localStorage quota exceeded, clearing old data');
+        // Clear all user-specific localStorage data
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+          if (key.startsWith('userSites_') || key.startsWith('deletedSites_')) {
+            localStorage.removeItem(key);
+          }
+        });
+        // Try again with just the current sites
+        try {
+          localStorage.setItem(userSpecificKey, JSON.stringify(minimalSites));
+        } catch (retryError) {
+          console.error('Still unable to save to localStorage after clearing:', retryError);
+        }
+      } else {
+        console.error('Error saving to localStorage:', error);
+      }
+    }
   };
 
   const refreshUserData = async () => {
