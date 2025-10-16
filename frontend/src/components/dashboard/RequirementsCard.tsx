@@ -236,9 +236,10 @@ export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRow
                 {isExpanded && (
                   <>
                     <div className="expanded-content">
-                      <div style={{ marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)', textAlign: 'left' }}>
-                        Found {r.count} violation{r.count !== 1 ? 's' : ''}:
-                      </div>
+                      <div className="expanded-content-main">
+                        <div style={{ marginBottom: '8px', fontWeight: '600', color: 'var(--text-primary)', textAlign: 'left' }}>
+                          Found {r.count} violation{r.count !== 1 ? 's' : ''}:
+                        </div>
                     {r.issues && r.issues.length > 0 ? (
                       <>
                         {!isExporting && r.issues.length > 10 && (
@@ -334,6 +335,7 @@ export const RequirementsCard: React.FC<Props> = ({ tab, setTab, requirementsRow
                         No specific violations found for this requirement.
                       </div>
                     )}
+                      </div>
                     </div>
                   </>
                 )}

@@ -200,6 +200,20 @@ export const DashboardPage: React.FC = () => {
     CLEAR_PAGE_TITLES: { id: '2.4.2', name: 'Page Titled', level: 'A', principle: 'Operable' },
     FOCUS_ORDER_LOGICAL: { id: '2.4.3', name: 'Focus Order', level: 'A', principle: 'Operable' },
     DESCRIPTIVE_LINK_TEXT: { id: '2.4.4', name: 'Link Purpose (In Context)', level: 'A', principle: 'Operable' },
+    ARIA_ROLE_MISSING_OR_INVALID: { id: '4.1.2', name: 'Name, Role, Value', level: 'A', principle: 'Robust' },
+    COMPONENTS_NOT_CONSISTENT: { id: '3.2.4', name: 'Consistent Identification', level: 'AA', principle: 'Understandable' },
+    LANGUAGE_NOT_DEFINED: { id: '3.1.1', name: 'Language of Page', level: 'A', principle: 'Understandable' },
+    NO_DRAG_DROP_ALTERNATIVE: { id: '2.5.7', name: 'Dragging Movements', level: 'A', principle: 'Operable' },
+    ERROR_SUGGESTION_NOT_PROVIDED: { id: '3.3.3', name: 'Error Suggestion', level: 'AA', principle: 'Understandable' },
+    HELP_NOT_AVAILABLE: { id: '3.3.5', name: 'Help', level: 'AA', principle: 'Understandable' },
+    ELEMENT_TOO_SMALL: { id: '2.5.5', name: 'Target Size', level: 'AA', principle: 'Operable' },
+    LABELS_OR_INSTRUCTIONS_UNCLEAR: { id: '3.3.2', name: 'Labels or Instructions', level: 'A', principle: 'Understandable' },
+    LANGUAGE_CHANGE_NOT_MARKED: { id: '3.1.2', name: 'Language of Parts', level: 'AA', principle: 'Understandable' },
+    REDUNDANT_ENTRY: { id: '3.3.4', name: 'Error Prevention (Legal, Financial, Data)', level: 'AA', principle: 'Understandable' },
+    STATUS_MESSAGE_MISSING: { id: '4.1.3', name: 'Status Messages', level: 'AA', principle: 'Robust' },
+    INVALID_HTML: { id: '4.1.1', name: 'Parsing', level: 'A', principle: 'Robust' },
+    FOCUS_NOT_VISIBLE: { id: '2.4.7', name: 'Focus Visible', level: 'AA', principle: 'Operable' },
+    FOCUS_INDICATOR_HIDDEN: { id: '2.4.7', name: 'Focus Visible', level: 'AA', principle: 'Operable' },
     MULTIPLE_WAYS_TO_NAVIGATE: { id: '2.4.5', name: 'Multiple Ways', level: 'AA', principle: 'Operable' },
   };
 
@@ -609,6 +623,7 @@ export const DashboardPage: React.FC = () => {
           </div>
           <ComplianceColumn pct={pct} passed={passed} totals={totals} />
         </div>
+        
       </main>
     </div>
   );

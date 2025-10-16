@@ -36,6 +36,18 @@ export const SiteCard: React.FC<SiteCardProps> = ({
     return 'Last scanned over a month ago';
   };
 
+  const truncateUrl = (url: string, maxLength: number = 50) => {
+    if (url.length <= maxLength) return url;
+    
+    // Remove protocol for display
+    const withoutProtocol = url.replace(/^https?:\/\//, '');
+    
+    if (withoutProtocol.length <= maxLength) return withoutProtocol;
+    
+    // Truncate and add ellipsis
+    return withoutProtocol.substring(0, maxLength - 3) + '...';
+  };
+
   const accessibilityScore = site.complianceScore || 0;
   const level = getAccessibilityLevel(accessibilityScore);
 
@@ -70,8 +82,9 @@ export const SiteCard: React.FC<SiteCardProps> = ({
               onClick={(e) => e.stopPropagation()}
               target="_blank"
               rel="noopener noreferrer"
+              title={site.url}
             >
-              {site.url}
+              {truncateUrl(site.url)}
             </a>
           </div>
         </div>
