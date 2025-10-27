@@ -7,7 +7,6 @@ All issue checkers should be located inside
 
 ## Template
 ```java
-@Service
 package co.vividhata.accessibility_api.checker.issue_checkers;
 
 import co.vividhata.accessibility_api.checker.IIssueChecker;
@@ -18,6 +17,7 @@ import org.w3c.dom.Document;
 
 import java.util.List;
 
+@Service
 public class SampleIssueChecker implements IIssueChecker {
 
     @Override
