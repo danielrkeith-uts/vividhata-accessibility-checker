@@ -45,7 +45,7 @@ public class AAATextContrastChecker implements IIssueChecker {
 
     private boolean hasTextContent(Element element) {
         String textContent = getTextContent(element).trim();
-        return !textContent.isEmpty() && textContent.length() >= 2;
+        return textContent.length() >= 2;
     }
 
     private boolean hasContrastViolation(Element element) {
@@ -55,10 +55,6 @@ public class AAATextContrastChecker implements IIssueChecker {
 
         String textColor = getTextColor(style, className, id);
         String backgroundColor = getBackgroundColor(style, className, id);
-
-        if (textColor == null || backgroundColor == null) {
-            return false;
-        }
 
         double contrastRatio = calculateContrastRatio(textColor, backgroundColor);
         
@@ -216,22 +212,12 @@ public class AAATextContrastChecker implements IIssueChecker {
 
     private String normalizeColorValue(String colorValue) {
         String lowerColor = colorValue.toLowerCase().trim();
-        
-        switch (lowerColor) {
-            case "red": return "red";
-            case "green": return "green";
-            case "blue": return "blue";
-            case "yellow": return "yellow";
-            case "orange": return "orange";
-            case "purple": return "purple";
-            case "pink": return "pink";
-            case "black": return "black";
-            case "white": return "white";
-            case "gray":
-            case "grey": return "gray";
-            default:
-                return lowerColor;
+
+        if ("grey".equals(lowerColor)) {
+            return "gray";
         }
+
+        return lowerColor;
     }
 
     private double calculateContrastRatio(String color1, String color2) {
@@ -275,9 +261,9 @@ public class AAATextContrastChecker implements IIssueChecker {
         try {
             String cleanHex = hex.replace("#", "");
             if (cleanHex.length() == 3) {
-                int r = Integer.parseInt(cleanHex.substring(0, 1) + cleanHex.substring(0, 1), 16);
-                int g = Integer.parseInt(cleanHex.substring(1, 2) + cleanHex.substring(1, 2), 16);
-                int b = Integer.parseInt(cleanHex.substring(2, 3) + cleanHex.substring(2, 3), 16);
+                int r = Integer.parseInt(cleanHex.charAt(0) + cleanHex.substring(0, 1), 16);
+                int g = Integer.parseInt(cleanHex.charAt(1) + cleanHex.substring(1, 2), 16);
+                int b = Integer.parseInt(cleanHex.charAt(2) + cleanHex.substring(2, 3), 16);
                 return new int[]{r, g, b};
             } else if (cleanHex.length() == 6) {
                 int r = Integer.parseInt(cleanHex.substring(0, 2), 16);
@@ -285,8 +271,7 @@ public class AAATextContrastChecker implements IIssueChecker {
                 int b = Integer.parseInt(cleanHex.substring(4, 6), 16);
                 return new int[]{r, g, b};
             }
-        } catch (NumberFormatException e) {
-        }
+        } catch (NumberFormatException _) { }
         
         return new int[]{0, 0, 0};
     }
