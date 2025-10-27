@@ -76,9 +76,8 @@ the accessibility of a website.
 
 ## Preparing for deployment
 If this project is to be deployed, multiple project constants may need to be converted to environment variables.
-|                              |      |
-| ---------------------------- | ---- |
 | Variable                     | File |
+| ---------------------------- | ---- |
 | `spring.datasource.url`      | `accessibility-api/src/main/resources/application.properties` |
 | `spring.datasource.username` | `accessibility-api/src/main/resources/application.properties` |
 | `FRONTEND_URL`               | `accessibility-api/src/main/java/co/vividhata/accessibility_api/config/WebSecurityConfig.java` |
