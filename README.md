@@ -1,60 +1,65 @@
 # Vividhata Accessibility Checker
 
-Accessibility Checker for Vividhata, developed in 41113 Software Development Studio
+Website accessibility checker developed for Vividhata. Designed to accept the URL of a website and check that website for WCAG violations.
 
+## Setting up project locally
 
-## Setup environment variables
-Environment variables can be set in multiple ways; pick one of the below.
+### Set environment variables
 
-These environment variables must be set to a password of your choice:
-- AC_DB_PASSWORD
-- AC_ADMIN_PASSWORD
+Environment variables can be set globally on the machine used to run the project, or
+in the run configuration used to launch the project (e.g. through IntelliJ). Research
+the correct way to set environment variables for your device or IDE.
 
-**Write these passwords down somewhere**
+The following environment variables must be set to values of your own choice:
+- `AC_DB_PASSWORD`
+- `AC_ADMIN_PASSWORD`
 
+These passwords will be used for setup later, so write them down somewhere.
 
-### Set environment variables on device
-Guide for each OS:  
-https://configu.com/blog/setting-env-variables-in-windows-linux-macos-beginners-guide/
+### Setup local PostgreSql database
+Ensure you have postgres installed and can access the `psql` command-line tool.
 
-
-### Set environment variables in IntelliJ run configuration
-Guide:  
-https://www.jetbrains.com/help/idea/program-arguments-and-environment-variables.html#environment_variables
-
-
-## Setup local PostgreSQL database
-Make sure you have postgres installed and can access the `psql` command-line tool.
-
-To log in with the admin user: `psql -U <username>`  
+Login with the admin user using `psql -U <username>`  
 *(username is* `postgres` *by default)*
 
-1. Run `CREATE USER ac_admin_local WITH PASSWORD '<AC_DB_PASSWORD>';`
-   * Replace `<AC_DB_PASSWORD>` with the password used for the corresponding environment variable
-2. Run `CREATE DATABASE accessibility_checker_local OWNER ac_admin_local;`
+Run the following to create the database, replacing `<AC_DB_PASSWORD>` with the
+corresponding environment variable.
 
-Now run the backend API, and use Postman (or some other tool) to rebuild the schema using the API:
-1. Create a `POST` request to `http://localhost:8080/api/admin/db/rebuild-schema`
-2. Include a header with key `ADMIN-AUTHENTICATION` and value `<AC_ADMIN_PASSWORD>`
-   * Replace `<AC_ADMIN_PASSWORD>` with the corresponding environment variable
-
+```sql
+CREATE USER ac_admin_local WITH PASSWORD '<AC_DB_PASSWORD>';
+CREATE DATABASE accessibility_checker_local OWNER ac_admin_local;
+```
 
 ## Running project locally
-The project will only work as intended when both the frontend and backend are running simultaneously
-
 
 ### Backend
-1. Navigate terminal to `accessibility-api`
-2. Run `mvn package`
-3. Run `java -jar target/*.jar`
+To run the backend, run the following in the root directory.
 
-Alternatively, an IntelliJ run configuration could be used
+```bash
+cd accessibility-api
+mvn package
+java -jar target/*.jar
+```
 
-This will run the backend on port 8000
+This will host the backend API at `http://localhost:8080`
 
+**If running the backend for the first time (or after a change to the DB schema),**
+call the API to build the database schema, replacing `<AC_ADMIN_PASSWORD>` with the
+corresponding environment variable.
+
+|          |     |
+| -------- | --- |
+| Method   | `POST` |
+| Endpoint | `http://localhost:8080/api/admin/db/rebuild-schema` |
+| Headers  | `ADMIN-AUTHENTICATION: <AC_ADMIN_PASSWORD>` |
 
 ### Frontend
-1. Navigate terminal to `frontend`
-2. Run  `npm install`
-3. Run `npm start`
-4. Open `http://localhost:3000`
+To run the frontend, run the following in the root directory.
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+This will host the frontend at `http://localhost:3000`
