@@ -45,7 +45,7 @@ This will host the backend API at `http://localhost:8080`
 
 **If running the backend for the first time (or after a change to the DB schema),**
 call the API to build the database schema, replacing `<AC_ADMIN_PASSWORD>` with the
-corresponding environment variable.
+corresponding environment variable. This can be done with an API tool (e.g. Postman).
 
 |          |     |
 | -------- | --- |
@@ -63,3 +63,23 @@ npm start
 ```
 
 This will host the frontend at `http://localhost:3000`
+
+## Understanding the project's structure
+This project is split into two distinct parts:
+- A backend API (built in Java using Spring Boot)
+- A frontend web app (built in TypeScript using React)
+
+Inside the backend folder (`accessibility-api`) are two more pieces of documentation:
+- `README.md` outlining how to use the API, and all of the available endpoints
+- `ImplementingIssueCheckers.md` detailing how to implement the logic which checks
+the accessibility of a website.
+
+## Preparing for deployment
+If this project is to be deployed, multiple project constants may need to be converted to environment variables.
+|                              |      |
+| ---------------------------- | ---- |
+| Variable                     | File |
+| `spring.datasource.url`      | `accessibility-api/src/main/resources/application.properties` |
+| `spring.datasource.username` | `accessibility-api/src/main/resources/application.properties` |
+| `FRONTEND_URL`               | `accessibility-api/src/main/java/co/vividhata/accessibility_api/config/WebSecurityConfig.java` |
+| `API_BASE_URL`               | `frontend/src/services/api/apiService.ts` |
