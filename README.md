@@ -1,8 +1,16 @@
 # Vividhata Accessibility Checker
 
-Website accessibility checker developed for Vividhata. Designed to accept the URL of a website and check that website for WCAG violations.
+## Project Overview
+Website accessibility checker developed for Vividhata. Designed to accept the URL of a
+website and check that website for WCAG violations.
 
 ## Setting up project locally
+
+### System dependencies
+Ensure you have the following tools installed:
+- PostgreSql
+- Maven
+- Node.js
 
 ### Set environment variables
 
@@ -47,11 +55,11 @@ This will host the backend API at `http://localhost:8080`
 call the API to build the database schema, replacing `<AC_ADMIN_PASSWORD>` with the
 corresponding environment variable. This can be done with an API tool (e.g. Postman).
 
-|          |     |
-| -------- | --- |
-| Method   | `POST` |
+|          |                                                     |
+|----------|-----------------------------------------------------|
+| Method   | `POST`                                              |
 | Endpoint | `http://localhost:8080/api/admin/db/rebuild-schema` |
-| Headers  | `ADMIN-AUTHENTICATION: <AC_ADMIN_PASSWORD>` |
+| Headers  | `ADMIN-AUTHENTICATION: <AC_ADMIN_PASSWORD>`         |
 
 ### Frontend
 To run the frontend, run the following in the root directory.
@@ -70,15 +78,20 @@ This project is split into two distinct parts:
 - A frontend web app (built in TypeScript using React)
 
 Inside the backend folder (`accessibility-api`) are two more pieces of documentation:
-- `README.md` outlining how to use the API, and all of the available endpoints
+- `README.md` outlining how to use the API, and all the available endpoints
 - `ImplementingIssueCheckers.md` detailing how to implement the logic which checks
 the accessibility of a website.
 
 ## Preparing for deployment
 If this project is to be deployed, multiple project constants may need to be converted to environment variables.
-| Variable                     | File |
-| ---------------------------- | ---- |
-| `spring.datasource.url`      | `accessibility-api/src/main/resources/application.properties` |
-| `spring.datasource.username` | `accessibility-api/src/main/resources/application.properties` |
+
+| Variable                     |  File                                                                                          |
+|------------------------------|------------------------------------------------------------------------------------------------|
+| `spring.datasource.url`      | `accessibility-api/src/main/resources/application.properties`                                  |
+| `spring.datasource.username` | `accessibility-api/src/main/resources/application.properties`                                  |
 | `FRONTEND_URL`               | `accessibility-api/src/main/java/co/vividhata/accessibility_api/config/WebSecurityConfig.java` |
-| `API_BASE_URL`               | `frontend/src/services/api/apiService.ts` |
+| `API_BASE_URL`               | `frontend/src/services/api/apiService.ts`                                                      |
+
+## Testing
+The backend unit tests are written using JUnit and are located in:
+- `accessibility-api/src/test`
