@@ -29,10 +29,27 @@ class ScanService {
       };
     } catch (error) {
       console.error('Error scanning URL:', error);
-      throw new Error(
-        `Failed to scan URL: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      let message = 'Failed to scan URL. Please try again.';
+
+      if (error instanceof Error) {
+        try {
+          const parsed = JSON.parse(error.message);
+          if (parsed && typeof parsed === 'object' && parsed.message) {
+            message = parsed.message; 
+          } else {
+            message = error.message;
+          }
+        } catch {
+          message = error.message;
+        }
+      }
+    
+      throw new Error(message); 
     }
+     // throw new Error(
+     //   `Failed to scan URL: ${error instanceof Error ? error.message : 'Unknown error'}`
+     // );
+   // }
   }
 
   // Get all web pages for the current user
