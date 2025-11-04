@@ -199,7 +199,7 @@ export const DashboardPage: React.FC = () => {
     ERROR_SUGGESTION_NOT_PROVIDED: { id: '3.3.3', name: 'Error Suggestion', level: 'AA', principle: 'Understandable' },
     FOCUS_ORDER_LOGICAL: { id: '2.4.3', name: 'Focus Order', level: 'A', principle: 'Operable' },
     HELP_NOT_AVAILABLE: { id : '3.3.5', name: 'Help', level: 'AAA', principle: 'Understandable' },
-    ELEMENT_TOO_SMALL: { id: '2.5.8', name: 'Target Size (Minimum', level: 'AA', principle: 'Operable' },
+    ELEMENT_TOO_SMALL: { id: '2.5.8', name: 'Target Size (Minimum)', level: 'AA', principle: 'Operable' },
     KEYBOARD_OPERABLE: { id: '2.1.1', name: 'Keyboard', level: 'A', principle: 'Operable' },
     LABELS_OR_INSTRUCTIONS_UNCLEAR: { id: '3.3.2', name: 'Labels or Instructions', level: 'A', principle: 'Understandable' },
     LANGUAGE_CHANGE_NOT_MARKED: { id: '3.1.2', name: 'Language of Parts', level: 'AA', principle: 'Understandable' },
