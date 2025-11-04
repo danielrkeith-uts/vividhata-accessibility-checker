@@ -126,7 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       'CONTENT_MEANINGFUL_SEQUENCE_VIOLATION': { level: 'A' },
       'LANGUAGE_NOT_DEFINED': { level: 'A' },
       'DESCRIPTIVE_LINK_TEXT': { level: 'A' },
-      'NO_DRAG_AND_DROP_ALTERNATIVE': { level: 'A' },
+      'NO_DRAG_DROP_ALTERNATIVE': { level: 'A' },
       'ERROR_SUGGESTION_NOT_PROVIDED': { level: 'AA' },
       'FOCUS_ORDER_LOGICAL': { level: 'A' },
       'HELP_NOT_AVAILABLE': { level: 'AAA' },
