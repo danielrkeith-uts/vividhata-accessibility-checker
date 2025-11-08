@@ -30,7 +30,7 @@ class ScanService {
     } catch (error) {
       console.error('Error scanning URL:', error);
       throw new Error(
-        `Failed to scan URL: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to scan URL: Make sure the URL is valid and the website allows scanning.`
       );
     }
   }
